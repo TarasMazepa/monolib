@@ -1,5 +1,5 @@
 name: monolib_dart
-description: A starting point for Dart libraries or applications.
+description: A collection of general purpose libraries for dart projects
 version: 0.0.0
 repository: https://github.com/TarasMazepa/monolib
 
