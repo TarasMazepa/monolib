@@ -1,4 +1,4 @@
-name: tag-monolib-dart
+name: tag-monolib-dart.yml
 
 on:
   push:
@@ -8,15 +8,13 @@ on:
       - 'monolib-dart/pubspec.yaml'
 
 jobs:
-  tag-version:
+  tag-monolib-dart:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # Need at least 2 commits to compare with previous
 
-      - name: Check version change and tag
-        run: .github/scripts/check-version-and-tag.sh "monolib-dart"
+      - run: .github/scripts/check-version-and-tag.sh "monolib-dart"
