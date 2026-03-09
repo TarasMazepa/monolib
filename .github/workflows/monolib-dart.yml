@@ -1,7 +1,6 @@
 name: monolib-dart.yml
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "main" ]
     paths:
