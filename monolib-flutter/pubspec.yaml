@@ -1,6 +1,6 @@
 name: monolib_flutter
-description: "A new Flutter package project."
-version: 0.0.1
+description: A collection of general purpose libraries for flutter projects
+version: 0.0.0
 homepage:
 
 environment:
