@@ -17,8 +17,8 @@ fi
 
 # Read version and package name using yq
 # Assumes standard yq binary is available (default on GitHub Actions ubuntu runner)
-VERSION=$(yq -r '.version' "$PUBSPEC_PATH")
-PACKAGE_NAME=$(yq -r '.name' "$PUBSPEC_PATH")
+VERSION=$(yq '.version' "$PUBSPEC_PATH")
+PACKAGE_NAME=$(yq '.name' "$PUBSPEC_PATH")
 
 if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
   echo "Error: Could not extract version from $PUBSPEC_PATH"

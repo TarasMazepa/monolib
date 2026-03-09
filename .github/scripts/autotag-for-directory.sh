@@ -20,11 +20,11 @@ fi
 PREV_VERSION=""
 if git rev-parse --verify HEAD^ >/dev/null 2>&1 && git ls-tree -r HEAD^ --name-only | grep -q "^${PUBSPEC_PATH}$"; then
   # Use yq to parse previous version from git show
-  PREV_VERSION=$(git show "HEAD^:${PUBSPEC_PATH}" | yq -r '.version')
+  PREV_VERSION=$(git show "HEAD^:${PUBSPEC_PATH}" | yq '.version')
 fi
 
 # Use yq to parse current version
-CURR_VERSION=$(yq -r '.version' "$PUBSPEC_PATH")
+CURR_VERSION=$(yq '.version' "$PUBSPEC_PATH")
 
 echo "Previous version: ${PREV_VERSION:-<none>}"
 echo "Current version: $CURR_VERSION"

@@ -24,29 +24,11 @@ jobs:
           fetch-depth: 0 # Need full history to list and delete tags
           token: ${{ secrets.TAGGING }}
 
-      - name: Extract version and create tag
+      - name: Create tag
         env:
           PACKAGE_DIR: ${{ github.event.inputs.directory }}
           FORCE: ${{ github.event.inputs.force }}
         run: |
-          PUBSPEC_PATH="${PACKAGE_DIR}/pubspec.yaml"
-
-          if [ ! -f "$PUBSPEC_PATH" ]; then
-            echo "Error: $PUBSPEC_PATH not found."
-            exit 1
-          fi
-
-          # Install python-yq if yq is not standard (Ubuntu runners typically have it or we can install pipx)
-          # The standard yq on ubuntu runners works differently than python-yq, but both support `.version`.
-          # Using standard binary yq which is pre-installed on GitHub Ubuntu runners
-          CURR_VERSION=$(yq -r '.version' "$PUBSPEC_PATH")
-
-          if [ -z "$CURR_VERSION" ] || [ "$CURR_VERSION" = "null" ]; then
-            echo "Error: Could not extract version from $PUBSPEC_PATH"
-            exit 1
-          fi
-
-          echo "Current version extracted: $CURR_VERSION"
           echo "Calling create-tag.sh for directory: $PACKAGE_DIR with force=$FORCE"
 
           .github/scripts/create-tag.sh "$PACKAGE_DIR" "$FORCE"
