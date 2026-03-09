@@ -1,0 +1,37 @@
+name: monolib-dart.yml
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'monolib-dart/**'
+      - '.github/workflows/monolib-dart.yml'
+  pull_request:
+    paths:
+      - 'monolib-dart/**'
+      - '.github/workflows/monolib-dart.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  monolib-dart:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: monolib-dart
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub get
+
+      - run: dart format --output=none --set-exit-if-changed .
+
+      - run: dart analyze --fatal-infos
+
+      - run: dart test
