@@ -1,27 +1,37 @@
 #!/bin/bash
 set -e
 
-TAG_NAME=$1
+PACKAGE_DIR=$1
 FORCE=$2
 
-if [ -z "$TAG_NAME" ]; then
-  echo "Usage: $0 <tag-name> [force]"
+if [ -z "$PACKAGE_DIR" ]; then
+  echo "Usage: $0 <package-dir> [force]"
   exit 1
 fi
+
+PUBSPEC_PATH="${PACKAGE_DIR}/pubspec.yaml"
+if [ ! -f "$PUBSPEC_PATH" ]; then
+  echo "Error: $PUBSPEC_PATH not found."
+  exit 1
+fi
+
+# Read version and package name using yq
+# Assumes standard yq binary is available (default on GitHub Actions ubuntu runner)
+VERSION=$(yq -r '.version' "$PUBSPEC_PATH")
+PACKAGE_NAME=$(yq -r '.name' "$PUBSPEC_PATH")
+
+if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+  echo "Error: Could not extract version from $PUBSPEC_PATH"
+  exit 1
+fi
+
+TAG_NAME="${PACKAGE_DIR}-v${VERSION}"
 
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 
 if [ "$FORCE" = "true" ]; then
   echo "Force flag is set. Checking for existing tag..."
-
-  # Extract directory and version from TAG_NAME (e.g., monolib-dart-v0.0.1)
-  # Assuming format <directory>-v<version>
-  PACKAGE_DIR=$(echo "$TAG_NAME" | sed -E 's/-v[0-9].*//')
-  VERSION=$(echo "$TAG_NAME" | sed -E 's/.*-v([0-9].*)/\1/')
-
-  # Package name replaces dashes with underscores
-  PACKAGE_NAME=$(echo "$PACKAGE_DIR" | tr '-' '_')
 
   PUB_API_URL="https://pub.dev/api/packages/${PACKAGE_NAME}/versions/${VERSION}"
   echo "Checking pub.dev: $PUB_API_URL"

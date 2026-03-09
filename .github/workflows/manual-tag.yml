@@ -36,15 +36,17 @@ jobs:
             exit 1
           fi
 
-          CURR_VERSION=$(grep '^version: ' "$PUBSPEC_PATH" | awk '{print $2}' | tr -d '\r')
+          # Install python-yq if yq is not standard (Ubuntu runners typically have it or we can install pipx)
+          # The standard yq on ubuntu runners works differently than python-yq, but both support `.version`.
+          # Using standard binary yq which is pre-installed on GitHub Ubuntu runners
+          CURR_VERSION=$(yq -r '.version' "$PUBSPEC_PATH")
 
-          if [ -z "$CURR_VERSION" ]; then
+          if [ -z "$CURR_VERSION" ] || [ "$CURR_VERSION" = "null" ]; then
             echo "Error: Could not extract version from $PUBSPEC_PATH"
             exit 1
           fi
 
-          TAG_NAME="${PACKAGE_DIR}-v${CURR_VERSION}"
-          echo "Current version: $CURR_VERSION"
-          echo "Calling create-tag.sh for tag: $TAG_NAME with force=$FORCE"
+          echo "Current version extracted: $CURR_VERSION"
+          echo "Calling create-tag.sh for directory: $PACKAGE_DIR with force=$FORCE"
 
-          .github/scripts/create-tag.sh "$TAG_NAME" "$FORCE"
+          .github/scripts/create-tag.sh "$PACKAGE_DIR" "$FORCE"
