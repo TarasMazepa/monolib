@@ -3,12 +3,12 @@ name: monolib_dart CI
 on:
   push:
     paths:
-      - 'monolib_dart/**'
-      - '.github/workflows/monolib_dart.yml'
+      - 'monolib-dart/**'
+      - '.github/workflows/monolib-dart.yml'
   pull_request:
     paths:
-      - 'monolib_dart/**'
-      - '.github/workflows/monolib_dart.yml'
+      - 'monolib-dart/**'
+      - '.github/workflows/monolib-dart.yml'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: monolib_dart
+        working-directory: monolib-dart
 
     steps:
       - uses: actions/checkout@v4
