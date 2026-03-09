@@ -2,6 +2,7 @@ name: monolib-dart.yml
 
 on:
   push:
+    branches: [ "main" ]
     paths:
       - 'monolib-dart/**'
       - '.github/workflows/monolib-dart.yml'
@@ -9,6 +10,10 @@ on:
     paths:
       - 'monolib-dart/**'
       - '.github/workflows/monolib-dart.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   monolib-dart:
