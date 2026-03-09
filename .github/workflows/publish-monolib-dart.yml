@@ -1,6 +1,7 @@
 name: publish-monolib-dart.yml
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'monolib-dart-v[0-9]+.[0-9]+.[0-9]+*'
