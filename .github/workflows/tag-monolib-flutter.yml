@@ -19,22 +19,4 @@ jobs:
           fetch-depth: 2 # Need at least 2 commits to compare with previous
 
       - name: Check version change and tag
-        run: |
-          PREV_VERSION=$(git show HEAD^:monolib-flutter/pubspec.yaml | grep '^version: ' | awk '{print $2}' | tr -d '\r')
-          CURR_VERSION=$(grep '^version: ' monolib-flutter/pubspec.yaml | awk '{print $2}' | tr -d '\r')
-
-          echo "Previous version: $PREV_VERSION"
-          echo "Current version: $CURR_VERSION"
-
-          if [ "$PREV_VERSION" != "$CURR_VERSION" ] && [ -n "$CURR_VERSION" ]; then
-            TAG_NAME="monolib-dart-v${CURR_VERSION}"
-            echo "Version changed. Creating tag: $TAG_NAME"
-
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-
-            git tag "$TAG_NAME"
-            git push origin "$TAG_NAME"
-          else
-            echo "Version did not change. No tag created."
-          fi
+        run: .github/scripts/check-version-and-tag.sh "monolib-flutter" "monolib-dart-v"
