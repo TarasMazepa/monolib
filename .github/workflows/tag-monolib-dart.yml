@@ -16,6 +16,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # Need at least 2 commits to compare with previous
-          token: ${{TAGGING}}
+          token: ${{ secrets.TAGGING }}
 
       - run: .github/scripts/check-version-and-tag.sh "monolib-dart"
