@@ -1,0 +1,15 @@
+name: Publish monolib-dart
+
+on:
+  push:
+    tags:
+      - 'monolib-dart-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish_dart:
+    if: startsWith(github.ref, 'refs/tags/monolib-dart-v')
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      working-directory: monolib-dart
