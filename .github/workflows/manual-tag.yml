@@ -1,0 +1,34 @@
+name: manual-tag.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: 'Directory for which to create the tag (e.g., monolib-dart, monolib-flutter)'
+        required: true
+        type: string
+      force:
+        description: 'Force create the tag (delete existing tag if it exists)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  manual-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history to list and delete tags
+          token: ${{ secrets.TAGGING }}
+
+      - name: Create tag
+        env:
+          PACKAGE_DIR: ${{ github.event.inputs.directory }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          echo "Calling create-tag.sh for directory: $PACKAGE_DIR with force=$FORCE"
+
+          .github/scripts/create-tag.sh "$PACKAGE_DIR" "$FORCE"

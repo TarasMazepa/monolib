@@ -19,23 +19,20 @@ fi
 
 PREV_VERSION=""
 if git rev-parse --verify HEAD^ >/dev/null 2>&1 && git ls-tree -r HEAD^ --name-only | grep -q "^${PUBSPEC_PATH}$"; then
-  PREV_VERSION=$(git show "HEAD^:${PUBSPEC_PATH}" | grep '^version: ' | awk '{print $2}' | tr -d '\r')
+  # Use yq to parse previous version from git show
+  PREV_VERSION=$(git show "HEAD^:${PUBSPEC_PATH}" | yq '.version')
 fi
 
-CURR_VERSION=$(grep '^version: ' "$PUBSPEC_PATH" | awk '{print $2}' | tr -d '\r')
+# Use yq to parse current version
+CURR_VERSION=$(yq '.version' "$PUBSPEC_PATH")
 
 echo "Previous version: ${PREV_VERSION:-<none>}"
 echo "Current version: $CURR_VERSION"
 
-if [ "$PREV_VERSION" != "$CURR_VERSION" ] && [ -n "$CURR_VERSION" ]; then
-  TAG_NAME="${TAG_PREFIX}${CURR_VERSION}"
-  echo "Version changed. Creating tag: $TAG_NAME"
+if [ "$PREV_VERSION" != "$CURR_VERSION" ] && [ -n "$CURR_VERSION" ] && [ "$CURR_VERSION" != "null" ]; then
+  echo "Version changed. Calling create-tag.sh for directory: $PACKAGE_DIR"
 
-  git config user.name "github-actions[bot]"
-  git config user.email "github-actions[bot]@users.noreply.github.com"
-
-  git tag "$TAG_NAME"
-  git push origin "$TAG_NAME"
+  "$(dirname "$0")/create-tag.sh" "$PACKAGE_DIR"
 else
   echo "Version did not change. No tag created."
 fi
