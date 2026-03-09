@@ -1,0 +1,20 @@
+name: tag-monolib-dart.yml
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'monolib-dart/pubspec.yaml'
+
+jobs:
+  tag-monolib-dart:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Need at least 2 commits to compare with previous
+
+      - run: .github/scripts/check-version-and-tag.sh "monolib-dart"
