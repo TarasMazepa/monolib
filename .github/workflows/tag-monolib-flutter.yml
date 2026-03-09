@@ -1,6 +1,7 @@
 name: tag-monolib-flutter.yml
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
