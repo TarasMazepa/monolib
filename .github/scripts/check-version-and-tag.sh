@@ -2,10 +2,10 @@
 set -e
 
 PACKAGE_DIR=$1
-TAG_PREFIX=$2
+TAG_PREFIX="${PACKAGE_DIR}-v"
 
-if [ -z "$PACKAGE_DIR" ] || [ -z "$TAG_PREFIX" ]; then
-  echo "Usage: $0 <package-dir> <tag-prefix>"
+if [ -z "$PACKAGE_DIR" ]; then
+  echo "Usage: $0 <package-dir>"
   # return 1 since we source or execute it
   exit 1
 fi
