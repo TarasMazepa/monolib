@@ -29,13 +29,9 @@ echo "Current version: $CURR_VERSION"
 
 if [ "$PREV_VERSION" != "$CURR_VERSION" ] && [ -n "$CURR_VERSION" ]; then
   TAG_NAME="${TAG_PREFIX}${CURR_VERSION}"
-  echo "Version changed. Creating tag: $TAG_NAME"
+  echo "Version changed. Calling create-tag.sh for tag: $TAG_NAME"
 
-  git config user.name "github-actions[bot]"
-  git config user.email "github-actions[bot]@users.noreply.github.com"
-
-  git tag "$TAG_NAME"
-  git push origin "$TAG_NAME"
+  "$(dirname "$0")/create-tag.sh" "$TAG_NAME"
 else
   echo "Version did not change. No tag created."
 fi

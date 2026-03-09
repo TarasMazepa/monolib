@@ -1,0 +1,50 @@
+name: manual-tag.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: 'Directory for which to create the tag (e.g., monolib-dart, monolib-flutter)'
+        required: true
+        type: string
+      force:
+        description: 'Force create the tag (delete existing tag if it exists)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  manual-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history to list and delete tags
+          token: ${{ secrets.TAGGING }}
+
+      - name: Extract version and create tag
+        env:
+          PACKAGE_DIR: ${{ github.event.inputs.directory }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          PUBSPEC_PATH="${PACKAGE_DIR}/pubspec.yaml"
+
+          if [ ! -f "$PUBSPEC_PATH" ]; then
+            echo "Error: $PUBSPEC_PATH not found."
+            exit 1
+          fi
+
+          CURR_VERSION=$(grep '^version: ' "$PUBSPEC_PATH" | awk '{print $2}' | tr -d '\r')
+
+          if [ -z "$CURR_VERSION" ]; then
+            echo "Error: Could not extract version from $PUBSPEC_PATH"
+            exit 1
+          fi
+
+          TAG_NAME="${PACKAGE_DIR}-v${CURR_VERSION}"
+          echo "Current version: $CURR_VERSION"
+          echo "Calling create-tag.sh for tag: $TAG_NAME with force=$FORCE"
+
+          .github/scripts/create-tag.sh "$TAG_NAME" "$FORCE"
