@@ -1,4 +1,4 @@
-name: tag-monolib-flutter
+name: tag-monolib-flutter.yml
 
 on:
   push:
@@ -8,15 +8,13 @@ on:
       - 'monolib-flutter/pubspec.yaml'
 
 jobs:
-  tag-version:
+  tag-monolib-flutter:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # Need at least 2 commits to compare with previous
 
-      - name: Check version change and tag
-        run: .github/scripts/check-version-and-tag.sh "monolib-flutter"
+      - run: .github/scripts/check-version-and-tag.sh "monolib-flutter"
