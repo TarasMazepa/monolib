@@ -1,4 +1,4 @@
-name: monolib_dart CI
+name: monolib-dart.yml
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - '.github/workflows/monolib-dart.yml'
 
 jobs:
-  build:
+  monolib-dart:
     runs-on: ubuntu-latest
 
     defaults:
@@ -21,17 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1
 
-      - name: Install dependencies
-        run: dart pub get
+      - run: dart pub get
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+      - run: dart format --output=none --set-exit-if-changed .
 
-      - name: Analyze project source
-        run: dart analyze --fatal-infos
+      - run: dart analyze --fatal-infos
 
-      - name: Run tests
-        run: dart test
+      - run: dart test
