@@ -19,4 +19,4 @@ jobs:
           fetch-depth: 2 # Need at least 2 commits to compare with previous
           token: ${{ secrets.TAGGING }}
 
-      - run: .github/scripts/autotag-for-directory.sh "monolib-dart"
+      - run: .github/scripts/autotag-for-directory.sh monolib-dart
