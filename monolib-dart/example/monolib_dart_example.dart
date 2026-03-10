@@ -1,4 +1,4 @@
-import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/fluent_json.dart';
 
 void main() {
   var fluentJson = FluentJson.decode('{"name": "test"}');
