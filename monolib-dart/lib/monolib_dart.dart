@@ -8,4 +8,3 @@ export 'src/general/on_object.dart';
 export 'src/general/on_date_time.dart';
 export 'src/json/fluent_json.dart';
 export 'src/general/on_fluent_json.dart';
-export 'src/uuid_v7/uuid_v7.dart';
