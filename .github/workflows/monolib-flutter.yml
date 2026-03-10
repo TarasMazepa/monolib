@@ -26,7 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          cache: true
+          cache-sdk: true
 
       - run: flutter pub get
 
