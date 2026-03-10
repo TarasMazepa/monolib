@@ -1,15 +1,9 @@
-name: monolib-dart.yml
+name: ci
 
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'monolib-dart/**'
-      - '.github/workflows/monolib-dart.yml'
   pull_request:
-    paths:
-      - 'monolib-dart/**'
-      - '.github/workflows/monolib-dart.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,3 +33,27 @@ jobs:
       - run: dart analyze --fatal-infos
 
       - run: dart test
+
+  monolib-flutter:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: monolib-flutter
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          cache: true
+          cache-sdk: true
+
+      - run: flutter pub get
+
+      - run: dart format --output=none --set-exit-if-changed .
+
+      - run: flutter analyze --fatal-infos
+
+      - run: flutter test
