@@ -22,34 +22,26 @@ jobs:
           cache: true
           cache-sdk: true
 
-      - name: monolib-dart - dart pub get
+      - run: dart pub get
         working-directory: monolib-dart
-        run: dart pub get
 
-      - name: monolib-dart - dart format
+      - run: flutter pub get
+        working-directory: monolib-flutter
+
+      - run: dart format --output=none --set-exit-if-changed .
         working-directory: monolib-dart
-        run: dart format --output=none --set-exit-if-changed .
 
-      - name: monolib-dart - dart analyze
+      - run: dart format --output=none --set-exit-if-changed .
+        working-directory: monolib-flutter
+
+      - run: dart analyze --fatal-infos
         working-directory: monolib-dart
-        run: dart analyze --fatal-infos
 
-      - name: monolib-dart - dart test
+      - run: flutter analyze --fatal-infos
+        working-directory: monolib-flutter
+
+      - run: dart test
         working-directory: monolib-dart
-        run: dart test
 
-      - name: monolib-flutter - flutter pub get
+      - run: flutter test
         working-directory: monolib-flutter
-        run: flutter pub get
-
-      - name: monolib-flutter - dart format
-        working-directory: monolib-flutter
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: monolib-flutter - flutter analyze
-        working-directory: monolib-flutter
-        run: flutter analyze --fatal-infos
-
-      - name: monolib-flutter - flutter test
-        working-directory: monolib-flutter
-        run: flutter test
