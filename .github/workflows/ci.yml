@@ -10,50 +10,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  monolib-dart:
+  ci:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          cache: true
+          cache-sdk: true
+
+      - name: monolib-dart - dart pub get
         working-directory: monolib-dart
+        run: dart pub get
 
-    steps:
-      - uses: actions/checkout@v4
+      - name: monolib-dart - dart format
+        working-directory: monolib-dart
+        run: dart format --output=none --set-exit-if-changed .
 
-      - uses: flutter-actions/setup-flutter@v4
-        with:
-          channel: stable
-          cache: true
-          cache-sdk: true
+      - name: monolib-dart - dart analyze
+        working-directory: monolib-dart
+        run: dart analyze --fatal-infos
 
-      - run: dart pub get
+      - name: monolib-dart - dart test
+        working-directory: monolib-dart
+        run: dart test
 
-      - run: dart format --output=none --set-exit-if-changed .
-
-      - run: dart analyze --fatal-infos
-
-      - run: dart test
-
-  monolib-flutter:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
+      - name: monolib-flutter - flutter pub get
         working-directory: monolib-flutter
+        run: flutter pub get
 
-    steps:
-      - uses: actions/checkout@v4
+      - name: monolib-flutter - dart format
+        working-directory: monolib-flutter
+        run: dart format --output=none --set-exit-if-changed .
 
-      - uses: flutter-actions/setup-flutter@v4
-        with:
-          channel: stable
-          cache: true
-          cache-sdk: true
+      - name: monolib-flutter - flutter analyze
+        working-directory: monolib-flutter
+        run: flutter analyze --fatal-infos
 
-      - run: flutter pub get
-
-      - run: dart format --output=none --set-exit-if-changed .
-
-      - run: flutter analyze --fatal-infos
-
-      - run: flutter test
+      - name: monolib-flutter - flutter test
+        working-directory: monolib-flutter
+        run: flutter test

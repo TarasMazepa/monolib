@@ -1,0 +1,22 @@
+name: autotag-monolib-flutter.yml
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'monolib-flutter/pubspec.yaml'
+
+jobs:
+  autotag-monolib-flutter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Need at least 2 commits to compare with previous
+          token: ${{ secrets.TAGGING }}
+
+      - run: .github/scripts/autotag-for-directory.sh monolib-flutter
