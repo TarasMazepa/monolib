@@ -1,6 +1,6 @@
 name: monolib_dart
 description: A collection of general purpose libraries for dart projects
-version: 0.0.2
+version: 0.0.3
 repository: https://github.com/TarasMazepa/monolib
 
 environment:

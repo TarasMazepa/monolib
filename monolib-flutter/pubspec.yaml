@@ -1,6 +1,6 @@
 name: monolib_flutter
 description: A collection of general purpose libraries for flutter projects
-version: 0.0.0
+version: 0.0.1
 repository: https://github.com/TarasMazepa/monolib
 
 environment:

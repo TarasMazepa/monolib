@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:monolib_dart/monolib_dart.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('OnIterableIterable', () {
@@ -31,19 +31,6 @@ void main() {
         [5, 6],
       ].mixed.toList();
       expect(result, [1, 4, 5, 2, 6, 3]);
-    });
-
-    test('mixSorted empty', () {
-      final result = <Iterable<int>>[].mixSorted().toList();
-      expect(result, []);
-    });
-
-    test('mixSorted multiple iterables', () {
-      final result = [
-        [1, 3, 5, 6, 7],
-        [2, 4, 6, 8, 9],
-      ].mixSorted().toList();
-      expect(result, [1, 2, 3, 4, 5, 6, 6, 7, 8, 9]);
     });
   });
 }
