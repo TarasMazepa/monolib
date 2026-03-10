@@ -9,9 +9,9 @@ class DefaultFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: size.width),
-      child: child,
-    ),
-  );
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: size.width),
+          child: child,
+        ),
+      );
 }
