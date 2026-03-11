@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.PR_CREATION }}
           ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: flutter-actions/setup-flutter@v4
@@ -40,4 +40,4 @@ jobs:
           git add -f monolib-dart/pubspec.lock monolib-flutter/pubspec.lock
           git diff --staged --quiet || (git commit -m "chore: run pub upgrade" && git push)
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PR_CREATION }}
