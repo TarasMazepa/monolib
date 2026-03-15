@@ -32,7 +32,10 @@ void main() {
     test('decoder with missing trailing newline', () {
       final input = '{"id":1}\n{"id":2}';
       final decoded = jsonl.decode(input);
-      expect(decoded, [{"id":1}, {"id":2}]);
+      expect(decoded, [
+        {"id": 1},
+        {"id": 2}
+      ]);
     });
 
     test('decoder with multiple newlines and empty strings', () {
