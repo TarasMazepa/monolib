@@ -1,35 +1,35 @@
 import 'dart:convert';
 import 'dart:async';
 
-Stream<String> jsonEncodeAsync(dynamic object) async* {
+Future<void> jsonEncodeAsync(dynamic object, StringSink sink) async {
   if (object == null) {
-    yield 'null';
+    sink.write('null');
   } else if (object is num || object is bool) {
-    yield object.toString();
+    sink.write(object.toString());
   } else if (object is String) {
-    yield jsonEncode(object);
+    sink.write(jsonEncode(object));
   } else if (object is Future) {
-    yield* jsonEncodeAsync(await object);
+    await jsonEncodeAsync(await object, sink);
   } else if (object is Stream) {
-    yield '[';
+    sink.write('[');
     bool first = true;
     await for (final item in object) {
-      if (!first) yield ',';
-      yield* jsonEncodeAsync(item);
+      if (!first) sink.write(',');
+      await jsonEncodeAsync(item, sink);
       first = false;
     }
-    yield ']';
+    sink.write(']');
   } else if (object is Iterable) {
-    yield '[';
+    sink.write('[');
     bool first = true;
     for (final item in object) {
-      if (!first) yield ',';
-      yield* jsonEncodeAsync(item);
+      if (!first) sink.write(',');
+      await jsonEncodeAsync(item, sink);
       first = false;
     }
-    yield ']';
+    sink.write(']');
   } else if (object is Map) {
-    yield '{';
+    sink.write('{');
     bool first = true;
     for (final entry in object.entries) {
       dynamic key = entry.key;
@@ -41,20 +41,20 @@ Stream<String> jsonEncodeAsync(dynamic object) async* {
         // Force the standard error message for map keys
         jsonEncode({key: null});
       }
-      if (!first) yield ',';
-      yield jsonEncode(key);
-      yield ':';
-      yield* jsonEncodeAsync(entry.value);
+      if (!first) sink.write(',');
+      sink.write(jsonEncode(key));
+      sink.write(':');
+      await jsonEncodeAsync(entry.value, sink);
       first = false;
     }
-    yield '}';
+    sink.write('}');
   } else {
     try {
       dynamic result = (object as dynamic).toJson();
-      yield* jsonEncodeAsync(result);
+      await jsonEncodeAsync(result, sink);
     } on NoSuchMethodError {
       // Let standard jsonEncode throw its normal error
-      yield jsonEncode(object);
+      sink.write(jsonEncode(object));
     } catch (e) {
       // If toJson throws something else, we rethrow it
       rethrow;
