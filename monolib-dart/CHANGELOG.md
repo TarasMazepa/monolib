@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Adds `jsonEncodeAsync` streaming JSON encoder
+
 ## 0.0.3
 
 - Adds various extension methods
