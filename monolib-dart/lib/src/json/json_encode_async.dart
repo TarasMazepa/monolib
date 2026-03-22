@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
-Future<void> jsonEncodeAsync(dynamic object, StringSink sink) async {
+Future<void> jsonEncodeAsync(Object? object, StringSink sink) async {
   if (object == null) {
     sink.write('null');
   } else if (object is num || object is bool) {
