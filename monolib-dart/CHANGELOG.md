@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Changes `jsonEncodeAsync` signature to use `Object?` instead of `dynamic`
+
 ## 0.0.4
 
 - Adds `jsonEncodeAsync` streaming JSON encoder
