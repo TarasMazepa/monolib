@@ -16,8 +16,6 @@ class NullIOSink implements IOSink {
 
   @override
   Future<void> addStream(Stream<List<int>> stream) {
-    // This is the magic line. If someone pipes a stream here,
-    // it automatically delegates to the highly optimized .drain() method.
     return stream.drain();
   }
 
