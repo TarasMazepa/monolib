@@ -1,3 +1,7 @@
+## 0.0.6
+
+- Adds `NullIOSink`
+
 ## 0.0.5
 
 - Changes `jsonEncodeAsync` signature to use `Object?` instead of `dynamic`
