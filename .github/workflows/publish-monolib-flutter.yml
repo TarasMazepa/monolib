@@ -11,6 +11,20 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/monolib-flutter-v')
     permissions:
       id-token: write # Required for authentication using OIDC
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-    with:
-      working-directory: monolib-flutter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          cache: true
+          cache-sdk: true
+
+      - run: dart pub get
+        working-directory: monolib-flutter
+
+      - run: dart pub publish --dry-run
+        working-directory: monolib-flutter
+
+      - run: dart pub publish -f
+        working-directory: monolib-flutter
