@@ -14,7 +14,10 @@ void main() {
     sink.add([1, 2, 3]);
     sink.addError(Exception());
 
-    final stream = Stream.fromIterable([[1], [2]]);
+    final stream = Stream.fromIterable([
+      [1],
+      [2]
+    ]);
     await sink.addStream(stream);
 
     await sink.flush();
