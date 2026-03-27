@@ -12,8 +12,9 @@ class FluentJson {
 
   FluentJson.root(this.json) : breadCrumbs = const [];
 
-  String _describeForException() =>
-      '''Hierarchy from root json: ${['\$'].followedBy(breadCrumbs.map((x) => "[$x]")).join()}
+  String _describeForException() => '''Hierarchy from root json: ${[
+        '\$'
+      ].followedBy(breadCrumbs.map((x) => "[$x]")).join()}
 
 ${jsonEncode(json)}''';
 
@@ -50,9 +51,9 @@ $e''');
     return switch (_elementAt(accessor, couldBeNull: true)) {
       null => null,
       final json => FluentJson(
-        json: json,
-        breadCrumbs: breadCrumbs.followedBy([accessor]),
-      ),
+          json: json,
+          breadCrumbs: breadCrumbs.followedBy([accessor]),
+        ),
     };
   }
 
@@ -61,9 +62,9 @@ $e''');
       null => throw Exception('''json[$accessor] resulted in null.
 ${_describeForException()}'''),
       final json => FluentJson(
-        json: json,
-        breadCrumbs: breadCrumbs.followedBy([accessor]),
-      ),
+          json: json,
+          breadCrumbs: breadCrumbs.followedBy([accessor]),
+        ),
     };
   }
 
