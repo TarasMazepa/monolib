@@ -16,7 +16,7 @@ void main() {
 
     final stream = Stream.fromIterable([
       [1],
-      [2]
+      [2],
     ]);
     await sink.addStream(stream);
 
