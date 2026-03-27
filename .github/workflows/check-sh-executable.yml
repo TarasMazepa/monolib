@@ -13,7 +13,7 @@ jobs:
   check-sh-executable:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: |
           non_executable=$(find . -type f -name "*.sh" ! -executable)
           if [ -n "$non_executable" ]; then
