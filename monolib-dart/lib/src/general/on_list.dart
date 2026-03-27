@@ -17,7 +17,8 @@ extension OnList<T> on List<T> {
   List<E> toIndexedMappedList<E>(
     E Function(T, int index) mapper, {
     bool growable = true,
-  }) => List.generate(length, (i) => mapper(this[i], i), growable: growable);
+  }) =>
+      List.generate(length, (i) => mapper(this[i], i), growable: growable);
 
   int insertSorted(T element, {int Function(T a, T b)? compare}) {
     final comparator = compare ?? (a, b) => (a as Comparable).compareTo(b);
