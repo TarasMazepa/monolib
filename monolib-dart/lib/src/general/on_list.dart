@@ -1,4 +1,22 @@
 extension OnList<T> on List<T> {
+  bool deepEquals(List<T> other) {
+    if (identical(this, other)) return true;
+    if (length != other.length) return false;
+    for (int index = 0; index < length; index++) {
+      if (this[index] != other[index]) return false;
+    }
+    return true;
+  }
+
+  List<T> sorted([int Function(T left, T right)? compare]) =>
+      this..sort(compare);
+
+  List<T> sortedBy<C>(Comparable<C> Function(T) mapper) => this
+    ..sort((left, right) => Comparable.compare(mapper(left), mapper(right)));
+
+  List<T> sortedByDescending<C>(Comparable<C> Function(T) mapper) => this
+    ..sort((left, right) => Comparable.compare(mapper(right), mapper(left)));
+
   Iterable<T> drain() sync* {
     while (isNotEmpty) {
       yield removeLast();
@@ -17,8 +35,7 @@ extension OnList<T> on List<T> {
   List<E> toIndexedMappedList<E>(
     E Function(T, int index) mapper, {
     bool growable = true,
-  }) =>
-      List.generate(length, (i) => mapper(this[i], i), growable: growable);
+  }) => List.generate(length, (i) => mapper(this[i], i), growable: growable);
 
   int insertSorted(T element, {int Function(T a, T b)? compare}) {
     final comparator = compare ?? (a, b) => (a as Comparable).compareTo(b);

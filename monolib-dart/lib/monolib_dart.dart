@@ -1,7 +1,15 @@
+export 'src/general/on_bool.dart';
+export 'src/general/on_double.dart';
+export 'src/general/on_function.dart';
 export 'src/general/on_int.dart';
 export 'src/general/on_iterable_iterable.dart';
+export 'src/general/on_iterable_num.dart';
+export 'src/general/on_iterable.dart';
 export 'src/general/on_iterable_mapper.dart';
 export 'src/general/on_list.dart';
 export 'src/general/on_nullable_comparable.dart';
 export 'src/general/on_nullable_object.dart';
 export 'src/general/on_object.dart';
+export 'src/general/on_string.dart';
+export 'src/general/retry_on_failure.dart';
+export 'src/general/table.dart';
