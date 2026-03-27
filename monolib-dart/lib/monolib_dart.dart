@@ -1,3 +1,8 @@
+export 'src/general/comparison_chain.dart';
+export 'src/general/nullable_index_of.dart';
+export 'src/general/on_empty_iterable.dart';
+export 'src/general/on_empty_iterator.dart';
+export 'src/general/on_empty_on_iterable.dart';
 export 'src/general/on_int.dart';
 export 'src/general/on_iterable_iterable.dart';
 export 'src/general/on_iterable_mapper.dart';
@@ -5,3 +10,6 @@ export 'src/general/on_list.dart';
 export 'src/general/on_nullable_comparable.dart';
 export 'src/general/on_nullable_object.dart';
 export 'src/general/on_object.dart';
+export 'src/general/on_string.dart';
+export 'src/general/once.dart';
+export 'src/general/string_empty_to_null.dart';

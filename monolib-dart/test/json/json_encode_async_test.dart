@@ -45,7 +45,7 @@ void main() {
       final map = {
         'a': 1,
         'b': [2, 3],
-        'c': {'d': 'hello'}
+        'c': {'d': 'hello'},
       };
       expect(await encodeToString(map), '{"a":1,"b":[2,3],"c":{"d":"hello"}}');
     });
@@ -56,10 +56,12 @@ void main() {
 
       final map = {
         'futureValue': Future.value([1, 2]),
-        Future.value('futureKey'): 'value'
+        Future.value('futureKey'): 'value',
       };
-      expect(await encodeToString(map),
-          '{"futureValue":[1,2],"futureKey":"value"}');
+      expect(
+        await encodeToString(map),
+        '{"futureValue":[1,2],"futureKey":"value"}',
+      );
     });
 
     test('throws standard jsonEncode error for invalid Map keys', () async {
@@ -83,27 +85,34 @@ void main() {
       expect(await encodeToString(obj), '{"delayed":true}');
     });
 
-    test('throws standard jsonEncode error for custom objects without toJson',
-        () async {
-      final obj = CustomWithoutToJson();
-      try {
-        await encodeToString(obj);
-        fail('Should have thrown');
-      } catch (e) {
-        expect(e, isA<JsonUnsupportedObjectError>());
-      }
-    });
+    test(
+      'throws standard jsonEncode error for custom objects without toJson',
+      () async {
+        final obj = CustomWithoutToJson();
+        try {
+          await encodeToString(obj);
+          fail('Should have thrown');
+        } catch (e) {
+          expect(e, isA<JsonUnsupportedObjectError>());
+        }
+      },
+    );
 
     test('encodes mixed nested async structures properly', () async {
       final complex = {
-        'stream': Stream.fromIterable(
-            [1, Future.delayed(Duration(milliseconds: 10), () => 2), 3]),
-        'nestedMap': {'futureObj': Future.value(CustomWithToJson())}
+        'stream': Stream.fromIterable([
+          1,
+          Future.delayed(Duration(milliseconds: 10), () => 2),
+          3,
+        ]),
+        'nestedMap': {'futureObj': Future.value(CustomWithToJson())},
       };
 
       final result = await encodeToString(complex);
-      expect(result,
-          '{"stream":[1,2,3],"nestedMap":{"futureObj":{"custom":true,"nested":"value"}}}');
+      expect(
+        result,
+        '{"stream":[1,2,3],"nestedMap":{"futureObj":{"custom":true,"nested":"value"}}}',
+      );
     });
   });
 }
