@@ -17,14 +17,14 @@ extension OnObject<T> on T {
   R castTo<R>() => this as R;
 
   String get quotingString => switch (this) {
-    List<List> list =>
-      '[\n${list.map((Object? list) => '  ${list.quotingString}').join('\n')}\n]',
-    List list => Iterable.iterableToFullString(
-      list.map((Object? x) => x.quotingString),
-      '[',
-      ']',
-    ),
-    Map _ => toString(),
-    _ => "'$this'",
-  };
+        List<List> list =>
+          '[\n${list.map((Object? list) => '  ${list.quotingString}').join('\n')}\n]',
+        List list => Iterable.iterableToFullString(
+            list.map((Object? x) => x.quotingString),
+            '[',
+            ']',
+          ),
+        Map _ => toString(),
+        _ => "'$this'",
+      };
 }
