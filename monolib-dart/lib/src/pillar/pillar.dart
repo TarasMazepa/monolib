@@ -23,6 +23,12 @@ class Pillar implements PillarAccessor {
   final Map<PillarKey, PillarEntry> _map = {};
   final Map<PillarScope, _PillarChangeNotifier> _scopeChanges = {};
 
+  static ({T value, PillarScope? scope}) _replacedFactory<T>() {
+    throw Exception(
+      'Instance should have been used instead of calling factory method',
+    );
+  }
+
   PillarKey _createKey<T>(PillarKey? key, String? token) {
     return switch ((key, token)) {
       (final key?, null) => key,
@@ -95,11 +101,7 @@ class Pillar implements PillarAccessor {
     final PillarKey createdKey = _createKey<T>(null, null);
     _map[createdKey] = PillarEntry(
       key: createdKey,
-      factory: () {
-        throw Exception(
-          'Instance should have been used instead of calling factory method',
-        );
-      },
+      factory: _replacedFactory<T>,
       value: instance,
       instanceScope: scope,
     );
@@ -109,7 +111,7 @@ class Pillar implements PillarAccessor {
   void discard(PillarScope scope) {
     _map.removeWhere(
       (key, value) =>
-          value.instanceScope?.isOrChildOf(scope) == true && value.isInstance,
+          value.isInstance && value.instanceScope?.isOrChildOf(scope) == true,
     );
     for (final MapEntry<PillarKey, PillarEntry> entry in _map.entries) {
       if (entry.value.effectiveScopeIncludingDependencies?.isOrChildOf(scope) ==
