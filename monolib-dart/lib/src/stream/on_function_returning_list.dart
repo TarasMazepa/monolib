@@ -1,4 +1,4 @@
-extension OnMapper<T> on List<T> Function(List<T>) {
+extension OnFunctionReturningList<T> on List<T> Function(List<T>) {
   Stream<List<T>> Function(Stream<List<T>>)
       get asSkippingMappedToEmptyExpander {
     List<List<T>> expander(List<T> list) {

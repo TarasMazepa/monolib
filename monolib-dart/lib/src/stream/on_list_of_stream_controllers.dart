@@ -1,6 +1,6 @@
 import 'dart:async';
 
-extension OnListStreamController<T> on List<StreamController<T>> {
+extension OnListOfStreamControllers<T> on List<StreamController<T>> {
   void addAndSetupOnCancel(
     StreamController<T> listener, {
     void Function()? onEmpty,

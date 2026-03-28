@@ -1,4 +1,4 @@
-extension OnIterableIterable<T> on Iterable<Iterable<T>> {
+extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
   Iterable<T> get mixed sync* {
     final iterators = map(
       (iterable) => iterable.iterator,

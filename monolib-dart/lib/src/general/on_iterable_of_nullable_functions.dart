@@ -1,4 +1,4 @@
-extension OnIterableMapper<T> on Iterable<T Function(T)?> {
+extension OnIterableOfNullableFunctions<T> on Iterable<T Function(T)?> {
   T Function(T)? get combined => switch (nonNulls.toList(growable: false)) {
         [] => null,
         [final mapper] => mapper,

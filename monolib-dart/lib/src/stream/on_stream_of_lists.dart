@@ -1,4 +1,4 @@
-extension OnStreamList<T> on Stream<List<T>> {
+extension OnStreamOfLists<T> on Stream<List<T>> {
   /// Accumulates the lists emitted by this stream into a single list.
   ///
   /// Note: This yields the same [List] instance on every event, so consumers

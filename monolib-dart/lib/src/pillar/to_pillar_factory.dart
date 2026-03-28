@@ -1,23 +1,21 @@
 import 'pillar_accessor.dart';
 
-extension ToPillarFactoryOneArgument<T, P0> on T Function(P0) {
+extension OnFunction1<T, P0> on T Function(P0) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(pillar.get<P0>());
 }
 
-extension ToPillarFactoryTwoArguments<T, P0, P1> on T Function(P0, P1) {
+extension OnFunction2<T, P0, P1> on T Function(P0, P1) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(pillar.get<P0>(), pillar.get<P1>());
 }
 
-extension ToPillarFactoryThreeArguments<T, P0, P1, P2> on T Function(
-    P0, P1, P2) {
+extension OnFunction3<T, P0, P1, P2> on T Function(P0, P1, P2) {
   T Function(PillarAccessor) toPillarFactory() => (PillarAccessor pillar) =>
       this(pillar.get<P0>(), pillar.get<P1>(), pillar.get<P2>());
 }
 
-extension ToPillarFactoryFourArguments<T, P0, P1, P2, P3> on T Function(
-    P0, P1, P2, P3) {
+extension OnFunction4<T, P0, P1, P2, P3> on T Function(P0, P1, P2, P3) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
@@ -27,8 +25,7 @@ extension ToPillarFactoryFourArguments<T, P0, P1, P2, P3> on T Function(
           );
 }
 
-extension ToPillarFactoryFiveArguments<T, P0, P1, P2, P3, P4> on T Function(
-    P0, P1, P2, P3, P4) {
+extension OnFunction5<T, P0, P1, P2, P3, P4> on T Function(P0, P1, P2, P3, P4) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
@@ -39,7 +36,7 @@ extension ToPillarFactoryFiveArguments<T, P0, P1, P2, P3, P4> on T Function(
           );
 }
 
-extension ToPillarFactorySixArguments<T, P0, P1, P2, P3, P4, P5> on T Function(
+extension OnFunction6<T, P0, P1, P2, P3, P4, P5> on T Function(
     P0, P1, P2, P3, P4, P5) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
@@ -52,8 +49,8 @@ extension ToPillarFactorySixArguments<T, P0, P1, P2, P3, P4, P5> on T Function(
           );
 }
 
-extension ToPillarFactorySevenArguments<T, P0, P1, P2, P3, P4, P5, P6> on T
-    Function(P0, P1, P2, P3, P4, P5, P6) {
+extension OnFunction7<T, P0, P1, P2, P3, P4, P5, P6> on T Function(
+    P0, P1, P2, P3, P4, P5, P6) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
@@ -66,8 +63,8 @@ extension ToPillarFactorySevenArguments<T, P0, P1, P2, P3, P4, P5, P6> on T
           );
 }
 
-extension ToPillarFactoryEightArguments<T, P0, P1, P2, P3, P4, P5, P6, P7> on T
-    Function(P0, P1, P2, P3, P4, P5, P6, P7) {
+extension OnFunction8<T, P0, P1, P2, P3, P4, P5, P6, P7> on T Function(
+    P0, P1, P2, P3, P4, P5, P6, P7) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
@@ -81,8 +78,8 @@ extension ToPillarFactoryEightArguments<T, P0, P1, P2, P3, P4, P5, P6, P7> on T
           );
 }
 
-extension ToPillarFactoryNineArguments<T, P0, P1, P2, P3, P4, P5, P6, P7, P8>
-    on T Function(P0, P1, P2, P3, P4, P5, P6, P7, P8) {
+extension OnFunction9<T, P0, P1, P2, P3, P4, P5, P6, P7, P8> on T Function(
+    P0, P1, P2, P3, P4, P5, P6, P7, P8) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
@@ -97,8 +94,8 @@ extension ToPillarFactoryNineArguments<T, P0, P1, P2, P3, P4, P5, P6, P7, P8>
           );
 }
 
-extension ToPillarFactoryTenArguments<T, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    on T Function(P0, P1, P2, P3, P4, P5, P6, P7, P8, P9) {
+extension OnFunction10<T, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9> on T Function(
+    P0, P1, P2, P3, P4, P5, P6, P7, P8, P9) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(
             pillar.get<P0>(),
