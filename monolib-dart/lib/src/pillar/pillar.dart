@@ -13,15 +13,9 @@ typedef PillarPureFactory<T> = T Function();
 typedef PillarFactoryWithScopeTracking<T> = ({T value, PillarScope? scope})
     Function();
 
-class _PillarChangeNotifier extends PillarChangeNotifier {
-  void notify() {
-    notifyListeners();
-  }
-}
-
 class Pillar implements PillarAccessor {
   final Map<PillarKey, PillarEntry> _map = {};
-  final Map<PillarScope, _PillarChangeNotifier> _scopeChanges = {};
+  final Map<PillarScope, PillarChangeNotifierInternal> _scopeChanges = {};
 
   static ({T value, PillarScope? scope}) _replacedFactory<T>() {
     throw Exception(
@@ -122,6 +116,6 @@ class Pillar implements PillarAccessor {
   }
 
   PillarListenable changeNotifierFor(PillarScope scope) {
-    return _scopeChanges.putIfAbsent(scope, _PillarChangeNotifier.new);
+    return _scopeChanges.putIfAbsent(scope, PillarChangeNotifierInternal.new);
   }
 }
