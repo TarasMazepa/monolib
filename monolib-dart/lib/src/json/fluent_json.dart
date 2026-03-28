@@ -12,9 +12,19 @@ class FluentJson {
 
   FluentJson.root(this.json) : breadCrumbs = const [];
 
+  Iterable<dynamic> _flattenBreadCrumbs(dynamic crumbs) sync* {
+    if (crumbs is List) {
+      for (final crumb in crumbs) {
+        yield* _flattenBreadCrumbs(crumb);
+      }
+    } else {
+      yield crumbs;
+    }
+  }
+
   String _describeForException() => '''Hierarchy from root json: ${[
         '\$'
-      ].followedBy(breadCrumbs.map((x) => "[$x]")).join()}
+      ].followedBy(_flattenBreadCrumbs(breadCrumbs).map((x) => "[$x]")).join()}
 
 ${jsonEncode(json)}''';
 
@@ -52,7 +62,7 @@ $e''');
       null => null,
       final json => FluentJson(
           json: json,
-          breadCrumbs: [...breadCrumbs, accessor],
+          breadCrumbs: [breadCrumbs, accessor],
         ),
     };
   }
@@ -63,7 +73,7 @@ $e''');
 ${_describeForException()}'''),
       final json => FluentJson(
           json: json,
-          breadCrumbs: [...breadCrumbs, accessor],
+          breadCrumbs: [breadCrumbs, accessor],
         ),
     };
   }
@@ -99,7 +109,7 @@ ${_describeForException()}''',
     for (final (index, item) in unbox<List>().indexed) {
       yield FluentJson(
         json: item,
-        breadCrumbs: [...breadCrumbs, index],
+        breadCrumbs: [breadCrumbs, index],
       );
     }
   }
