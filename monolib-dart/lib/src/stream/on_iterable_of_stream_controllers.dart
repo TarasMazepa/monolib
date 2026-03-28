@@ -1,6 +1,6 @@
 import 'dart:async';
 
-extension OnIterableStreamController<T> on Iterable<StreamController<T>> {
+extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
   void onEachAdd(T event) {
     for (final listener in this) {
       try {

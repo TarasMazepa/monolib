@@ -4,7 +4,7 @@ abstract class PillarAccessor {
   T get<T>({PillarKey? key, String? token});
 }
 
-extension PillarAccessorAssisted on PillarAccessor {
+extension OnPillarAccessor on PillarAccessor {
   T assisted<T, P>(P parameter, {PillarKey? key, String? token}) {
     return get<T Function(P)>(key: key, token: token)(parameter);
   }

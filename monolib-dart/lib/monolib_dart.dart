@@ -1,10 +1,11 @@
-export 'src/general/comparison_chain.dart';
+export 'src/general/on_bool.dart';
+export 'src/general/on_comparable.dart';
 export 'src/general/on_empty_iterable.dart';
 export 'src/general/on_empty_iterator.dart';
-export 'src/general/on_empty_on_iterable.dart';
 export 'src/general/on_int.dart';
-export 'src/general/on_iterable_iterable.dart';
-export 'src/general/on_iterable_mapper.dart';
+export 'src/general/on_iterable.dart';
+export 'src/general/on_iterable_of_iterables.dart';
+export 'src/general/on_iterable_of_nullable_functions.dart';
 export 'src/general/on_list.dart';
 export 'src/general/on_nullable_comparable.dart';
 export 'src/general/on_nullable_object.dart';
