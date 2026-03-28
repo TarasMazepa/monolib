@@ -10,12 +10,12 @@ void main() {
           0.5); // floor of -1.5 is -2.0, -1.5 - (-2.0) = 0.5
     });
 
-    test('toStars', () {
-      expect(0.0.toStars(), '🌑🌑🌑🌑🌑');
-      expect(0.5.toStars(), '🌕🌕🌗🌑🌑');
-      expect(1.0.toStars(), '🌕🌕🌕🌕🌕');
-      expect(1.5.toStars(), '🌕🌕🌕🌕🌕');
-      expect((-0.5).toStars(), '🌑🌑🌑🌑🌑');
+    test('toFiveMoonRating', () {
+      expect(0.0.toFiveMoonRating(), '🌑🌑🌑🌑🌑');
+      expect(0.5.toFiveMoonRating(), '🌕🌕🌗🌑🌑');
+      expect(1.0.toFiveMoonRating(), '🌕🌕🌕🌕🌕');
+      expect(1.5.toFiveMoonRating(), '🌕🌕🌕🌕🌕');
+      expect((-0.5).toFiveMoonRating(), '🌑🌑🌑🌑🌑');
     });
   });
 }

@@ -18,7 +18,9 @@ void main() {
           'Charlie      22 88.8 \n' // TableCellAlignLeft string left-aligned
           '        Unknown      \n';
 
-      expect(table.formatTable(), expected);
+      final sink = StringBuffer();
+      table.formatTable(sink);
+      expect(sink.toString(), expected);
     });
   });
 }
