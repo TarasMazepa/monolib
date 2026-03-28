@@ -27,9 +27,7 @@ void main() {
     });
 
     test('encode custom object', () {
-      final input = [
-        _CustomObj()
-      ];
+      final input = [_CustomObj()];
       final output = csv.encode(input);
       expect(output, 'a,b,c\r\n');
     });
@@ -65,14 +63,20 @@ void main() {
         ['john', '20']
       ];
 
-      final res1 = input.skipFirstIfIsCsvHeaderRow(
-        isCsvHeaderRow: (row) => row.isTrimmedDeepEqualsTo(['name', 'age'])
-      ).toList();
-      expect(res1, [['john', '20']]);
+      final res1 = input
+          .skipFirstIfIsCsvHeaderRow(
+              isCsvHeaderRow: (row) =>
+                  row.isTrimmedDeepEqualsTo(['name', 'age']))
+          .toList();
+      expect(res1, [
+        ['john', '20']
+      ]);
 
-      final res2 = input.skipFirstIfIsCsvHeaderRow(
-        isCsvHeaderRow: (row) => row.isTrimmedDeepEqualsTo(['wrong', 'header'])
-      ).toList();
+      final res2 = input
+          .skipFirstIfIsCsvHeaderRow(
+              isCsvHeaderRow: (row) =>
+                  row.isTrimmedDeepEqualsTo(['wrong', 'header']))
+          .toList();
       expect(res2, [
         ['name', 'age'],
         ['john', '20']
