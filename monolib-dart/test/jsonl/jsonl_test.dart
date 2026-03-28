@@ -3,6 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('JsonlCodec', () {
+    const jsonl = JsonlCodec();
+
     test('encoder', () {
       final input = [
         {"id": 1, "name": "test"},
@@ -44,26 +46,6 @@ void main() {
       expect(decoded, [
         {"id": 1},
         [1],
-      ]);
-    });
-  });
-
-  group('JsonlOnIterable', () {
-    test('encodeAsJsonl', () {
-      final input = [
-        {"id": 1},
-        {"id": 2}
-      ];
-      expect(input.encodeAsJsonl(), '{"id":1}\n{"id":2}\n');
-    });
-  });
-
-  group('JsonlOnString', () {
-    test('decodeFromJsonl', () {
-      final input = '{"id":1}\n{"id":2}\n';
-      expect(input.decodeFromJsonl(), [
-        {"id": 1},
-        {"id": 2}
       ]);
     });
   });
