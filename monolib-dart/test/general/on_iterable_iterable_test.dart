@@ -32,5 +32,24 @@ void main() {
       ].mixed.toList();
       expect(result, [1, 4, 5, 2, 6, 3]);
     });
+
+    test('average of multiple iterables of same length', () {
+      final result = [
+        [10, 20],
+        [20, 30],
+        [30, 40],
+      ].average().toList();
+      // (10+20+30)~/3 = 20
+      // (20+30+40)~/3 = 30
+      expect(result, [20, 30]);
+    });
+
+    test('average of different lengths throws StateError', () {
+      final iterables = [
+        [10, 20],
+        [20],
+      ];
+      expect(() => iterables.average().toList(), throwsStateError);
+    });
   });
 }
