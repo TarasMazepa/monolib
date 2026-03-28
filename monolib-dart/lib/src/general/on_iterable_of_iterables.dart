@@ -41,10 +41,7 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
       for (int i = 1; i < iterators.length; i++) {
         sum += iterators[i].current;
       }
-      yield divide(
-        sum,
-        iterators.length,
-      );
+      yield divide(sum, iterators.length);
     }
   }
 }

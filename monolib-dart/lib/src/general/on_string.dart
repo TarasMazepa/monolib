@@ -1,3 +1,5 @@
+import '../csv/csv.dart';
+
 extension OnString on String {
   String removeEndingNewLine() {
     if (isEmpty) return this;
@@ -22,7 +24,13 @@ extension OnString on String {
 
 extension OnNullableString on String? {
   String? emptyToNull() => switch (this) {
-        null || '' => null,
-        _ => this,
-      };
+    null || '' => null,
+    _ => this,
+  };
+}
+
+extension OnStringCsv on String {
+  List<List<String>> decodeCsv() {
+    return csv.decode(this).cast<List<String>>();
+  }
 }
