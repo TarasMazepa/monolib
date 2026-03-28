@@ -1,3 +1,14 @@
+## 0.0.7
+
+- Adds `JsonlCodec`
+- Adds `OnIterableOfStreamControllers`
+- Adds `OnFunctionReturningList`
+- Adds `OnListOfStreamControllers`
+- Adds `OnStreamController`
+- Adds `OnStreamOfLists`
+- Adds `SingleValueCachingStream`
+- Adds `StreamWithClose`
+
 ## 0.0.6
 
 - Adds `NullIOSink`
