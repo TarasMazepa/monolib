@@ -2,7 +2,7 @@ import 'dart:convert';
 
 class FluentJson {
   final dynamic json;
-  final Iterable<dynamic> breadCrumbs;
+  final List<dynamic> breadCrumbs;
 
   const FluentJson({required this.json, this.breadCrumbs = const []});
 
@@ -52,7 +52,7 @@ $e''');
       null => null,
       final json => FluentJson(
           json: json,
-          breadCrumbs: breadCrumbs.followedBy([accessor]),
+          breadCrumbs: [...breadCrumbs, accessor],
         ),
     };
   }
@@ -63,7 +63,7 @@ $e''');
 ${_describeForException()}'''),
       final json => FluentJson(
           json: json,
-          breadCrumbs: breadCrumbs.followedBy([accessor]),
+          breadCrumbs: [...breadCrumbs, accessor],
         ),
     };
   }
@@ -99,7 +99,7 @@ ${_describeForException()}''',
     for (final (index, item) in unbox<List>().indexed) {
       yield FluentJson(
         json: item,
-        breadCrumbs: breadCrumbs.followedBy([index]),
+        breadCrumbs: [...breadCrumbs, index],
       );
     }
   }
