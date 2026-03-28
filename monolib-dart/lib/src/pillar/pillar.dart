@@ -1,6 +1,6 @@
 import '../../monolib_dart.dart';
 import 'pillar_accessor.dart';
-import 'pillar_change_notifier.dart';
+import 'pillar_change_notifier_internal.dart';
 import 'pillar_entry.dart';
 import 'pillar_key.dart';
 import 'pillar_listenable.dart';

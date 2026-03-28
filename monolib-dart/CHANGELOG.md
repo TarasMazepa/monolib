@@ -1,3 +1,8 @@
+## 0.0.8
+
+- Fixes ConcurrentModificationError in PillarChangeNotifier during notification.
+- Extracts PillarChangeNotifierInternal into a separate file.
+
 ## 0.0.7
 
 - Adds `JsonlCodec`

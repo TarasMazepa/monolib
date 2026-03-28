@@ -1,11 +1,5 @@
 import 'pillar_listenable.dart';
 
-class PillarChangeNotifierInternal extends PillarChangeNotifier {
-  void notify() {
-    notifyListeners();
-  }
-}
-
 class PillarChangeNotifier implements PillarListenable {
   final List<void Function()> _listeners = [];
 
@@ -20,7 +14,7 @@ class PillarChangeNotifier implements PillarListenable {
   }
 
   void notifyListeners() {
-    for (final void Function() listener in _listeners) {
+    for (final void Function() listener in [..._listeners]) {
       listener();
     }
   }

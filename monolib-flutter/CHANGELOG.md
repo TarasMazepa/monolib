@@ -1,3 +1,8 @@
+## 0.0.2
+
+- Adds `PillarListenableAdapter`
+- Adds `OnPillarListenable.asListenable` extension
+
 ## 0.0.1
 
 - Adds StreamBuilderForList
