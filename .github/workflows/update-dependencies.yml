@@ -1,0 +1,54 @@
+name: update-dependencies.yml
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "25 12 * * *"
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          cache: true
+          cache-sdk: true
+
+      - run: dart pub upgrade --major-versions
+        working-directory: monolib-dart
+      - run: dart pub get
+        working-directory: monolib-dart
+
+      - run: flutter pub upgrade --major-versions
+        working-directory: monolib-flutter
+      - run: flutter pub get
+        working-directory: monolib-flutter
+
+      - run: dart format . -o none --set-exit-if-changed
+        working-directory: monolib-dart
+      - run: dart format . -o none --set-exit-if-changed
+        working-directory: monolib-flutter
+
+      - run: dart analyze
+        working-directory: monolib-dart
+      - run: flutter analyze
+        working-directory: monolib-flutter
+
+      - run: dart test
+        working-directory: monolib-dart
+      - run: flutter test
+        working-directory: monolib-flutter
+
+      - run: |
+          if ! git diff --quiet; then
+            branch_name=update-dependencies-$(date -u +"%Y-%m-%dT%H-%M-%S")
+            git config --global user.name 'stax'
+            git config --global user.email 'stax@staxforgit.com'
+            git checkout -b $branch_name
+            git commit -a -m "Update dependencies"
+            git push --set-upstream origin $branch_name
+            gh pr merge $(gh pr create -B main -f) --auto --squash
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}

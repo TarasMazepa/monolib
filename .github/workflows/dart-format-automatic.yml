@@ -1,0 +1,42 @@
+name: dart-format-automatic.yml
+on:
+  repository_dispatch:
+    types:
+      - format-dart-code
+
+jobs:
+  dart-format-automatic:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.client_payload.ref }}
+
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          cache: true
+          cache-sdk: true
+
+      - run: dart format .
+        working-directory: monolib-dart
+
+      - run: dart format .
+        working-directory: monolib-flutter
+
+      - run: |
+          if ! git diff --quiet; then
+            branch_name=format-dart-code-in-${BASE#refs/heads/}-branch-at-$(date -u +"%Y-%m-%dT%H-%M-%S")
+            git config --global user.name 'stax'
+            git config --global user.email 'stax@staxforgit.com'
+            git checkout -b $branch_name
+            git commit -a -m "Format dart code in ${BASE#refs/heads/} branch"
+            git push --set-upstream origin $branch_name
+            pr_url=$(gh pr create -B ${BASE#refs/heads/} -f)
+            pr_number=${pr_url##*/}
+            gh pr merge $pr_number --auto --squash
+            gh workflow run check-format-pr-status.yml -f pr_number=$pr_number -f branch_name=$branch_name
+          fi
+        env:
+          BASE: ${{ github.event.client_payload.ref }}
+          GH_TOKEN: ${{ secrets.PAT }}

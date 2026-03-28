@@ -28,9 +28,29 @@ jobs:
         working-directory: monolib-flutter
 
       - run: dart format --output=none --set-exit-if-changed .
+        id: format-check-dart
+        working-directory: monolib-dart
+        continue-on-error: true
+
+      - run: dart format --output=none --set-exit-if-changed .
+        id: format-check-flutter
+        working-directory: monolib-flutter
+        continue-on-error: true
+
+      - uses: peter-evans/repository-dispatch@v3
+        if: ${{ (steps.format-check-dart.outcome == 'failure' || steps.format-check-flutter.outcome == 'failure') && github.event_name == 'pull_request' }}
+        with:
+          token: ${{ secrets.PAT }}
+          repository: TarasMazepa/monolib
+          event-type: format-dart-code
+          client-payload: '{"ref": "${{ github.head_ref }}"}'
+
+      - run: dart format --output=none --set-exit-if-changed .
+        if: steps.format-check-dart.outcome == 'failure'
         working-directory: monolib-dart
 
       - run: dart format --output=none --set-exit-if-changed .
+        if: steps.format-check-flutter.outcome == 'failure'
         working-directory: monolib-flutter
 
       - run: dart analyze --fatal-infos
