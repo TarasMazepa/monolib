@@ -5,3 +5,10 @@ extension OnString on String {
     return substring(0, length - 1);
   }
 }
+
+extension OnNullableString on String? {
+  String? emptyToNull() => switch (this) {
+        null || '' => null,
+        _ => this,
+      };
+}
