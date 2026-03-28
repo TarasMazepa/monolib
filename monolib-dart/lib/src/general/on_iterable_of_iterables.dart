@@ -4,15 +4,15 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
       (iterable) => iterable.iterator,
     ).toList(growable: true);
     while (iterators.isNotEmpty) {
-      for (int i = 0; i < iterators.length;) {
+      int activeCount = 0;
+      for (int i = 0; i < iterators.length; i++) {
         final iterator = iterators[i];
         if (iterator.moveNext()) {
           yield iterator.current;
-          i++;
-        } else {
-          iterators.removeAt(i);
+          iterators[activeCount++] = iterator;
         }
       }
+      iterators.length = activeCount;
     }
   }
 }
