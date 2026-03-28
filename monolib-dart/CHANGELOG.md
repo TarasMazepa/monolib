@@ -1,6 +1,13 @@
 ## 0.0.7
 
-- Update MORE-AGENTS.md
+- Adds `JsonlCodec`
+- Adds `OnIterableOfStreamControllers`
+- Adds `OnFunctionReturningList`
+- Adds `OnListOfStreamControllers`
+- Adds `OnStreamController`
+- Adds `OnStreamOfLists`
+- Adds `SingleValueCachingStream`
+- Adds `StreamWithClose`
 
 ## 0.0.6
 
