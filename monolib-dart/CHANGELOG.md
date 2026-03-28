@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Update MORE-AGENTS.md
+
 ## 0.0.6
 
 - Adds `NullIOSink`
