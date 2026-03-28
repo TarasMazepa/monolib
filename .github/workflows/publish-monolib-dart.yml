@@ -17,11 +17,6 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
 
-      - uses: flutter-actions/setup-flutter@v4
-        with:
-          cache: true
-          cache-sdk: true
-
       - run: dart pub get
         working-directory: monolib-dart
 
