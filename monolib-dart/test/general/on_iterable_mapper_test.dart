@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:monolib_dart/monolib_dart.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('OnIterableMapper', () {
