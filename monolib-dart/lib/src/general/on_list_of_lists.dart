@@ -10,14 +10,14 @@ extension OnListOfLists on List<List> {
       0,
     );
     final strings = toMappedList(
-      (list) => list
-          .map(
-            (x) => switch (x) {
-              null => '',
-              _ => x.toString(),
-            },
-          )
-          .toList(),
+      (list) => list.toMappedList(
+        (x) => switch (x) {
+          null => '',
+          _ => x.toString(),
+        },
+        growable: false,
+      ),
+      growable: false,
     );
     for (final list in strings) {
       for (int i = 0; i < list.length; i++) {
