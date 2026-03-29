@@ -69,13 +69,4 @@ extension OnList<T> on List<T> {
     }
     return true;
   }
-
-  List<T> sorted({int Function(T left, T right)? compare}) =>
-      this..sort(compare);
-
-  List<T> sortedBy<C>(Comparable<C> Function(T) mapper) => this
-    ..sort((left, right) => Comparable.compare(mapper(left), mapper(right)));
-
-  List<T> sortedByDescending<C>(Comparable<C> Function(T) mapper) => this
-    ..sort((left, right) => Comparable.compare(mapper(right), mapper(left)));
 }
