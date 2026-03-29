@@ -1,8 +1,9 @@
 ## 0.0.9
 
-- feat(json): add `OnString.parseAsFluentJson` extension
-- feat(csv): Add CSV codec and extensions
-- feat: extract base utility functions and extensions into monolib-dart
+- Adds `OnString.parseAsFluentJson` extension
+- Adds CSV codec and extensions
+- Extracts base utility functions and extensions into monolib-dart
+
 
 ## 0.0.8
 
