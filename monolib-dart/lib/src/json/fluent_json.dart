@@ -107,10 +107,7 @@ ${_describeForException()}''',
 
   Iterable<FluentJson> unboxIterable() sync* {
     for (final (index, item) in unbox<List>().indexed) {
-      yield FluentJson(
-        json: item,
-        breadCrumbs: [breadCrumbs, index],
-      );
+      yield FluentJson(json: item, breadCrumbs: [breadCrumbs, index]);
     }
   }
 

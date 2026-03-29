@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:async';
-import 'package:test/test.dart';
+import 'dart:convert';
 
 import 'package:monolib_dart/json_encode_async.dart';
+import 'package:test/test.dart';
 
 class CustomWithToJson {
   dynamic toJson() => {'custom': true, 'nested': Future.value('value')};

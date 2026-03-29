@@ -7,5 +7,6 @@ extension type const PillarKey._(({Type type, String? token}) _data) {
   static PillarKey of<T>() => PillarKey(T);
 
   Type get type => _data.type;
+
   String? get token => _data.token;
 }
