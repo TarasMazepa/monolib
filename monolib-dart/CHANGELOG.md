@@ -1,3 +1,9 @@
+## 0.0.9
+
+- feat(json): add `OnString.parseAsFluentJson` extension
+- feat(csv): Add CSV codec and extensions
+- feat: extract base utility functions and extensions into monolib-dart
+
 ## 0.0.8
 
 - Fixes ConcurrentModificationError in PillarChangeNotifier during notification.
