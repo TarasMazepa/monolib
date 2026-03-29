@@ -2,7 +2,9 @@
 
 - Adds `OnString.parseAsFluentJson` extension
 - Adds CSV codec and extensions
-- Extracts base utility functions and extensions into monolib-dart
+- Adds `OnDouble`, `OnFunctionWithNoArguments`, `OnFunctionWithOneArgument`, `OnIterableOfNum`, `OnListOfLists`, and `OnString` extensions.
+- Adds `TableCellAlignLeft` and `TableCellAlignRight` for table formatting.
+
 
 
 ## 0.0.8
