@@ -1,3 +1,12 @@
+## 0.0.9
+
+- Adds `OnString.parseAsFluentJson` extension
+- Adds CSV codec and extensions
+- Adds `OnDouble`, `OnFunctionWithNoArguments`, `OnFunctionWithOneArgument`, `OnIterableOfNum`, `OnListOfLists`, and `OnString` extensions.
+- Adds `TableCellAlignLeft` and `TableCellAlignRight` for table formatting.
+
+
+
 ## 0.0.8
 
 - Fixes ConcurrentModificationError in PillarChangeNotifier during notification.
