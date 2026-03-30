@@ -1,3 +1,7 @@
+## 0.0.13
+
+- Adds `withIOSink` to `IOSink Function()`
+
 ## 0.0.12
 
 - Actually adds jsonlEncodeAsync
