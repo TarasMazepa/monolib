@@ -22,7 +22,7 @@ extension OnString on String {
 
 extension OnNullableString on String? {
   String? emptyToNull() => switch (this) {
-    null || '' => null,
-    _ => this,
-  };
+        null || '' => null,
+        _ => this,
+      };
 }
