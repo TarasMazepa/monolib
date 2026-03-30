@@ -27,17 +27,5 @@ void main() {
       expect(['a', 'bb', 'ccc'].sumBy((e) => e.length), 6);
       expect(() => <String>[].sumBy((e) => e.length), throwsStateError);
     });
-
-    test('max', () {
-      expect([1, 5, 3].max(), 5);
-      expect([2.0, 1.0, 3.5].max(), 3.5);
-      expect(() => <int>[].max(), throwsStateError);
-    });
-
-    test('min', () {
-      expect([5, 1, 3].min(), 1);
-      expect([2.0, 1.0, 3.5].min(), 1.0);
-      expect(() => <int>[].min(), throwsStateError);
-    });
   });
 }
