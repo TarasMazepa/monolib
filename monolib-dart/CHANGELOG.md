@@ -1,3 +1,7 @@
+## 0.0.10
+
+- Adds `toExtendedRadixString` extension method to `int`
+
 ## 0.0.9
 
 - Adds `OnString.parseAsFluentJson` extension
