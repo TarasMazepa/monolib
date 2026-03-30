@@ -1,3 +1,7 @@
+## 0.0.12
+
+- Actually adds jsonlEncodeAsync
+
 ## 0.0.11
 
 - Adds jsonlEncodeAsync
