@@ -43,34 +43,4 @@ extension OnIterable<T> on Iterable<T> {
     }
     return result;
   }
-
-  T max() {
-    final iterator = this.iterator;
-    if (!iterator.moveNext()) {
-      throw StateError("Empty iterable can't be computed max");
-    }
-    dynamic result = iterator.current;
-    while (iterator.moveNext()) {
-      final current = iterator.current;
-      if (result < current) {
-        result = current;
-      }
-    }
-    return result;
-  }
-
-  T min() {
-    final iterator = this.iterator;
-    if (!iterator.moveNext()) {
-      throw StateError("Empty iterable can't be computed min");
-    }
-    dynamic result = iterator.current;
-    while (iterator.moveNext()) {
-      final current = iterator.current;
-      if (result > current) {
-        result = current;
-      }
-    }
-    return result;
-  }
 }

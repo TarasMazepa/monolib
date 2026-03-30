@@ -1,3 +1,8 @@
+## 0.0.10
+
+- Adds `toExtendedRadixString` extension method to `int`
+- Removes `min()` and `max()` extension methods
+
 ## 0.0.9
 
 - Adds `OnString.parseAsFluentJson` extension
