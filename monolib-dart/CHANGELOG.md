@@ -1,3 +1,7 @@
+## 0.0.11
+
+- Adds jsonlEncodeAsync
+
 ## 0.0.10
 
 - Adds `toExtendedRadixString` extension method to `int`
