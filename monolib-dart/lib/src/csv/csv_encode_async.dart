@@ -36,7 +36,6 @@ Future<void> csvEncodeAsync(Object items, StringSink sink) async {
       } else {
         int index = 0;
         bool needsEscaping = cell[0] == '"';
-        String? previous;
         while (!needsEscaping && index < cell.length) {
           final current = cell[index++];
           needsEscaping = switch (current) {
@@ -46,7 +45,6 @@ Future<void> csvEncodeAsync(Object items, StringSink sink) async {
             '"' => true,
             _ => false,
           };
-          previous = current;
         }
         if (needsEscaping) {
           sink.write('"');

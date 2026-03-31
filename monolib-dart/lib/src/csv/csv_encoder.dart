@@ -26,7 +26,6 @@ class CsvEncoder extends Converter<List<dynamic>, String> {
         } else {
           int index = 0;
           bool needsEscaping = cell[0] == '"';
-          String? previous;
           while (!needsEscaping && index < cell.length) {
             final current = cell[index++];
             needsEscaping = switch (current) {
@@ -36,7 +35,6 @@ class CsvEncoder extends Converter<List<dynamic>, String> {
               '"' => true,
               _ => false,
             };
-            previous = current;
           }
           if (needsEscaping) {
             result.write('"');
