@@ -26,16 +26,14 @@ class CsvEncoder extends Converter<List<dynamic>, String> {
         } else {
           int index = 0;
           bool needsEscaping = cell[0] == '"';
-          String? previous;
           while (!needsEscaping && index < cell.length) {
             final current = cell[index++];
             needsEscaping = switch (current) {
               ',' => true,
-              '\r' => false,
-              '\n' when previous == '\r' => true,
+              '\n' => true,
+              '"' => true,
               _ => false,
             };
-            previous = current;
           }
           if (needsEscaping) {
             result.write('"');
