@@ -21,5 +21,3 @@ export 'src/general/on_string.dart';
 export 'src/general/once.dart';
 export 'src/general/table_cell_align_left.dart';
 export 'src/general/table_cell_align_right.dart';
-export 'src/io/on_function.dart';
-export 'src/io/on_io_sink.dart';

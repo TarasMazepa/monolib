@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:monolib_dart/null_io_sink.dart';
+import 'package:monolib_dart/io.dart';
 import 'package:test/test.dart';
 
 void main() {

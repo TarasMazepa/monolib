@@ -1,6 +1,6 @@
 name: monolib_flutter
 description: A collection of general purpose libraries for flutter projects
-version: 0.0.3
+version: 0.0.2
 repository: https://github.com/TarasMazepa/monolib
 
 environment:
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  monolib_dart: ^0.0.14
+  monolib_dart: ^0.0.8
 
 dev_dependencies:
   flutter_test:
