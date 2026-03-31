@@ -32,7 +32,8 @@ class CsvEncoder extends Converter<List<dynamic>, String> {
             needsEscaping = switch (current) {
               ',' => true,
               '\r' => false,
-              '\n' when previous == '\r' => true,
+              '\n' => true,
+              '"' => true,
               _ => false,
             };
             previous = current;
