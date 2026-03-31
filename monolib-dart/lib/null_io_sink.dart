@@ -1,1 +1,1 @@
-export 'src/general/null_io_sink.dart';
+export 'src/io/null_io_sink.dart';
