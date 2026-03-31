@@ -41,7 +41,6 @@ Future<void> csvEncodeAsync(Object items, StringSink sink) async {
           needsEscaping = switch (current) {
             ',' => true,
             '\n' => true,
-            '"' => true,
             _ => false,
           };
         }
