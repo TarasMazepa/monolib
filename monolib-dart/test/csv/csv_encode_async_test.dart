@@ -40,18 +40,12 @@ void main() {
       ];
       final buffer = StringBuffer();
       await csvEncodeAsync(items, buffer);
-      expect(
-        buffer.toString(),
-        'a,b,c\r\n1,2,3\r\n',
-      );
+      expect(buffer.toString(), 'a,b,c\r\n1,2,3\r\n');
     });
 
     test('throws ArgumentError for invalid input', () async {
       final buffer = StringBuffer();
-      expect(
-        () => csvEncodeAsync('invalid', buffer),
-        throwsArgumentError,
-      );
+      expect(() => csvEncodeAsync('invalid', buffer), throwsArgumentError);
     });
   });
 }

@@ -1,3 +1,8 @@
+## 0.0.15
+
+- Adds `csvEncodeAsync` asynchronous CSV stream encoder
+- Adds `OnFutureFunction` extension with `asyncCallWithRetryOnFailure` and `asyncRetryOnFailure` global function
+
 ## 0.0.14
 
 - Adds `withIOSink` to `IOSink`
