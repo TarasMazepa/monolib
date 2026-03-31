@@ -10,8 +10,8 @@ import 'scope_tracking_pillar_accessor.dart';
 
 typedef PillarFactory<T> = T Function(PillarAccessor);
 typedef PillarPureFactory<T> = T Function();
-typedef PillarFactoryWithScopeTracking<T> = ({T value, PillarScope? scope})
-    Function();
+typedef PillarFactoryWithScopeTracking<T> =
+    ({T value, PillarScope? scope}) Function();
 
 class Pillar implements PillarAccessor {
   final Map<PillarKey, PillarEntry> _map = {};
@@ -28,8 +28,8 @@ class Pillar implements PillarAccessor {
       (final key?, null) => key,
       (null, final token) => PillarKey.withToken(T, token: token),
       _ => throw Exception(
-          'You need to provide key or token or none, but not both',
-        ),
+        'You need to provide key or token or none, but not both',
+      ),
     };
   }
 
@@ -62,28 +62,28 @@ class Pillar implements PillarAccessor {
     _map[effectiveKey] = PillarEntry(
       key: effectiveKey,
       factory: switch ((factory, pureFactory, instance, scope)) {
-        (PillarFactory factory, null, null, PillarScope _) => () =>
-            ScopeEnforcingPillarAccessor(
-              _map[effectiveKey]!,
-              _get,
-            ).wrapFactory(factory),
-        (PillarFactory factory, null, null, null) => () =>
-            ScopeTrackingPillarAccessor(_get).wrapFactory(factory),
+        (PillarFactory factory, null, null, PillarScope _) =>
+          () => ScopeEnforcingPillarAccessor(
+            _map[effectiveKey]!,
+            _get,
+          ).wrapFactory(factory),
+        (PillarFactory factory, null, null, null) =>
+          () => ScopeTrackingPillarAccessor(_get).wrapFactory(factory),
         (null, PillarPureFactory factory, null, _) => () => (
-              value: factory(),
-              scope: null,
-            ),
+          value: factory(),
+          scope: null,
+        ),
         (null, null, T _, PillarScope _) => () {
-            throw Exception(
-              'Instance should have been used instead of calling factory method',
-            );
-          },
+          throw Exception(
+            'Instance should have been used instead of calling factory method',
+          );
+        },
         (null, null, T _, null) => throw Exception(
-            'Instance should have scope specified',
-          ),
+          'Instance should have scope specified',
+        ),
         _ => throw Exception(
-            'You should supply factory, pureFactory, or instance',
-          ),
+          'You should supply factory, pureFactory, or instance',
+        ),
       },
       value: instance,
       instanceScope: scope,

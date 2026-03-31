@@ -1,3 +1,8 @@
+## 0.0.15
+
+- Adds `csvEncodeAsync` asynchronous CSV stream encoder
+- Adds `OnFutureFunction` extension
+
 ## 0.0.14
 
 - Adds `withIOSink` to `IOSink`
