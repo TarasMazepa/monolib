@@ -1,3 +1,7 @@
+## 0.0.14
+
+- Adds `withIOSink` to `IOSink`
+
 ## 0.0.13
 
 - Adds `withIOSink` to `IOSink Function()`

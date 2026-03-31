@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/io.dart';
 import 'package:test/test.dart';
 
 void main() {
