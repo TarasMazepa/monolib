@@ -16,7 +16,6 @@ Future<void> jsonlEncodeAsync(Object items, StringSink sink) async {
 
     default:
       throw ArgumentError(
-        'The "items" parameter must be an Iterable or a Stream.',
-      );
+          'The "items" parameter must be an Iterable or a Stream.');
   }
 }
