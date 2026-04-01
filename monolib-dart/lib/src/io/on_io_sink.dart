@@ -1,9 +1,9 @@
 import 'dart:io';
 
 extension OnIoSink on IOSink {
-  Future<void> withIOSink(Future<void> Function(IOSink) call) async {
+  Future<T> withIOSink<T>(Future<T> Function(IOSink) call) async {
     try {
-      await call(this);
+      return await call(this);
     } finally {
       await flush();
       await close();
