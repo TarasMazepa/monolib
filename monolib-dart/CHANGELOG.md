@@ -1,3 +1,7 @@
+## 0.0.16
+
+- Adds `jsonEncodeAsyncForIOSink`, `jsonlEncodeAsyncForIOSink`, and `csvEncodeAsyncForIOSink`
+
 ## 0.0.15
 
 - Adds `csvEncodeAsync` asynchronous CSV stream encoder

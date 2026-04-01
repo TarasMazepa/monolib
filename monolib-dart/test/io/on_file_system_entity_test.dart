@@ -8,8 +8,9 @@ void main() {
     late Directory tempDir;
 
     setUp(() async {
-      tempDir =
-          await Directory.systemTemp.createTemp('on_file_system_entity_test_');
+      tempDir = await Directory.systemTemp.createTemp(
+        'on_file_system_entity_test_',
+      );
     });
 
     tearDown(() async {
@@ -27,13 +28,15 @@ void main() {
       expect(await file.exists(), isFalse);
     });
 
-    test('deleteQuietly does not throw when deleting a non-existent file',
-        () async {
-      final file = File('${tempDir.path}/non_existent_file.txt');
-      expect(await file.exists(), isFalse);
+    test(
+      'deleteQuietly does not throw when deleting a non-existent file',
+      () async {
+        final file = File('${tempDir.path}/non_existent_file.txt');
+        expect(await file.exists(), isFalse);
 
-      await expectLater(file.deleteQuietly(), completes);
-    });
+        await expectLater(file.deleteQuietly(), completes);
+      },
+    );
 
     test('deleteQuietly deletes an empty directory', () async {
       final dir = Directory('${tempDir.path}/test_dir');
@@ -44,41 +47,46 @@ void main() {
       expect(await dir.exists(), isFalse);
     });
 
-    test('deleteQuietly does not throw when deleting a non-existent directory',
-        () async {
-      final dir = Directory('${tempDir.path}/non_existent_dir');
-      expect(await dir.exists(), isFalse);
+    test(
+      'deleteQuietly does not throw when deleting a non-existent directory',
+      () async {
+        final dir = Directory('${tempDir.path}/non_existent_dir');
+        expect(await dir.exists(), isFalse);
 
-      await expectLater(dir.deleteQuietly(), completes);
-    });
+        await expectLater(dir.deleteQuietly(), completes);
+      },
+    );
 
     test(
-        'deleteQuietly without recursive: true does not throw when deleting a non-empty directory',
-        () async {
-      final dir = Directory('${tempDir.path}/test_dir_not_empty');
-      await dir.create();
-      final file = File('${dir.path}/test_file.txt');
-      await file.create();
+      'deleteQuietly without recursive: true does not throw when deleting a non-empty directory',
+      () async {
+        final dir = Directory('${tempDir.path}/test_dir_not_empty');
+        await dir.create();
+        final file = File('${dir.path}/test_file.txt');
+        await file.create();
 
-      // Deleting a non-empty directory without recursive: true would normally throw FileSystemException.
-      // deleteQuietly should catch it and not throw.
-      await expectLater(dir.deleteQuietly(), completes);
+        // Deleting a non-empty directory without recursive: true would normally throw FileSystemException.
+        // deleteQuietly should catch it and not throw.
+        await expectLater(dir.deleteQuietly(), completes);
 
-      // The directory should still exist since delete failed
-      expect(await dir.exists(), isTrue);
-    });
+        // The directory should still exist since delete failed
+        expect(await dir.exists(), isTrue);
+      },
+    );
 
-    test('deleteQuietly with recursive: true deletes a non-empty directory',
-        () async {
-      final dir = Directory('${tempDir.path}/test_dir_recursive');
-      await dir.create();
-      final file = File('${dir.path}/test_file.txt');
-      await file.create();
+    test(
+      'deleteQuietly with recursive: true deletes a non-empty directory',
+      () async {
+        final dir = Directory('${tempDir.path}/test_dir_recursive');
+        await dir.create();
+        final file = File('${dir.path}/test_file.txt');
+        await file.create();
 
-      await dir.deleteQuietly(recursive: true);
+        await dir.deleteQuietly(recursive: true);
 
-      // The directory should be deleted
-      expect(await dir.exists(), isFalse);
-    });
+        // The directory should be deleted
+        expect(await dir.exists(), isFalse);
+      },
+    );
   });
 }
