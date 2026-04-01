@@ -58,7 +58,9 @@ class CsvDecoder extends Converter<String, List<List<String>>> {
         }
       }
     }
-    if (items[leftIndex - 1] == ',' || leftIndex != rightIndex) {
+    if (items.isNotEmpty &&
+        (leftIndex > 0 && items[leftIndex - 1] == ',' ||
+            leftIndex != rightIndex)) {
       result.last.add(items.substring(leftIndex, rightIndex));
     }
     if (result.last.isEmpty) {
