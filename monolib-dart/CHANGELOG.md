@@ -1,10 +1,6 @@
 ## 0.0.16
 
 - Adds `jsonEncodeAsyncForIOSink`, `jsonlEncodeAsyncForIOSink`, and `csvEncodeAsyncForIOSink`
-- Adds `csvEncodeAsync` asynchronous CSV stream encoder
-- Adds `OnFutureFunction` extension with `asyncCallWithRetryOnFailure` and `asyncRetryOnFailure` global function
-- Adds `withIOSink` to `IOSink`
-- Adds `withIOSink` to `IOSink Function()`
 
 ## 0.0.15
 

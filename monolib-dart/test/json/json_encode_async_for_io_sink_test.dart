@@ -1,7 +1,7 @@
 import 'package:monolib_dart/json_encode_async.dart';
 import 'package:test/test.dart';
 
-import 'mock_io_sink.dart';
+import '../io/mock_io_sink.dart';
 
 void main() {
   group('jsonEncodeAsyncForIOSink', () {
