@@ -60,8 +60,8 @@ class Batcher<T> {
 
     if (_buffer.length >= maxBatchSize) {
       _emit();
-    } else if (_timer == null) {
-      _timer = Timer(maxDuration, _emit);
+    } else {
+      _timer ??= Timer(maxDuration, _emit);
     }
   }
 
