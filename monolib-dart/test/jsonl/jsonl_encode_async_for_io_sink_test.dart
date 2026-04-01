@@ -1,4 +1,4 @@
-import 'package:monolib_dart/io.dart';
+import 'package:monolib_dart/jsonl.dart';
 import 'package:test/test.dart';
 
 import 'mock_io_sink.dart';
