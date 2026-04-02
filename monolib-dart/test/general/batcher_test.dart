@@ -99,6 +99,25 @@ void main() {
       expect(() => batcher.add(1), throwsStateError);
     });
 
+    test(
+        'silently ignores items when adding after dispose with throwOnAddAfterDispose false',
+        () async {
+      final List<List<int>> emittedBatches = <List<int>>[];
+      final Batcher<int> batcher = Batcher<int>(
+        maxBatchSize: 10,
+        maxDuration: const Duration(milliseconds: 500),
+        onBatch: (List<int> batch) {
+          emittedBatches.add(batch);
+        },
+        throwOnAddAfterDispose: false,
+      );
+
+      await batcher.dispose();
+
+      expect(() => batcher.add(1), returnsNormally);
+      expect(emittedBatches, isEmpty);
+    });
+
     test('waits for async onBatch to finish when disposing', () async {
       final List<List<int>> emittedBatches = <List<int>>[];
       bool asyncOperationCompleted = false;
@@ -146,6 +165,74 @@ void main() {
       await batcher.dispose();
 
       expect(completedBatches, 2);
+    });
+
+    test('works with null maxBatchSize', () async {
+      final List<List<int>> emittedBatches = <List<int>>[];
+      final Batcher<int> batcher = Batcher<int>(
+        maxBatchSize: null,
+        maxDuration: const Duration(milliseconds: 50),
+        onBatch: (List<int> batch) {
+          emittedBatches.add(batch);
+        },
+      );
+
+      batcher.add(1);
+      batcher.add(2);
+      batcher.add(3);
+
+      expect(emittedBatches, isEmpty);
+
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(emittedBatches, hasLength(1));
+      expect(emittedBatches[0], equals(<int>[1, 2, 3]));
+
+      await batcher.dispose();
+    });
+
+    test('works with null maxDuration', () async {
+      final List<List<int>> emittedBatches = <List<int>>[];
+      final Batcher<int> batcher = Batcher<int>(
+        maxBatchSize: 3,
+        maxDuration: null,
+        onBatch: (List<int> batch) {
+          emittedBatches.add(batch);
+        },
+      );
+
+      batcher.add(1);
+      batcher.add(2);
+
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(emittedBatches, isEmpty); // Shouldn't emit on duration
+
+      batcher.add(3);
+      expect(emittedBatches, hasLength(1));
+      expect(emittedBatches[0], equals(<int>[1, 2, 3]));
+
+      await batcher.dispose();
+    });
+
+    test('does not emit automatically if both are null', () async {
+      final List<List<int>> emittedBatches = <List<int>>[];
+      final Batcher<int> batcher = Batcher<int>(
+        maxBatchSize: null,
+        maxDuration: null,
+        onBatch: (List<int> batch) {
+          emittedBatches.add(batch);
+        },
+      );
+
+      batcher.add(1);
+      batcher.add(2);
+      batcher.add(3);
+
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(emittedBatches, isEmpty);
+
+      await batcher.dispose();
+      expect(emittedBatches, hasLength(1));
+      expect(emittedBatches[0], equals(<int>[1, 2, 3]));
     });
   });
 }
