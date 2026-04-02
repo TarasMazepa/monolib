@@ -1,7 +1,13 @@
 import 'dart:convert';
 
 extension OnStreamOfListOfInt on Stream<List<int>> {
-  /// Decodes the stream as UTF-8 and splits it into lines.
+  Future<String> readLine() {
+    return cast<List<int>>()
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .first;
+  }
+
   Stream<String> utf8DecodeAndLineSplit() {
     return cast<List<int>>()
         .transform(utf8.decoder)
