@@ -36,48 +36,75 @@ import 'dart:async';
 /// ```
 class Batcher<T> {
   /// The maximum number of items in a single batch.
-  final int maxBatchSize;
+  /// If null, the batcher will not emit based on size.
+  final int? maxBatchSize;
 
   /// The maximum duration to wait before emitting a batch after the first item is added.
-  final Duration maxDuration;
+  /// If null, the batcher will not emit based on duration.
+  final Duration? maxDuration;
 
   /// The callback to invoke when a batch is ready.
-  final void Function(List<T>) onBatch;
+  final FutureOr<void> Function(List<T>) onBatch;
+
+  /// Whether to throw a [StateError] if items are added after the batcher is disposed.
+  final bool throwOnAddAfterDispose;
 
   List<T> _buffer = <T>[];
   Timer? _timer;
+  bool _isDisposed = false;
+  final List<Future<void>> _inflightBatches = <Future<void>>[];
 
   /// Creates a [Batcher] that groups items into batches.
   Batcher({
-    required this.maxBatchSize,
-    required this.maxDuration,
+    this.maxBatchSize,
+    this.maxDuration,
     required this.onBatch,
-  }) : assert(maxBatchSize > 0);
+    this.throwOnAddAfterDispose = true,
+  }) : assert(maxBatchSize == null || maxBatchSize > 0);
 
   /// Adds an item to the current batch.
   void add(T item) {
+    if (_isDisposed) {
+      if (throwOnAddAfterDispose) {
+        throw StateError('Cannot add items to a disposed Batcher.');
+      }
+      return;
+    }
+
     _buffer.add(item);
 
-    if (_buffer.length >= maxBatchSize) {
-      _emit();
-    } else {
-      _timer ??= Timer(maxDuration, _emit);
+    if (maxBatchSize != null && _buffer.length >= maxBatchSize!) {
+      unawaited(_emit());
+    } else if (maxDuration != null) {
+      _timer ??= Timer(maxDuration!, _emit);
     }
   }
 
-  void _emit() {
+  Future<void> _emit() async {
     _timer?.cancel();
     _timer = null;
 
     if (_buffer.isNotEmpty) {
       final List<T> batch = _buffer;
       _buffer = <T>[];
-      onBatch(batch);
+
+      late Future<void> future;
+      future = Future<void>.sync(() async {
+        try {
+          await onBatch(batch);
+        } finally {
+          _inflightBatches.remove(future);
+        }
+      });
+      _inflightBatches.add(future);
+
+      await future;
     }
   }
 
   /// Cancels any active timers and immediately emits any remaining items in the buffer.
-  void dispose() {
-    _emit();
+  Future<void> dispose() async {
+    _isDisposed = true;
+    await <Future<void>>[_emit(), ..._inflightBatches].wait;
   }
 }
