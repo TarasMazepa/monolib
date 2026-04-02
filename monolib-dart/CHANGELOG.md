@@ -1,3 +1,8 @@
+## 0.0.17
+
+- Enhances `Batcher` with proper asynchronous disposal (waits for all in-flight batches) and allows nullable limits (`maxBatchSize` / `maxDuration`). Adds `throwOnAddAfterDispose` configuration flag.
+- Adds `OnStreamOfListOfInt` extension on `Stream<List<int>>` with `readLine()` and `utf8DecodeAndLineSplit()`.
+
 ## 0.0.16
 
 - Adds `jsonEncodeAsyncForIOSink`, `jsonlEncodeAsyncForIOSink`, and `csvEncodeAsyncForIOSink`
