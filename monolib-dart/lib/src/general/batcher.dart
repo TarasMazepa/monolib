@@ -42,10 +42,12 @@ class Batcher<T> {
   final Duration maxDuration;
 
   /// The callback to invoke when a batch is ready.
-  final void Function(List<T>) onBatch;
+  final FutureOr<void> Function(List<T>) onBatch;
 
   List<T> _buffer = <T>[];
   Timer? _timer;
+  bool _isDisposed = false;
+  final List<Future<void>> _inflightBatches = <Future<void>>[];
 
   /// Creates a [Batcher] that groups items into batches.
   Batcher({
@@ -56,6 +58,10 @@ class Batcher<T> {
 
   /// Adds an item to the current batch.
   void add(T item) {
+    if (_isDisposed) {
+      throw StateError('Cannot add items to a disposed Batcher.');
+    }
+
     _buffer.add(item);
 
     if (_buffer.length >= maxBatchSize) {
@@ -65,19 +71,29 @@ class Batcher<T> {
     }
   }
 
-  void _emit() {
+  Future<void> _emit() async {
     _timer?.cancel();
     _timer = null;
 
     if (_buffer.isNotEmpty) {
       final List<T> batch = _buffer;
       _buffer = <T>[];
-      onBatch(batch);
+
+      late Future<void> future;
+      future = Future<void>.sync(() async {
+        await onBatch(batch);
+        _inflightBatches.remove(future);
+      });
+      _inflightBatches.add(future);
+
+      await future;
     }
   }
 
   /// Cancels any active timers and immediately emits any remaining items in the buffer.
-  void dispose() {
-    _emit();
+  Future<void> dispose() async {
+    _isDisposed = true;
+    final Future<void> finalEmit = _emit();
+    await Future.wait(<Future<void>>[finalEmit, ..._inflightBatches]);
   }
 }
