@@ -61,7 +61,7 @@ class CsvDecoder extends Converter<String, List<List<String>>> {
     if (items[leftIndex - 1] == ',' || leftIndex != rightIndex) {
       result.last.add(items.substring(leftIndex, rightIndex));
     }
-    if (result.last.isEmpty) {
+    while (result.isNotEmpty && result.last.isEmpty) {
       result.removeLast();
     }
     return result;

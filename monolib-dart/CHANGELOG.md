@@ -1,3 +1,7 @@
+## 0.0.18
+
+- CsvDecoder - ensuring that no empty lists would be output at the end of the csv list of lists
+
 ## 0.0.17
 
 - Enhances `Batcher` with proper asynchronous disposal (waits for all in-flight batches) and allows nullable limits (`maxBatchSize` / `maxDuration`). Adds `throwOnAddAfterDispose` configuration flag.
