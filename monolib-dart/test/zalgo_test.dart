@@ -46,7 +46,7 @@ void main() {
     test('decode undecodable string throws', () {
       // we need to create a string with one character encodable and another outside decodable range
       final encodableStart = String.fromCharCode(32);
-      expect(() => zalgoDecodeSingle(encodableStart + 'a'), throwsException);
+      expect(() => zalgoDecodeSingle('${encodableStart}a'), throwsException);
     });
   });
 }

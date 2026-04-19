@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:monolib_flutter/monolib_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:monolib_dart/monolib_dart.dart';
@@ -20,7 +19,7 @@ void main() {
     test('ZalgoTextRange decodedTextInside', () {
       final originalText = 'Hello';
       final encodedText = zalgoEncode(originalText);
-      final text = 'abc' + encodedText + 'def';
+      final text = 'abc${encodedText}def';
 
       final zalgoRange =
           ZalgoTextRange(start: 3, end: 3 + encodedText.length, isZalgo: true);
@@ -48,7 +47,7 @@ void main() {
     test('mapZalgoRanges parses mixed text', () {
       final original = 'Zalgo';
       final encoded = zalgoEncode(original);
-      final text = 'abc' + encoded + 'def';
+      final text = 'abc${encoded}def';
 
       final ranges = mapZalgoRanges(text);
       expect(ranges, hasLength(3));
