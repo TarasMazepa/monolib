@@ -1,3 +1,7 @@
+## 0.0.19
+
+- Adds Zalgo encoding and decoding functions
+
 ## 0.0.18
 
 - CsvDecoder - ensuring that no empty lists would be output at the end of the csv list of lists

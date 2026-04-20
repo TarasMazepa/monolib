@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Adds `ZalgoTextRange` and `mapZalgoRanges` functions
+
 ## 0.0.2
 
 - Adds `PillarListenableAdapter`
