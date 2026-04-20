@@ -1,4 +1,4 @@
-import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/zalgo.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -39,7 +39,7 @@ void main() {
 
     test('encode unencodable string throws', () {
       // outside 32-126
-      expect(() => zalgoEncode('Привет'), throwsException);
+      expect(() => zalgoEncode('Привіт'), throwsException);
       expect(() => zalgoEncode('\n'), throwsException);
     });
 

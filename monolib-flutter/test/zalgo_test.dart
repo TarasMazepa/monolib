@@ -1,6 +1,6 @@
-import 'package:monolib_flutter/monolib_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/zalgo.dart';
+import 'package:monolib_flutter/zalgo.dart';
 
 void main() {
   group('ZalgoTextRange and mapZalgoRanges', () {
