@@ -1,3 +1,7 @@
+## 0.0.20
+
+- Adds `Flag` and related models (`FlagFindResult`, `FlagFindType`, `OptionalFlagResult`) for parsing CLI arguments to `cli.dart`.
+
 ## 0.0.19
 
 - Adds Zalgo encoding and decoding functions
