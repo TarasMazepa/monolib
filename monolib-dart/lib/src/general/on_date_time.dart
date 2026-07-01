@@ -1,7 +1,7 @@
 extension Iso8601WithTimeZone on DateTime {
   String toIso8601StringWithTz() {
     // Get the timezone offset
-    final duration = this.timeZoneOffset;
+    final duration = timeZoneOffset;
 
     // Extract hours and minutes
     final hours = duration.inHours.abs().toString().padLeft(2, '0');
@@ -14,7 +14,7 @@ extension Iso8601WithTimeZone on DateTime {
 
     // Get the standard ISO string
     // If the time is UTC, Dart appends a 'Z'. We remove it so we can append '+00:00' instead.
-    final isoString = this.toIso8601String().replaceAll('Z', '');
+    final isoString = toIso8601String().replaceAll('Z', '');
 
     // Combine them
     return '$isoString$formattedOffset';
