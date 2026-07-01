@@ -1,3 +1,7 @@
+## 0.0.21
+
+- Adds `Iso8601WithTimeZone` extension on `DateTime` with `toIso8601StringWithTz` method.
+
 ## 0.0.20
 
 - Adds `Flag` and related models (`FlagFindResult`, `FlagFindType`, `OptionalFlagResult`) for parsing CLI arguments to `cli.dart`.
