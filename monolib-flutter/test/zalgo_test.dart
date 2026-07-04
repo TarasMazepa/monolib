@@ -21,8 +21,11 @@ void main() {
       final encodedText = zalgoEncode(originalText);
       final text = 'abc${encodedText}def';
 
-      final zalgoRange =
-          ZalgoTextRange(start: 3, end: 3 + encodedText.length, isZalgo: true);
+      final zalgoRange = ZalgoTextRange(
+        start: 3,
+        end: 3 + encodedText.length,
+        isZalgo: true,
+      );
       expect(zalgoRange.decodedTextInside(text), originalText);
 
       final normalRange = ZalgoTextRange(start: 0, end: 3, isZalgo: false);
@@ -30,18 +33,24 @@ void main() {
     });
 
     test('ZalgoTextRange equality', () {
-      expect(ZalgoTextRange(start: 1, end: 2, isZalgo: true),
-          equals(ZalgoTextRange(start: 1, end: 2, isZalgo: true)));
-      expect(ZalgoTextRange(start: 1, end: 2, isZalgo: true),
-          isNot(equals(ZalgoTextRange(start: 1, end: 2, isZalgo: false))));
+      expect(
+        ZalgoTextRange(start: 1, end: 2, isZalgo: true),
+        equals(ZalgoTextRange(start: 1, end: 2, isZalgo: true)),
+      );
+      expect(
+        ZalgoTextRange(start: 1, end: 2, isZalgo: true),
+        isNot(equals(ZalgoTextRange(start: 1, end: 2, isZalgo: false))),
+      );
     });
 
     test('mapZalgoRanges parses plain text', () {
       final text = 'Hello world';
       final ranges = mapZalgoRanges(text);
       expect(ranges, hasLength(1));
-      expect(ranges.first,
-          equals(ZalgoTextRange(start: 0, end: 11, isZalgo: false)));
+      expect(
+        ranges.first,
+        equals(ZalgoTextRange(start: 0, end: 11, isZalgo: false)),
+      );
     });
 
     test('mapZalgoRanges parses mixed text', () {
@@ -53,15 +62,25 @@ void main() {
       expect(ranges, hasLength(3));
 
       expect(
-          ranges[0], equals(ZalgoTextRange(start: 0, end: 3, isZalgo: false)));
+        ranges[0],
+        equals(ZalgoTextRange(start: 0, end: 3, isZalgo: false)),
+      );
       expect(
-          ranges[1],
-          equals(ZalgoTextRange(
-              start: 3, end: 3 + encoded.length, isZalgo: true)));
+        ranges[1],
+        equals(
+          ZalgoTextRange(start: 3, end: 3 + encoded.length, isZalgo: true),
+        ),
+      );
       expect(
-          ranges[2],
-          equals(ZalgoTextRange(
-              start: 3 + encoded.length, end: text.length, isZalgo: false)));
+        ranges[2],
+        equals(
+          ZalgoTextRange(
+            start: 3 + encoded.length,
+            end: text.length,
+            isZalgo: false,
+          ),
+        ),
+      );
     });
   });
 }
