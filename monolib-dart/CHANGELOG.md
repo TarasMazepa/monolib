@@ -1,3 +1,8 @@
+## 0.0.22
+
+- Adds `CsvRowDecoder` for streaming asynchronous chunked CSV parsing.
+- Adds rfc4180 compatibility parity tests for Csv encoders/decoders.
+
 ## 0.0.21
 
 - Adds `Iso8601WithTimeZone` extension on `DateTime` with `toIso8601StringWithTz` method.
