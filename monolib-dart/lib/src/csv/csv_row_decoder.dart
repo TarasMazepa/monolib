@@ -10,13 +10,9 @@ class CsvRowDecoder extends StreamTransformerBase<String, List<String>> {
       bool isInsideDoubleQuotes = false;
       List<String> currentRow = [];
       int previousChar = -1;
-      bool pendingDoubleQuote = false;
 
       void processBuffer(bool isDone) {
         if (buffer.isEmpty && isDone) {
-          if (pendingDoubleQuote) {
-            currentRow.add('');
-          }
           if (currentRow.isNotEmpty || previousChar == 44 /* ',' */) {
             if (previousChar == 44) currentRow.add('');
             if (currentRow.isNotEmpty) controller.add(currentRow);
