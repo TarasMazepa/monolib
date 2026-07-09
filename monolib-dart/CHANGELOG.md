@@ -1,3 +1,8 @@
+## 0.0.23
+
+- Adds `StreamWhereTypeExtension` with `whereType<R>()` method to `Stream`.
+- Adds `MapNotNullStreamExtension` with `mapNotNull<R>()` method to `Stream`.
+
 ## 0.0.22
 
 - Adds `CsvRowDecoder` for streaming asynchronous chunked CSV parsing.
