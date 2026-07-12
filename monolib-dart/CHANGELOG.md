@@ -1,3 +1,7 @@
+## 0.0.24
+
+- Adds `LazyJson` class to defer JSON evaluation.
+
 ## 0.0.23
 
 - Adds `StreamWhereTypeExtension` with `whereType<R>()` method to `Stream`.
