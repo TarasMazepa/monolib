@@ -9,7 +9,7 @@ void main() {
       final result = await stream.transform(const CsvRowDecoder()).toList();
       expect(result, [
         ['a', 'b', 'c'],
-        ['1', '2', '3']
+        ['1', '2', '3'],
       ]);
     });
   });
@@ -37,7 +37,7 @@ void main() {
       expect(result, [
         ['a', '', 'c'],
         ['', 'b', ''],
-        ['x', '', '']
+        ['x', '', ''],
       ]);
     });
 

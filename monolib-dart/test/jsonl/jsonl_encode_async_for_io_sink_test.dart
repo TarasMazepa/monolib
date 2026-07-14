@@ -8,7 +8,7 @@ void main() {
     test('returns a function that writes jsonl to sink', () async {
       final data = [
         {'hello': 'world'},
-        {'foo': 'bar'}
+        {'foo': 'bar'},
       ];
       final buffer = StringBuffer();
       final sink = MockIOSink(buffer);

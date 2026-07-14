@@ -21,8 +21,12 @@ void main() {
     });
 
     test('mapNotNull handles mapping to different types', () async {
-      final stream =
-          Stream<String>.fromIterable(['apple', 'banana', 'kiwi', 'pear']);
+      final stream = Stream<String>.fromIterable([
+        'apple',
+        'banana',
+        'kiwi',
+        'pear',
+      ]);
 
       final mappedStream = stream.mapNotNull<int>((event) {
         if (event.length > 4) {
@@ -39,8 +43,9 @@ void main() {
     test('mapNotNull works with empty streams', () async {
       final emptyStream = Stream<int>.empty();
 
-      final mappedStream =
-          emptyStream.mapNotNull<String>((event) => event.toString());
+      final mappedStream = emptyStream.mapNotNull<String>(
+        (event) => event.toString(),
+      );
       final result = await mappedStream.toList();
 
       expect(result, isEmpty);

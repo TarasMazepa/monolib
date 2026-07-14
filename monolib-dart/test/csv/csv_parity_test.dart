@@ -13,18 +13,25 @@ void main() {
       expect(csvCodec.decode(input), expected, reason: 'CsvDecoder failed');
 
       // Test asynchronous CsvRowDecoder (single chunk)
-      final streamResult1 =
-          await Stream.value(input).transform(csvRowDecoder).toList();
-      expect(streamResult1, expected,
-          reason: 'CsvRowDecoder (single chunk) failed');
+      final streamResult1 = await Stream.value(
+        input,
+      ).transform(csvRowDecoder).toList();
+      expect(
+        streamResult1,
+        expected,
+        reason: 'CsvRowDecoder (single chunk) failed',
+      );
 
       // Test asynchronous CsvRowDecoder (char by char chunks)
       final charChunks = input.split('');
-      final streamResult2 = await Stream.fromIterable(charChunks)
-          .transform(csvRowDecoder)
-          .toList();
-      expect(streamResult2, expected,
-          reason: 'CsvRowDecoder (char chunks) failed');
+      final streamResult2 = await Stream.fromIterable(
+        charChunks,
+      ).transform(csvRowDecoder).toList();
+      expect(
+        streamResult2,
+        expected,
+        reason: 'CsvRowDecoder (char chunks) failed',
+      );
     }
 
     test('aaa,bbb,ccc\r\nzzz,yyy,xxx\r\n', () async {

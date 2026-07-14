@@ -32,22 +32,26 @@ void main() {
       expect(result, equals(expected));
     });
 
-    test('toIso8601StringWithTz can be parsed back by DateTime.parse (local)',
-        () {
-      final dateTime = DateTime.now();
-      final isoString = dateTime.toIso8601StringWithTz();
-      final parsed = DateTime.parse(isoString);
+    test(
+      'toIso8601StringWithTz can be parsed back by DateTime.parse (local)',
+      () {
+        final dateTime = DateTime.now();
+        final isoString = dateTime.toIso8601StringWithTz();
+        final parsed = DateTime.parse(isoString);
 
-      expect(parsed.isAtSameMomentAs(dateTime), isTrue);
-    });
+        expect(parsed.isAtSameMomentAs(dateTime), isTrue);
+      },
+    );
 
-    test('toIso8601StringWithTz can be parsed back by DateTime.parse (UTC)',
-        () {
-      final dateTime = DateTime.now().toUtc();
-      final isoString = dateTime.toIso8601StringWithTz();
-      final parsed = DateTime.parse(isoString);
+    test(
+      'toIso8601StringWithTz can be parsed back by DateTime.parse (UTC)',
+      () {
+        final dateTime = DateTime.now().toUtc();
+        final isoString = dateTime.toIso8601StringWithTz();
+        final parsed = DateTime.parse(isoString);
 
-      expect(parsed.isAtSameMomentAs(dateTime), isTrue);
-    });
+        expect(parsed.isAtSameMomentAs(dateTime), isTrue);
+      },
+    );
   });
 }

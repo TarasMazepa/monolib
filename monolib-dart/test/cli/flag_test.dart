@@ -145,8 +145,11 @@ void main() {
     });
 
     test('toString', () {
-      final flag1 =
-          Flag(short: '-v', long: '--verbose', description: 'Verbose mode');
+      final flag1 = Flag(
+        short: '-v',
+        long: '--verbose',
+        description: 'Verbose mode',
+      );
       expect(flag1.toString(), '-v, --verbose - Verbose mode');
 
       final flag2 = Flag(short: '-v', description: 'Verbose mode');
@@ -158,14 +161,22 @@ void main() {
 
     test('assertions', () {
       expect(() => Flag(description: 'Desc'), throwsA(isA<AssertionError>()));
-      expect(() => Flag(short: 'v', description: 'Desc'),
-          throwsA(isA<AssertionError>()));
-      expect(() => Flag(short: '-vx', description: 'Desc'),
-          throwsA(isA<AssertionError>()));
-      expect(() => Flag(long: '-v', description: 'Desc'),
-          throwsA(isA<AssertionError>()));
-      expect(() => Flag(long: 'verbose', description: 'Desc'),
-          throwsA(isA<AssertionError>()));
+      expect(
+        () => Flag(short: 'v', description: 'Desc'),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Flag(short: '-vx', description: 'Desc'),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Flag(long: '-v', description: 'Desc'),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Flag(long: 'verbose', description: 'Desc'),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 }
