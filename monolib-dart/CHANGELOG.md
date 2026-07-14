@@ -1,3 +1,7 @@
+## 0.0.25
+
+- Adds `MappedCsvRowDecoder` for streaming asynchronous chunked CSV parsing with mapping and filtering support.
+
 ## 0.0.24
 
 - Adds `LazyJson` class to defer JSON evaluation.

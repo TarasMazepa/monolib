@@ -100,23 +100,24 @@ void main() {
     });
 
     test(
-        'silently ignores items when adding after dispose with throwOnAddAfterDispose false',
-        () async {
-      final List<List<int>> emittedBatches = <List<int>>[];
-      final Batcher<int> batcher = Batcher<int>(
-        maxBatchSize: 10,
-        maxDuration: const Duration(milliseconds: 500),
-        onBatch: (List<int> batch) {
-          emittedBatches.add(batch);
-        },
-        throwOnAddAfterDispose: false,
-      );
+      'silently ignores items when adding after dispose with throwOnAddAfterDispose false',
+      () async {
+        final List<List<int>> emittedBatches = <List<int>>[];
+        final Batcher<int> batcher = Batcher<int>(
+          maxBatchSize: 10,
+          maxDuration: const Duration(milliseconds: 500),
+          onBatch: (List<int> batch) {
+            emittedBatches.add(batch);
+          },
+          throwOnAddAfterDispose: false,
+        );
 
-      await batcher.dispose();
+        await batcher.dispose();
 
-      expect(() => batcher.add(1), returnsNormally);
-      expect(emittedBatches, isEmpty);
-    });
+        expect(() => batcher.add(1), returnsNormally);
+        expect(emittedBatches, isEmpty);
+      },
+    );
 
     test('waits for async onBatch to finish when disposing', () async {
       final List<List<int>> emittedBatches = <List<int>>[];

@@ -6,8 +6,13 @@ import 'package:test/test.dart';
 void main() {
   group('StreamWhereTypeExtension', () {
     test('whereType filters elements by type correctly', () async {
-      final mixedStream =
-          Stream<Object>.fromIterable([1, 'two', 3.0, 4, 'five']);
+      final mixedStream = Stream<Object>.fromIterable([
+        1,
+        'two',
+        3.0,
+        4,
+        'five',
+      ]);
 
       final intStream = mixedStream.whereType<int>();
       final ints = await intStream.toList();
@@ -16,8 +21,13 @@ void main() {
     });
 
     test('whereType filters string elements correctly', () async {
-      final mixedStream =
-          Stream<Object>.fromIterable([1, 'two', 3.0, 4, 'five']);
+      final mixedStream = Stream<Object>.fromIterable([
+        1,
+        'two',
+        3.0,
+        4,
+        'five',
+      ]);
 
       final stringStream = mixedStream.whereType<String>();
       final strings = await stringStream.toList();

@@ -18,11 +18,7 @@ void main() {
 
       final lines = await stream.utf8DecodeAndLineSplit().toList();
 
-      expect(lines, [
-        'hello world',
-        'how are you?',
-        'im good',
-      ]);
+      expect(lines, ['hello world', 'how are you?', 'im good']);
     });
 
     test('handles empty stream', () async {
@@ -34,10 +30,7 @@ void main() {
     });
 
     test('handles stream with no newlines', () async {
-      final byteChunks = [
-        utf8.encode('hello'),
-        utf8.encode(' world'),
-      ];
+      final byteChunks = [utf8.encode('hello'), utf8.encode(' world')];
 
       final stream = Stream.fromIterable(byteChunks);
 
