@@ -29,5 +29,5 @@ jobs:
 
       - run: gh release create "$TAG" --title "Monolib Dart v${TAG#monolib-dart-v}" --generate-notes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
           TAG: ${{ github.ref_name }}
