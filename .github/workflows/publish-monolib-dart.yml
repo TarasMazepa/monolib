@@ -11,6 +11,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/monolib-dart-v')
     permissions:
       id-token: write # Required for authentication using OIDC
+      contents: write # Required to create the GitHub release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -25,3 +26,8 @@ jobs:
 
       - run: dart pub publish -f
         working-directory: monolib-dart
+
+      - run: gh release create "$TAG" --title "Monolib Dart v${TAG#monolib-dart-v}" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
