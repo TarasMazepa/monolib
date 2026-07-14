@@ -1,3 +1,8 @@
+## 0.0.26
+
+- Adds `JsonlMapper` and `JsonlMapperSinkInternal` for mapping JSON from chunked JSONL strings.
+- Fuses utf8 decoding with line splitting in `utf8DecodeAndLineSplit` extension on `Stream<List<int>>`.
+
 ## 0.0.25
 
 - Adds `MappedCsvRowDecoder` for streaming asynchronous chunked CSV parsing with mapping and filtering support.
