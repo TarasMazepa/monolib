@@ -5,7 +5,7 @@ class LineSplitterConverter extends Converter<String, String> {
 
   @override
   String convert(String input) {
-    return const LineSplitter().convert(input).join('\n');
+    throw UnsupportedError('This converter only supports chunked conversion');
   }
 
   @override
