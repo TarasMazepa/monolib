@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monolib_flutter/monolib_flutter.dart';
 
-
 class EditorScreen extends StatefulWidget {
   const EditorScreen({super.key});
 
@@ -10,6 +9,14 @@ class EditorScreen extends StatefulWidget {
 }
 
 class _EditorScreenState extends State<EditorScreen> {
+  final FocusNode _myFocusNode = FocusNode();
+
+
+  @override
+  void dispose() {
+    _myFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +27,9 @@ class _EditorScreenState extends State<EditorScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          // Inside your EditorScreen build method:
-          child: CustomEngineEditor(
-            text: "Hello! This is our custom rendering engine.",
-          ),
+        child: CustomEngineEditor(
+          text: "Hello! This is our custom rendering engine.",
+          focusNode: _myFocusNode,
         ),
       ),
     );

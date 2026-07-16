@@ -1,5 +1,6 @@
+import 'package:example/editor_screen.dart';
 import 'package:flutter/material.dart';
-import 'editor_screen.dart';
+
 
 void main() async {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Notepad Editor Test',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const EditorScreen(),
+      home: EditorScreen(),
     );
   }
 }

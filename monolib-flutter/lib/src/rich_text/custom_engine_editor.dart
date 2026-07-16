@@ -2,20 +2,97 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-// A leaf widget that wraps the custom render engine.
-class CustomEngineEditor extends LeafRenderObjectWidget {
+class CustomEngineEditor extends StatefulWidget {
   final String text;
+  final FocusNode? focusNode;
+  final EdgeInsetsGeometry? padding;
+  final BoxDecoration? decoration;
+  final TapRegionCallback? onTapOutside;
 
-  const CustomEngineEditor({required this.text, super.key});
+  const CustomEngineEditor({
+    required this.text,
+    this.focusNode,
+    this.padding ,
+    this.decoration,
+    this.onTapOutside,
+    super.key,
+  });
+
+  @override
+  State<CustomEngineEditor> createState() => _CustomEngineEditorState();
+}
+
+class _CustomEngineEditorState extends State<CustomEngineEditor> {
+  late FocusNode _focusNode;
+  bool _ownsFocusNode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    } else {
+      _focusNode = FocusNode();
+      _ownsFocusNode = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsFocusNode) {
+      _focusNode.dispose();
+    }
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return TapRegion(
+      onTapOutside: (PointerDownEvent event) {
+        if (widget.onTapOutside != null) {
+          widget.onTapOutside!(event);
+        } else {
+          _focusNode.unfocus();
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: widget.padding ?? EdgeInsets.all(12),
+        decoration: widget.decoration ?? BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Focus(
+          focusNode: _focusNode,
+          child: _CustomEngineRenderWidget(
+            text: widget.text,
+            focusNode: _focusNode,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+// A leaf widget that wraps the custom render engine.
+class _CustomEngineRenderWidget extends LeafRenderObjectWidget {
+  final String text;
+  final FocusNode focusNode;
+
+  const _CustomEngineRenderWidget({ required this.text, required this.focusNode });
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return RenderCustomEditor(text: text);
+    return RenderCustomEditor(text: text, focusNode: focusNode);
   }
 
   @override
   void updateRenderObject(BuildContext context, RenderCustomEditor renderObject) {
     renderObject.text = text;
+    renderObject.focusNode = focusNode;
   }
 }
 
@@ -28,11 +105,36 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
   // State variable to track exactly where the cursor is.
   TextSelection _selection = const TextSelection.collapsed(offset: 0);
 
-  bool _hasFocus = false;
+  FocusNode _focusNode;
+  bool _isFocusFromTap = false;
 
-  RenderCustomEditor({required String text})
-      : _text = text, _textPainter = TextPainter(textDirection: TextDirection.ltr) {
+  RenderCustomEditor({ required String text, required FocusNode focusNode })
+      : _text = text, _focusNode = focusNode, _textPainter = TextPainter(textDirection: TextDirection.ltr) {
     _updateTextPainter();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (_focusNode.hasFocus) {
+      if(!_isFocusFromTap){
+        _selection = TextSelection.collapsed(offset: _text.length);
+      }
+      _requestKeyboard();
+      _isFocusFromTap = false;
+    } else {
+      _textInputConnection?.close();
+      _textInputConnection = null;
+    }
+    markNeedsPaint();
+  }
+
+
+  // FocusNode setter
+  set focusNode(FocusNode value) {
+    if (_focusNode == value) return;
+    _focusNode.removeListener(_handleFocusChange);
+    _focusNode = value;
+    _focusNode.addListener(_handleFocusChange);
   }
 
   String get text => _text;
@@ -80,8 +182,7 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
     context.canvas.drawRect(rect, bgPaint);
     _textPainter.paint(context.canvas, offset);
 
-    // Only draw the cursor if the editor is focused ()
-    if (_hasFocus) {
+    if (_focusNode.hasFocus) {
       final Offset caretOffset = _textPainter.getOffsetForCaret(_selection.base, Rect.zero);
 
       final Offset finalCaretPosition = offset + caretOffset;
@@ -95,6 +196,8 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
         caretPaint,
       );
     }
+
+
   }
 
 
@@ -102,18 +205,19 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
   @override
   bool hitTestSelf(Offset position) => true;
 
-
   @override
   void handleEvent(PointerEvent event, HitTestEntry entry) {
     if (event is PointerDownEvent) {
       final TextPosition position = _textPainter.getPositionForOffset(event.localPosition);
       _selection = TextSelection.collapsed(offset: position.offset);
 
-      //We gained focus because the user tapped on the editor
-      _hasFocus = true;
-
-      markNeedsPaint();
-      _requestKeyboard();
+      if(!_focusNode.hasFocus){
+        _isFocusFromTap = true;
+        _focusNode.requestFocus();
+      }else{
+        _requestKeyboard();
+        markNeedsPaint();
+      }
     }
   }
 
@@ -162,13 +266,7 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
 
   @override
   void connectionClosed() {
-    _textInputConnection = null;
-
-    // We lost focus because the keyboard closed
-    _hasFocus = false;
-
-    // Force redraw so the cursor disappears immediately
-    markNeedsPaint();
+    _focusNode.unfocus();
   }
 
   @override
@@ -209,6 +307,11 @@ class RenderCustomEditor extends RenderBox implements TextInputClient {
     // Return true to notify the platform that this input successfully acquired focus
     return true;
   }
+
+
+
+
+
 
 }
 
