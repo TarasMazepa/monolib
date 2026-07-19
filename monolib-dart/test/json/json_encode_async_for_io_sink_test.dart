@@ -5,13 +5,22 @@ import '../io/mock_io_sink.dart';
 
 void main() {
   group('jsonEncodeAsyncForIOSink', () {
-    test('returns a function that writes json to sink', () async {
+    test('writes json to sink', () async {
       final data = {'hello': 'world'};
       final buffer = StringBuffer();
       final sink = MockIOSink(buffer);
 
-      final func = jsonEncodeAsyncForIOSink(data);
-      await func(sink);
+      await jsonEncodeAsyncForIOSink(data: data, ioSink: sink);
+
+      expect(buffer.toString(), '{"hello":"world"}');
+    });
+
+    test('writes json using ioSinkProvider lazily', () async {
+      final data = {'hello': 'world'};
+      final buffer = StringBuffer();
+      final sink = MockIOSink(buffer);
+
+      await jsonEncodeAsyncForIOSink(data: data, ioSinkProvider: () => sink);
 
       expect(buffer.toString(), '{"hello":"world"}');
     });

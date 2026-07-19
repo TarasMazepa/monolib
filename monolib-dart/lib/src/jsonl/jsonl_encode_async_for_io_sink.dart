@@ -2,6 +2,14 @@ import 'dart:io';
 
 import 'jsonl_encode_async.dart';
 
-Future<void> Function(IOSink) jsonlEncodeAsyncForIOSink(Object items) {
-  return (IOSink ioSink) => jsonlEncodeAsync(items, ioSink);
+Future<void> jsonlEncodeAsyncForIOSink({
+  required Object items,
+  IOSink? ioSink,
+  IOSink Function()? ioSinkProvider,
+}) {
+  return jsonlEncodeAsync(
+    items: items,
+    sink: ioSink,
+    sinkProvider: ioSinkProvider,
+  );
 }
