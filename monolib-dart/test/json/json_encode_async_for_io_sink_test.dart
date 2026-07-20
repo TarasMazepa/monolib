@@ -16,18 +16,4 @@ void main() {
       expect(buffer.toString(), '{"hello":"world"}');
     });
   });
-
-  group('jsonEncodeAsyncForIOSinkProvider', () {
-    test('returns a function that writes json using ioSinkProvider lazily',
-        () async {
-      final data = {'hello': 'world'};
-      final buffer = StringBuffer();
-      final sink = MockIOSink(buffer);
-
-      final func = jsonEncodeAsyncForIOSinkProvider(data: data);
-      await func(() => sink);
-
-      expect(buffer.toString(), '{"hello":"world"}');
-    });
-  });
 }

@@ -1,3 +1,4 @@
+export 'src/general/batcher.dart';
 export 'src/general/on_bool.dart';
 export 'src/general/on_comparable.dart';
 export 'src/general/on_date_time.dart';
@@ -19,7 +20,6 @@ export 'src/general/on_list_of_string.dart';
 export 'src/general/on_nullable_comparable.dart';
 export 'src/general/on_nullable_object.dart';
 export 'src/general/on_object.dart';
-export 'src/general/batcher.dart';
 export 'src/general/on_string.dart';
 export 'src/general/once.dart';
 export 'src/general/table_cell_align_left.dart';

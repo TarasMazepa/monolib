@@ -12,29 +12,25 @@ Future<void> jsonlEncodeAsync({
         'Exactly one of sink or sinkProvider must be provided.');
   }
 
-  StringSink? activeSink = sink;
   bool ownsSink = false;
-
-  StringSink getSink() {
-    if (activeSink == null) {
-      activeSink = sinkProvider!();
-      ownsSink = true;
-    }
-    return activeSink!;
-  }
+  late StringSink activeSink = sink ??
+      () {
+        ownsSink = true;
+        return sinkProvider!();
+      }();
 
   try {
     switch (items) {
       case Stream stream:
         await for (final item in stream) {
-          await jsonEncodeAsync(object: item, sinkProvider: getSink);
-          getSink().writeln();
+          await jsonEncodeAsync(object: item, sink: activeSink);
+          activeSink.writeln();
         }
 
       case Iterable iterable:
         for (final item in iterable) {
-          await jsonEncodeAsync(object: item, sinkProvider: getSink);
-          getSink().writeln();
+          await jsonEncodeAsync(object: item, sink: activeSink);
+          activeSink.writeln();
         }
 
       default:
@@ -43,7 +39,7 @@ Future<void> jsonlEncodeAsync({
         );
     }
   } finally {
-    if (ownsSink && activeSink != null) {
+    if (ownsSink) {
       if (activeSink is StreamSink) {
         await (activeSink as StreamSink).close();
       } else if (activeSink is Sink) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'jsonl_mapper_sink_internal.dart';
 
 /// A Converter that parses JSON and maps to a strongly typed model,
