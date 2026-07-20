@@ -11,46 +11,49 @@ Future<void> jsonEncodeAsync({
         'Exactly one of sink or sinkProvider must be provided.');
   }
 
-  StringSink? activeSink = sink;
   bool ownsSink = false;
-
-  StringSink getSink() {
-    if (activeSink == null) {
-      activeSink = sinkProvider!();
-      ownsSink = true;
-    }
-    return activeSink!;
-  }
+  late StringSink activeSink = sink ??
+      () {
+        ownsSink = true;
+        return sinkProvider!();
+      }();
 
   Future<void> encode(Object? obj) async {
     if (obj == null) {
-      getSink().write('null');
+      activeSink.write('null');
     } else if (obj is num || obj is bool) {
-      getSink().write(obj.toString());
+      activeSink.write(obj.toString());
     } else if (obj is String) {
-      getSink().write(jsonEncode(obj));
+      activeSink.write(jsonEncode(obj));
     } else if (obj is Future) {
       await encode(await obj);
     } else if (obj is Stream) {
-      getSink().write('[');
       bool first = true;
       await for (final item in obj) {
-        if (!first) getSink().write(',');
+        if (first) {
+          activeSink.write('[');
+        } else {
+          activeSink.write(',');
+        }
         await encode(item);
         first = false;
       }
-      getSink().write(']');
+      if (first) activeSink.write('[');
+      activeSink.write(']');
     } else if (obj is Iterable) {
-      getSink().write('[');
       bool first = true;
       for (final item in obj) {
-        if (!first) getSink().write(',');
+        if (first) {
+          activeSink.write('[');
+        } else {
+          activeSink.write(',');
+        }
         await encode(item);
         first = false;
       }
-      getSink().write(']');
+      if (first) activeSink.write('[');
+      activeSink.write(']');
     } else if (obj is Map) {
-      getSink().write('{');
       bool first = true;
       for (final entry in obj.entries) {
         dynamic key = entry.key;
@@ -62,20 +65,25 @@ Future<void> jsonEncodeAsync({
           // Force the standard error message for map keys
           jsonEncode({key: null});
         }
-        if (!first) getSink().write(',');
-        getSink().write(jsonEncode(key));
-        getSink().write(':');
+        if (first) {
+          activeSink.write('{');
+        } else {
+          activeSink.write(',');
+        }
+        activeSink.write(jsonEncode(key));
+        activeSink.write(':');
         await encode(entry.value);
         first = false;
       }
-      getSink().write('}');
+      if (first) activeSink.write('{');
+      activeSink.write('}');
     } else {
       try {
         dynamic result = (obj as dynamic).toJson();
         await encode(result);
       } on NoSuchMethodError {
         // Let standard jsonEncode throw its normal error
-        getSink().write(jsonEncode(obj));
+        activeSink.write(jsonEncode(obj));
       } catch (e) {
         // If toJson throws something else, we rethrow it
         rethrow;
@@ -86,7 +94,7 @@ Future<void> jsonEncodeAsync({
   try {
     await encode(object);
   } finally {
-    if (ownsSink && activeSink != null) {
+    if (ownsSink) {
       if (activeSink is StreamSink) {
         await (activeSink as StreamSink).close();
       } else if (activeSink is Sink) {

@@ -1,3 +1,10 @@
+## 0.0.27
+
+- **BREAKING:** Updates signatures for async JSON/JSONL encoders (`jsonEncodeAsync`, `jsonlEncodeAsync`) to use named arguments (`items`, `sink`, `sinkProvider`).
+- Introduces lazy initialization via `sinkProvider` for async encoders. Sinks are now memoized and only spun up upon the first write operation, saving resources for empty streams/iterables.
+- Adds automatic resource cleanup (`close()`) for sinks spawned by `sinkProvider`, while respecting caller ownership for directly provided sinks.
+- Adds `jsonEncodeAsyncForIOSinkProvider` and `jsonlEncodeAsyncForIOSinkProvider` to support lazy `IOSink` resolution.
+
 ## 0.0.26
 
 - Adds `JsonlMapper` and `JsonlMapperSinkInternal` for mapping JSON from chunked JSONL strings.

@@ -5,7 +5,7 @@ import '../io/mock_io_sink.dart';
 
 void main() {
   group('jsonlEncodeAsyncForIOSink', () {
-    test('writes jsonl to sink', () async {
+    test('returns a function that writes jsonl to sink', () async {
       final data = [
         {'hello': 'world'},
         {'goodbye': 'world'},
@@ -13,12 +13,16 @@ void main() {
       final buffer = StringBuffer();
       final sink = MockIOSink(buffer);
 
-      await jsonlEncodeAsyncForIOSink(items: data, ioSink: sink);
+      final func = jsonlEncodeAsyncForIOSink(data);
+      await func(sink);
 
       expect(buffer.toString(), '{"hello":"world"}\n{"goodbye":"world"}\n');
     });
+  });
 
-    test('writes jsonl using ioSinkProvider lazily', () async {
+  group('jsonlEncodeAsyncForIOSinkProvider', () {
+    test('returns a function that writes jsonl using ioSinkProvider lazily',
+        () async {
       final data = [
         {'hello': 'world'},
         {'goodbye': 'world'},
@@ -26,7 +30,8 @@ void main() {
       final buffer = StringBuffer();
       final sink = MockIOSink(buffer);
 
-      await jsonlEncodeAsyncForIOSink(items: data, ioSinkProvider: () => sink);
+      final func = jsonlEncodeAsyncForIOSinkProvider(items: data);
+      await func(() => sink);
 
       expect(buffer.toString(), '{"hello":"world"}\n{"goodbye":"world"}\n');
     });
