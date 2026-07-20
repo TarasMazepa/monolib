@@ -8,7 +8,7 @@ void main() {
     test('returns a function that writes jsonl to sink', () async {
       final data = [
         {'hello': 'world'},
-        {'foo': 'bar'},
+        {'goodbye': 'world'},
       ];
       final buffer = StringBuffer();
       final sink = MockIOSink(buffer);
@@ -16,7 +16,24 @@ void main() {
       final func = jsonlEncodeAsyncForIOSink(data);
       await func(sink);
 
-      expect(buffer.toString(), '{"hello":"world"}\n{"foo":"bar"}\n');
+      expect(buffer.toString(), '{"hello":"world"}\n{"goodbye":"world"}\n');
+    });
+  });
+
+  group('jsonlEncodeAsyncForIOSinkProvider', () {
+    test('returns a function that writes jsonl using ioSinkProvider lazily',
+        () async {
+      final data = [
+        {'hello': 'world'},
+        {'goodbye': 'world'},
+      ];
+      final buffer = StringBuffer();
+      final sink = MockIOSink(buffer);
+
+      final func = jsonlEncodeAsyncForIOSinkProvider(items: data);
+      await func(() => sink);
+
+      expect(buffer.toString(), '{"hello":"world"}\n{"goodbye":"world"}\n');
     });
   });
 }

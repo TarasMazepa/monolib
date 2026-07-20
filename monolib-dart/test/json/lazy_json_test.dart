@@ -44,7 +44,7 @@ void main() {
       expect(called, isFalse);
 
       final buffer = StringBuffer();
-      await jsonEncodeAsync(lazy, buffer);
+      await jsonEncodeAsync(object: lazy, sink: buffer);
 
       expect(called, isTrue);
       expect(buffer.toString(), '{"key":"value"}');
@@ -60,7 +60,7 @@ void main() {
       expect(called, isFalse);
 
       final buffer = StringBuffer();
-      await jsonEncodeAsync(lazy, buffer);
+      await jsonEncodeAsync(object: lazy, sink: buffer);
 
       expect(called, isTrue);
       expect(buffer.toString(), '{"key":"async value"}');

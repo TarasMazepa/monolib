@@ -18,7 +18,7 @@ class CustomWithAsyncToJson {
 
 Future<String> encodeToString(dynamic object) async {
   final buffer = StringBuffer();
-  await jsonEncodeAsync(object, buffer);
+  await jsonEncodeAsync(object: object, sink: buffer);
   return buffer.toString();
 }
 
