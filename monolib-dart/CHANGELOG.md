@@ -1,3 +1,9 @@
+## 0.0.28
+
+- **BREAKING:** Removes `jsonEncodeAsyncForIOSinkProvider` and `jsonlEncodeAsyncForIOSinkProvider`.
+- Refactors `jsonlEncodeAsync` to use a `late` variable for sink initialization.
+- Cleans up and sorts exports in `fluent_json.dart`, `monolib_dart.dart`, and `stream.dart`.
+
 ## 0.0.27
 
 - **BREAKING:** Updates signatures for async JSON/JSONL encoders (`jsonEncodeAsync`, `jsonlEncodeAsync`) to use named arguments (`items`, `sink`, `sinkProvider`).
