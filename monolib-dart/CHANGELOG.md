@@ -1,3 +1,8 @@
+## 0.0.29
+
+- Adds `AsyncJsonWritable` interface for providing inversion-of-control when encoding objects asynchronously in `jsonEncodeAsync`.
+- Adds `StreamingJsonString` which allows streaming strings directly into the output sink without holding them in memory.
+
 ## 0.0.28
 
 - **BREAKING:** Removes `jsonEncodeAsyncForIOSinkProvider` and `jsonlEncodeAsyncForIOSinkProvider`.
