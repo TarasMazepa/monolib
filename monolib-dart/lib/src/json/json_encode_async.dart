@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'async_json_writable.dart';
+
 Future<void> jsonEncodeAsync({
   required Object? object,
   StringSink? sink,
@@ -77,6 +79,8 @@ Future<void> jsonEncodeAsync({
       }
       if (first) activeSink.write('{');
       activeSink.write('}');
+    } else if (obj is AsyncJsonWritable) {
+      await obj.writeJsonAsync(activeSink, encode);
     } else {
       try {
         dynamic result = (obj as dynamic).toJson();
