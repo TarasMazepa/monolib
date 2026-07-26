@@ -1,4 +1,4 @@
-## 0.1.0
+## 0.0.30
 
 - Adds `JsonlBatchWriter` component to efficiently write high-frequency data to a JSONL file in batches.
 
