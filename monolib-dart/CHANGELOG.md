@@ -1,3 +1,7 @@
+## 0.1.0
+
+- Adds `JsonlBatchWriter` component to efficiently write high-frequency data to a JSONL file in batches.
+
 ## 0.0.29
 
 - Adds `AsyncJsonWritable` interface for providing inversion-of-control when encoding objects asynchronously in `jsonEncodeAsync`.
