@@ -5,21 +5,6 @@ extension OnIterable<T> on Iterable<T> {
     return OnEmptyIterable(this, onEmpty);
   }
 
-  Iterable<R> mapCatching<R>(
-    R Function(T) mapping, {
-    void Function(Object error, T item)? onError,
-  }) sync* {
-    for (final item in this) {
-      try {
-        yield mapping(item);
-      } catch (e) {
-        if (onError != null) {
-          onError(e, item);
-        }
-      }
-    }
-  }
-
   T sum() {
     final iterator = this.iterator;
     if (!iterator.moveNext()) {
