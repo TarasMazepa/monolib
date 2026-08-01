@@ -1,13 +1,13 @@
 import 'dart:async';
 
-/// A highly efficient utility class for batching high-frequency incoming data.
+/// A utility class for batching incoming data.
 ///
 /// The [Batcher] accepts items one by one and groups them into a [List].
-/// It outputs this batched list via a simple callback function [onBatch],
+/// It outputs this batched list via a callback function [onBatch],
 /// avoiding the overhead of `StreamController`s.
 ///
 /// The batch is emitted and the internal buffer cleared whenever either of
-/// these two conditions is met:
+/// these two conditions is met (if configured):
 /// 1. A specified [maxDuration] has passed since the first item in the current
 ///    batch was added. The timer is lazy (only running when there are items
 ///    in the buffer).
