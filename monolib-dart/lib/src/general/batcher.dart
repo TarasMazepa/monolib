@@ -88,23 +88,18 @@ class Batcher<T> {
       final List<T> batch = _buffer;
       _buffer = <T>[];
 
-      late Future<void> future;
-      future = Future<void>.sync(() async {
-        try {
-          await onBatch(batch);
-        } finally {
-          _inflightBatches.remove(future);
-        }
-      });
-      _inflightBatches.add(future);
+      final Future<void> batchTask = Future<void>.sync(() => onBatch(batch));
+      _inflightBatches.add(batchTask);
+      unawaited(batchTask.whenComplete(() => _inflightBatches.remove(batchTask)));
 
-      await future;
+      await batchTask;
     }
   }
 
   /// Cancels any active timers and immediately emits any remaining items in the buffer.
   Future<void> dispose() async {
     _isDisposed = true;
-    await <Future<void>>[_emit(), ..._inflightBatches].wait;
+    await _emit();
+    await _inflightBatches.wait;
   }
 }
