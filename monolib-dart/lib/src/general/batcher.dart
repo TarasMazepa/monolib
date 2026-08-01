@@ -90,7 +90,8 @@ class Batcher<T> {
 
       final Future<void> batchTask = Future<void>.sync(() => onBatch(batch));
       _inflightBatches.add(batchTask);
-      unawaited(batchTask.whenComplete(() => _inflightBatches.remove(batchTask)));
+      unawaited(
+          batchTask.whenComplete(() => _inflightBatches.remove(batchTask)));
 
       await batchTask;
     }
