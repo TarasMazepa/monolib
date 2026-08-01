@@ -1,6 +1,5 @@
 export 'src/stream/line_splitter_converter.dart';
 export 'src/stream/map_not_null_stream_extension.dart';
-export 'src/stream/on_function_returning_list.dart';
 export 'src/stream/on_iterable_of_stream_controllers.dart';
 export 'src/stream/on_list_of_stream_controllers.dart';
 export 'src/stream/on_stream_controller.dart';
