@@ -1,3 +1,18 @@
+## 0.0.31
+
+- Adds `mapLists` and `whereElements` to `OnStreamOfLists` extension on `Stream<List<T>>`.
+- Adds `OnIterableOfNullableBoolFunctions` extension with `combinedEvery` and `combinedAny`.
+- Moves `OnNullableString` extension with `emptyToNull` into `on_nullable_string.dart`.
+- Enhances `Batcher` documentation and streamlines internal batch tracking.
+- **BREAKING:** Removes `mapCatching` from `OnIterable`.
+- **BREAKING:** Removes `compareChainReverse` from `OnBool`.
+- **BREAKING:** Removes `discardedByFloor` from `OnDouble`.
+- **BREAKING:** Removes `OnIterableOfListOfString` (`skipFirstIfIsCsvHeaderRow`).
+- **BREAKING:** Removes `OnListOfString` (`isTrimmedDeepEqualsTo`).
+- **BREAKING:** Removes `OnString` (`removeEndingNewLine`, `ensureEndsWithADot`, `removeEnclosingQuotationMarks`).
+- **BREAKING:** Removes `NullIOSink`.
+- **BREAKING:** Removes `OnFunctionReturningList` (`asSkippingMappedToEmptyExpander`).
+
 ## 0.0.30
 
 - Adds `JsonlBatchWriter` component to efficiently write high-frequency data to a JSONL file in batches.
