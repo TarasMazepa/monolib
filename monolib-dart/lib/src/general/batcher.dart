@@ -7,7 +7,7 @@ import 'dart:async';
 /// avoiding the overhead of `StreamController`s.
 ///
 /// The batch is emitted and the internal buffer cleared whenever either of
-/// these two conditions is met (if configured):
+/// these two conditions is met (if configured) and if [dispose] is called:
 /// 1. A specified [maxDuration] has passed since the first item in the current
 ///    batch was added. The timer is lazy (only running when there are items
 ///    in the buffer).
