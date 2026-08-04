@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:monolib_dart/csv.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
-import 'dart:async';
 
 void main() {
   group('rfc4180 parity tests', () {

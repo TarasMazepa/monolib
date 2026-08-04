@@ -1,6 +1,7 @@
-import 'package:test/test.dart';
-import 'package:monolib_dart/src/csv/csv_row_decoder.dart';
 import 'dart:async';
+
+import 'package:monolib_dart/src/csv/csv_row_decoder.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('CsvRowDecoder', () {

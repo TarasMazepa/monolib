@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:monolib_dart/json_encode_async.dart';
 import 'package:test/test.dart';
 
 class _CustomWritable implements AsyncJsonWritable {
   final String value;
+
   _CustomWritable(this.value);
 
   @override
