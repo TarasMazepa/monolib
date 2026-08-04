@@ -11,9 +11,6 @@ extension OnObject<T> on T {
     return call(this);
   }
 
-  R Function() asArgumentIn<R>(R Function(T x) function) =>
-      () => function(this);
-
   R castTo<R>() => this as R;
 
   String get quotingString => switch (this) {
