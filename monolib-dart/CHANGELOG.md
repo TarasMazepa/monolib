@@ -1,3 +1,9 @@
+## 0.0.32
+
+- Guarantees `jsonlEncodeAsync` outputs a trailing newline even if item serialization throws an error.
+- **BREAKING:** Removes `OnFunctionWithOneArgument` (`withAnArgument`).
+- **BREAKING:** Removes `asArgumentIn` and `quotingString` from `OnObject`.
+
 ## 0.0.31
 
 - Adds `mapLists` and `whereElements` to `OnStreamOfLists` extension on `Stream<List<T>>`.

@@ -23,14 +23,20 @@ Future<void> jsonlEncodeAsync({
     switch (items) {
       case Stream stream:
         await for (final item in stream) {
-          await jsonEncodeAsync(object: item, sink: activeSink);
-          activeSink.writeln();
+          try {
+            await jsonEncodeAsync(object: item, sink: activeSink);
+          } finally {
+            activeSink.writeln();
+          }
         }
 
       case Iterable iterable:
         for (final item in iterable) {
-          await jsonEncodeAsync(object: item, sink: activeSink);
-          activeSink.writeln();
+          try {
+            await jsonEncodeAsync(object: item, sink: activeSink);
+          } finally {
+            activeSink.writeln();
+          }
         }
 
       default:
