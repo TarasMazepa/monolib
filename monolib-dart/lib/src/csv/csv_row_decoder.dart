@@ -5,7 +5,11 @@ class CsvRowDecoder extends StreamTransformerBase<String, List<String>> {
 
   @override
   Stream<List<String>> bind(Stream<String> stream) {
-    return Stream.multi((controller) {
+    final controller = stream.isBroadcast
+        ? StreamController<List<String>>.broadcast(sync: true)
+        : StreamController<List<String>>(sync: true);
+
+    controller.onListen = () {
       String buffer = '';
       bool isInsideDoubleQuotes = false;
       List<String> currentRow = [];
@@ -117,8 +121,7 @@ class CsvRowDecoder extends StreamTransformerBase<String, List<String>> {
         }
       }
 
-      StreamSubscription<String>? subscription;
-      subscription = stream.listen(
+      final subscription = stream.listen(
         (data) {
           buffer += data;
           processBuffer(false);
@@ -134,6 +137,8 @@ class CsvRowDecoder extends StreamTransformerBase<String, List<String>> {
       controller.onPause = subscription.pause;
       controller.onResume = subscription.resume;
       controller.onCancel = subscription.cancel;
-    });
+    };
+
+    return controller.stream;
   }
 }

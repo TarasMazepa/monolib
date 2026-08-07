@@ -7,13 +7,16 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
 
   @override
   Stream<T> bind(Stream<String> stream) {
-    return Stream.multi((controller) {
+    final controller = stream.isBroadcast
+        ? StreamController<T>.broadcast(sync: true)
+        : StreamController<T>(sync: true);
+
+    controller.onListen = () {
       String buffer = '';
       bool isInsideDoubleQuotes = false;
       List<String> currentRow = [];
       int previousChar = -1;
 
-      // NEW: Helper to map and filter before hitting the stream
       void emitRow() {
         if (currentRow.isNotEmpty) {
           final mapped = mapper(currentRow);
@@ -28,7 +31,7 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
         if (buffer.isEmpty && isDone) {
           if (currentRow.isNotEmpty || previousChar == 44 /* ',' */) {
             if (previousChar == 44) currentRow.add('');
-            emitRow(); // Replaced controller.add()
+            emitRow();
           }
           return;
         }
@@ -80,7 +83,7 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
                 if (leftIndex != rightIndex || getPrevChar() == 44) {
                   currentRow.add(buffer.substring(leftIndex, rightIndex));
                 }
-                emitRow(); // Replaced controller.add()
+                emitRow();
                 leftIndex = rightIndex = rightIndex + 2;
               } else if (rightIndex == buffer.length - 1 && !isDone) {
                 break;
@@ -91,7 +94,7 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
               if (leftIndex != rightIndex || getPrevChar() == 44) {
                 currentRow.add(buffer.substring(leftIndex, rightIndex));
               }
-              emitRow(); // Replaced controller.add()
+              emitRow();
               leftIndex = rightIndex = rightIndex + 1;
             } else {
               rightIndex++;
@@ -113,7 +116,7 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
               }
             }
           }
-          emitRow(); // Replaced controller.add()
+          emitRow();
           buffer = '';
         } else {
           if (leftIndex > 0) {
@@ -123,8 +126,7 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
         }
       }
 
-      StreamSubscription<String>? subscription;
-      subscription = stream.listen(
+      final subscription = stream.listen(
         (data) {
           buffer += data;
           processBuffer(false);
@@ -140,6 +142,8 @@ class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
       controller.onPause = subscription.pause;
       controller.onResume = subscription.resume;
       controller.onCancel = subscription.cancel;
-    });
+    };
+
+    return controller.stream;
   }
 }

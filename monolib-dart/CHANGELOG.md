@@ -1,3 +1,7 @@
+## 0.0.33
+
+- Refactors `MappedCsvRowDecoder` and `CsvRowDecoder` to use synchronous `StreamController` instead of `Stream.multi` to preserve standard stream contracts and lifecycle hooks.
+
 ## 0.0.32
 
 - Guarantees `jsonlEncodeAsync` outputs a trailing newline even if item serialization throws an error.
