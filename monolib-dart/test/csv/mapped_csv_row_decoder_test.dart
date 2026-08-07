@@ -79,5 +79,41 @@ void main() {
           await stream.transform(MappedCsvRowDecoder(mapper)).toList();
       expect(result, ['a|b|c"|d']);
     });
+
+    test('completes correctly when subscription uses asFuture', () async {
+      final controller = StreamController<String>();
+      final List<String> received = [];
+
+      final sub = controller.stream
+          .transform(MappedCsvRowDecoder((row) => row.join(',')))
+          .listen(received.add);
+
+      final future = sub.asFuture();
+      controller.add('1,2\n3,4\n');
+      await controller.close();
+      await future;
+
+      expect(received, ['1,2', '3,4']);
+    });
+
+    test('supports pause and resume', () async {
+      final controller = StreamController<String>();
+      final List<String> received = [];
+
+      final sub = controller.stream
+          .transform(MappedCsvRowDecoder((row) => row.join(',')))
+          .listen(received.add);
+
+      sub.pause();
+      expect(sub.isPaused, isTrue);
+      controller.add('1,2\n');
+      expect(received, isEmpty);
+
+      sub.resume();
+      await Future<void>.delayed(Duration.zero);
+      expect(received, ['1,2']);
+
+      await controller.close();
+    });
   });
 }
