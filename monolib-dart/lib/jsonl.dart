@@ -4,3 +4,4 @@ export 'src/jsonl/jsonl_encode_async.dart';
 export 'src/jsonl/jsonl_encode_async_for_io_sink.dart';
 export 'src/jsonl/jsonl_encoder.dart';
 export 'src/jsonl/jsonl_mapper.dart';
+export 'src/jsonl/jsonl_split_mapper.dart';

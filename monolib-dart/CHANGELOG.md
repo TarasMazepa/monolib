@@ -1,3 +1,7 @@
+## 0.0.34
+
+- Adds `JsonlSplitMapper` converter that fuses line-splitting directly into JSON mapping, eliminating intermediate stream event overhead.
+
 ## 0.0.33
 
 - Refactors `MappedCsvRowDecoder` and `CsvRowDecoder` to use synchronous `StreamController` instead of `Stream.multi` to preserve standard stream contracts and lifecycle hooks.
