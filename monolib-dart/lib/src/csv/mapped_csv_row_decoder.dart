@@ -1,149 +1,140 @@
-import 'dart:async';
+import 'dart:convert';
 
-class MappedCsvRowDecoder<T> extends StreamTransformerBase<String, T> {
+class MappedCsvRowDecoder<T> extends Converter<String, T> {
   final T? Function(List<String> row) mapper;
 
   const MappedCsvRowDecoder(this.mapper);
 
   @override
-  Stream<T> bind(Stream<String> stream) {
-    final controller = stream.isBroadcast
-        ? StreamController<T>.broadcast(sync: true)
-        : StreamController<T>(sync: true);
+  T convert(String input) {
+    throw UnsupportedError('This converter only supports chunked conversion');
+  }
 
-    controller.onListen = () {
-      String buffer = '';
-      bool isInsideDoubleQuotes = false;
-      List<String> currentRow = [];
-      int previousChar = -1;
+  @override
+  Sink<String> startChunkedConversion(Sink<T> sink) {
+    return _CsvRowDecoderSink<T>(sink, mapper);
+  }
+}
 
-      void emitRow() {
-        if (currentRow.isNotEmpty) {
-          final mapped = mapper(currentRow);
-          if (mapped != null) {
-            controller.add(mapped);
-          }
-          currentRow = [];
-        }
+class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
+  final Sink<T> _outSink;
+  final T? Function(List<String> row) _mapper;
+
+  bool _isInsideDoubleQuotes = false;
+  List<String> _currentRow = [];
+  int _previousChar = -1;
+  String _carry = '';
+
+  _CsvRowDecoderSink(this._outSink, this._mapper);
+
+  void _emitRow() {
+    if (_currentRow.isNotEmpty) {
+      final mapped = _mapper(_currentRow);
+      if (mapped != null) {
+        _outSink.add(mapped);
       }
+      _currentRow = [];
+    }
+  }
 
-      void processBuffer(bool isDone) {
-        if (buffer.isEmpty && isDone) {
-          if (currentRow.isNotEmpty || previousChar == 44 /* ',' */) {
-            if (previousChar == 44) currentRow.add('');
-            emitRow();
-          }
-          return;
-        }
+  @override
+  void add(String chunk) {
+    if (chunk.isEmpty) return;
 
-        int leftIndex = 0;
-        int rightIndex = 0;
+    if (_carry.isNotEmpty) {
+      chunk = _carry + chunk;
+      _carry = '';
+    }
 
-        int getPrevChar() {
-          return rightIndex > 0
-              ? buffer.codeUnitAt(rightIndex - 1)
-              : previousChar;
-        }
+    int leftIndex = 0;
+    int rightIndex = 0;
 
-        while (rightIndex < buffer.length) {
-          final current = buffer.codeUnitAt(rightIndex);
+    int getPrevChar() {
+      if (rightIndex > 0) {
+        return chunk.codeUnitAt(rightIndex - 1);
+      } else {
+        return _previousChar;
+      }
+    }
 
-          if (isInsideDoubleQuotes) {
-            if (current == 34 /* '"' */) {
-              if (rightIndex < buffer.length - 1 &&
-                  buffer.codeUnitAt(rightIndex + 1) == 34) {
-                rightIndex += 2;
-              } else if (rightIndex == buffer.length - 1 && !isDone) {
-                break;
-              } else {
-                isInsideDoubleQuotes = false;
-                currentRow.add(
-                  buffer.substring(leftIndex, rightIndex).replaceAll('""', '"'),
-                );
-                leftIndex = rightIndex = rightIndex + 1;
-              }
-            } else {
-              rightIndex++;
-            }
+    while (rightIndex < chunk.length) {
+      final current = chunk.codeUnitAt(rightIndex);
+
+      if (_isInsideDoubleQuotes) {
+        if (current == 34 /* '"' */) {
+          if (rightIndex < chunk.length - 1 &&
+              chunk.codeUnitAt(rightIndex + 1) == 34) {
+            rightIndex += 2;
+          } else if (rightIndex == chunk.length - 1) {
+            break;
           } else {
-            if (leftIndex == rightIndex && current == 34) {
-              isInsideDoubleQuotes = true;
-              leftIndex++;
-              rightIndex++;
-            } else if (current == 44 /* ',' */) {
-              if (leftIndex == rightIndex && getPrevChar() == 34) {
-                leftIndex = rightIndex = rightIndex + 1;
-              } else {
-                currentRow.add(buffer.substring(leftIndex, rightIndex));
-                leftIndex = rightIndex = rightIndex + 1;
-              }
-            } else if (current == 13 /* '\r' */) {
-              if (rightIndex < buffer.length - 1 &&
-                  buffer.codeUnitAt(rightIndex + 1) == 10 /* '\n' */) {
-                if (leftIndex != rightIndex || getPrevChar() == 44) {
-                  currentRow.add(buffer.substring(leftIndex, rightIndex));
-                }
-                emitRow();
-                leftIndex = rightIndex = rightIndex + 2;
-              } else if (rightIndex == buffer.length - 1 && !isDone) {
-                break;
-              } else {
-                rightIndex++;
-              }
-            } else if (current == 10 /* '\n' */) {
-              if (leftIndex != rightIndex || getPrevChar() == 44) {
-                currentRow.add(buffer.substring(leftIndex, rightIndex));
-              }
-              emitRow();
-              leftIndex = rightIndex = rightIndex + 1;
-            } else {
-              rightIndex++;
-            }
+            _isInsideDoubleQuotes = false;
+            _currentRow.add(
+              chunk.substring(leftIndex, rightIndex).replaceAll('""', '"'),
+            );
+            leftIndex = rightIndex = rightIndex + 1;
           }
-        }
-
-        if (isDone) {
-          if (leftIndex < buffer.length || getPrevChar() == 44) {
-            if (isInsideDoubleQuotes) {
-              currentRow.add(
-                buffer.substring(leftIndex, rightIndex).replaceAll('""', '"'),
-              );
-            } else {
-              if (leftIndex == rightIndex && getPrevChar() == 34) {
-                // handled
-              } else {
-                currentRow.add(buffer.substring(leftIndex, rightIndex));
-              }
-            }
-          }
-          emitRow();
-          buffer = '';
         } else {
-          if (leftIndex > 0) {
-            previousChar = buffer.codeUnitAt(leftIndex - 1);
+          rightIndex++;
+        }
+      } else {
+        if (leftIndex == rightIndex && current == 34) {
+          _isInsideDoubleQuotes = true;
+          leftIndex++;
+          rightIndex++;
+        } else if (current == 44 /* ',' */) {
+          if (leftIndex == rightIndex && getPrevChar() == 34) {
+            leftIndex = rightIndex = rightIndex + 1;
+          } else {
+            _currentRow.add(chunk.substring(leftIndex, rightIndex));
+            leftIndex = rightIndex = rightIndex + 1;
           }
-          buffer = buffer.substring(leftIndex);
+        } else if (current == 13 /* '\r' */) {
+          if (rightIndex < chunk.length - 1 &&
+              chunk.codeUnitAt(rightIndex + 1) == 10 /* '\n' */) {
+            if (leftIndex != rightIndex || getPrevChar() == 44) {
+              _currentRow.add(chunk.substring(leftIndex, rightIndex));
+            }
+            _emitRow();
+            leftIndex = rightIndex = rightIndex + 2;
+          } else if (rightIndex == chunk.length - 1) {
+            break;
+          } else {
+            rightIndex++;
+          }
+        } else if (current == 10 /* '\n' */) {
+          if (leftIndex != rightIndex || getPrevChar() == 44) {
+            _currentRow.add(chunk.substring(leftIndex, rightIndex));
+          }
+          _emitRow();
+          leftIndex = rightIndex = rightIndex + 1;
+        } else {
+          rightIndex++;
         }
       }
+    }
 
-      final subscription = stream.listen(
-        (data) {
-          buffer += data;
-          processBuffer(false);
-        },
-        onError: controller.addError,
-        onDone: () {
-          processBuffer(true);
-          controller.close();
-        },
-        cancelOnError: false,
-      );
+    if (leftIndex > 0) {
+      _previousChar = chunk.codeUnitAt(leftIndex - 1);
+    }
+    _carry = chunk.substring(leftIndex);
+  }
 
-      controller.onPause = subscription.pause;
-      controller.onResume = subscription.resume;
-      controller.onCancel = subscription.cancel;
-    };
-
-    return controller.stream;
+  @override
+  void close() {
+    if (_carry.isNotEmpty || _previousChar == 44) {
+      if (_isInsideDoubleQuotes) {
+        _currentRow.add(_carry.replaceAll('""', '"'));
+      } else {
+        if (_carry.isEmpty && _previousChar == 34) {
+          // handled
+        } else {
+          _currentRow.add(_carry);
+        }
+      }
+      _carry = '';
+    }
+    _emitRow();
+    _outSink.close();
   }
 }
