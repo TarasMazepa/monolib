@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-class CsvRowDecoder extends Converter<String, List<String>> {
-  const CsvRowDecoder();
+class CsvChunkedDecoder extends Converter<String, List<String>> {
+  const CsvChunkedDecoder();
 
   @override
   List<String> convert(String input) {
@@ -10,11 +10,11 @@ class CsvRowDecoder extends Converter<String, List<String>> {
 
   @override
   Sink<String> startChunkedConversion(Sink<List<String>> sink) {
-    return _CsvRowDecoderSink(sink);
+    return _CsvChunkedDecoderSink(sink);
   }
 }
 
-class _CsvRowDecoderSink implements ChunkedConversionSink<String> {
+class _CsvChunkedDecoderSink implements ChunkedConversionSink<String> {
   final Sink<List<String>> _outSink;
 
   bool _isInsideDoubleQuotes = false;
@@ -23,7 +23,7 @@ class _CsvRowDecoderSink implements ChunkedConversionSink<String> {
   String _carry = '';
   int _unprocessedTailLen = 0;
 
-  _CsvRowDecoderSink(this._outSink);
+  _CsvChunkedDecoderSink(this._outSink);
 
   void _emitRow() {
     if (_currentRow.isNotEmpty) {
