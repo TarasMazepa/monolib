@@ -1,21 +1,19 @@
 import 'dart:convert';
 
-/// A Converter that fuses line-splitting directly into JSON mapping,
-/// avoiding the stream event overhead of LineSplitterConverter.
-class JsonlSplitMapper<T> extends Converter<String, T> {
+class JsonlMappedBatchDecoder<T> extends Converter<String, List<T>> {
   final T? Function(dynamic) fromJson;
   final bool ignoreExceptions;
 
-  const JsonlSplitMapper(this.fromJson, {this.ignoreExceptions = false});
+  const JsonlMappedBatchDecoder(this.fromJson, {this.ignoreExceptions = false});
 
   @override
-  T convert(String input) {
+  List<T> convert(String input) {
     throw UnsupportedError('This converter only supports chunked conversion');
   }
 
   @override
-  Sink<String> startChunkedConversion(Sink<T> sink) {
-    return _JsonlSplitMapperSink<T>(
+  Sink<String> startChunkedConversion(Sink<List<T>> sink) {
+    return _JsonlMappedBatchDecoderSink<T>(
       sink,
       fromJson,
       ignoreExceptions: ignoreExceptions,
@@ -23,19 +21,19 @@ class JsonlSplitMapper<T> extends Converter<String, T> {
   }
 }
 
-class _JsonlSplitMapperSink<T> implements ChunkedConversionSink<String> {
-  final Sink<T> _outSink;
+class _JsonlMappedBatchDecoderSink<T> implements ChunkedConversionSink<String> {
+  final Sink<List<T>> _outSink;
   final T? Function(dynamic) _fromJson;
   final bool ignoreExceptions;
   String _carry = '';
 
-  _JsonlSplitMapperSink(
+  _JsonlMappedBatchDecoderSink(
     this._outSink,
     this._fromJson, {
     this.ignoreExceptions = false,
   });
 
-  void _processLine(String line) {
+  void _processLine(String line, List<T> batch) {
     if (line.endsWith('\r')) {
       line = line.substring(0, line.length - 1);
     }
@@ -44,7 +42,7 @@ class _JsonlSplitMapperSink<T> implements ChunkedConversionSink<String> {
         final json = jsonDecode(line);
         final mapped = _fromJson(json);
         if (mapped != null) {
-          _outSink.add(mapped);
+          batch.add(mapped);
         }
       } catch (e) {
         if (!ignoreExceptions) {
@@ -56,6 +54,7 @@ class _JsonlSplitMapperSink<T> implements ChunkedConversionSink<String> {
 
   @override
   void add(String chunk) {
+    final batch = <T>[];
     int start = 0;
     while (true) {
       final newlineIndex = chunk.indexOf('\n', start);
@@ -69,15 +68,23 @@ class _JsonlSplitMapperSink<T> implements ChunkedConversionSink<String> {
         line = _carry + line;
         _carry = '';
       }
-      _processLine(line);
+      _processLine(line, batch);
       start = newlineIndex + 1;
+    }
+
+    if (batch.isNotEmpty) {
+      _outSink.add(batch);
     }
   }
 
   @override
   void close() {
     if (_carry.isNotEmpty) {
-      _processLine(_carry);
+      final batch = <T>[];
+      _processLine(_carry, batch);
+      if (batch.isNotEmpty) {
+        _outSink.add(batch);
+      }
       _carry = '';
     }
     _outSink.close();

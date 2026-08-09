@@ -5,9 +5,9 @@ import 'package:monolib_dart/jsonl.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('JsonlSplitMapper', () {
+  group('JsonlMappedDecoder', () {
     test('convert() throws UnsupportedError', () {
-      const mapper = JsonlSplitMapper<Map<String, dynamic>>(_castMap);
+      const mapper = JsonlMappedDecoder<Map<String, dynamic>>(_castMap);
       expect(
         () => mapper.convert('{"a":1}'),
         throwsA(isA<UnsupportedError>()),
@@ -21,7 +21,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 
@@ -41,7 +41,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 
@@ -58,7 +58,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 
@@ -76,7 +76,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 
@@ -93,7 +93,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 
@@ -116,7 +116,7 @@ void main() {
       }
 
       final result = await stream
-          .transform(JsonlSplitMapper<int>(activeIdMapper))
+          .transform(JsonlMappedDecoder<int>(activeIdMapper))
           .toList();
 
       expect(result, [1, 3]);
@@ -130,7 +130,7 @@ void main() {
       expect(
         () => stream
             .transform(
-              const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+              const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
             )
             .toList(),
         throwsA(isA<FormatException>()),
@@ -144,7 +144,7 @@ void main() {
 
       final result = await stream
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(
+            const JsonlMappedDecoder<Map<String, dynamic>>(
               _castMap,
               ignoreExceptions: true,
             ),
@@ -165,7 +165,7 @@ void main() {
       final result = await stream
           .transform(utf8.decoder)
           .transform(
-            const JsonlSplitMapper<Map<String, dynamic>>(_castMap),
+            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
           )
           .toList();
 

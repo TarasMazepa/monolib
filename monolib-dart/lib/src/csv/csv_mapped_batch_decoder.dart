@@ -1,23 +1,23 @@
 import 'dart:convert';
 
-class MappedCsvRowDecoder<T> extends Converter<String, T> {
+class CsvMappedBatchDecoder<T> extends Converter<String, List<T>> {
   final T? Function(List<String> row) mapper;
 
-  const MappedCsvRowDecoder(this.mapper);
+  const CsvMappedBatchDecoder(this.mapper);
 
   @override
-  T convert(String input) {
+  List<T> convert(String input) {
     throw UnsupportedError('This converter only supports chunked conversion');
   }
 
   @override
-  Sink<String> startChunkedConversion(Sink<T> sink) {
-    return _CsvRowDecoderSink<T>(sink, mapper);
+  Sink<String> startChunkedConversion(Sink<List<T>> sink) {
+    return _CsvBatchDecoderSink<T>(sink, mapper);
   }
 }
 
-class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
-  final Sink<T> _outSink;
+class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
+  final Sink<List<T>> _outSink;
   final T? Function(List<String> row) _mapper;
 
   bool _isInsideDoubleQuotes = false;
@@ -25,13 +25,13 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
   int _previousChar = -1;
   String _carry = '';
 
-  _CsvRowDecoderSink(this._outSink, this._mapper);
+  _CsvBatchDecoderSink(this._outSink, this._mapper);
 
-  void _emitRow() {
+  void _emitRow(List<T> batch) {
     if (_currentRow.isNotEmpty) {
       final mapped = _mapper(_currentRow);
       if (mapped != null) {
-        _outSink.add(mapped);
+        batch.add(mapped);
       }
       _currentRow = [];
     }
@@ -46,6 +46,7 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
       _carry = '';
     }
 
+    final batch = <T>[];
     int leftIndex = 0;
     int rightIndex = 0;
 
@@ -95,7 +96,7 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
             if (leftIndex != rightIndex || getPrevChar() == 44) {
               _currentRow.add(chunk.substring(leftIndex, rightIndex));
             }
-            _emitRow();
+            _emitRow(batch);
             leftIndex = rightIndex = rightIndex + 2;
           } else if (rightIndex == chunk.length - 1) {
             break;
@@ -106,7 +107,7 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
           if (leftIndex != rightIndex || getPrevChar() == 44) {
             _currentRow.add(chunk.substring(leftIndex, rightIndex));
           }
-          _emitRow();
+          _emitRow(batch);
           leftIndex = rightIndex = rightIndex + 1;
         } else {
           rightIndex++;
@@ -118,10 +119,15 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
       _previousChar = chunk.codeUnitAt(leftIndex - 1);
     }
     _carry = chunk.substring(leftIndex);
+
+    if (batch.isNotEmpty) {
+      _outSink.add(batch);
+    }
   }
 
   @override
   void close() {
+    final batch = <T>[];
     if (_carry.isNotEmpty || _previousChar == 44) {
       if (_isInsideDoubleQuotes) {
         _currentRow.add(_carry.replaceAll('""', '"'));
@@ -134,7 +140,10 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
       }
       _carry = '';
     }
-    _emitRow();
+    _emitRow(batch);
+    if (batch.isNotEmpty) {
+      _outSink.add(batch);
+    }
     _outSink.close();
   }
 }
