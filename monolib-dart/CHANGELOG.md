@@ -1,3 +1,8 @@
+## 0.0.35
+
+- Adds `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder` for high-throughput batch-emitting stream optimizations.
+- Renames `MappedCsvRowDecoder` to `CsvMappedDecoder` and `JsonlSplitMapper` to `JsonlMappedDecoder` to unify naming conventions.
+
 ## 0.0.34
 
 - Adds `JsonlSplitMapper` converter that fuses line-splitting directly into JSON mapping, eliminating intermediate stream event overhead.

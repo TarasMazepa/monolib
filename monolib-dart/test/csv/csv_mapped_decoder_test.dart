@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:monolib_dart/src/csv/mapped_csv_row_decoder.dart';
+import 'package:monolib_dart/src/csv/csv_mapped_decoder.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('MappedCsvRowDecoder', () {
+  group('CsvMappedDecoder', () {
     test('parses simple csv across chunks and maps to objects', () async {
       final stream = Stream.fromIterable(['name,age\n', 'John,30\n']);
 
@@ -15,8 +15,7 @@ void main() {
         return null;
       }
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['name: age', 'John: 30']);
     });
 
@@ -33,20 +32,18 @@ void main() {
         return '${row[0]}: ${row[1]}';
       }
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['John: 30']);
     });
   });
 
-  group('MappedCsvRowDecoder more tests', () {
+  group('CsvMappedDecoder more tests', () {
     test('parses csv with escaped quotes and newlines across chunks', () async {
       final stream = Stream.fromIterable(['a,"b\n', 'c",d\n']);
 
       String? mapper(List<String> row) => row.join('|');
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['a|b\nc|d']);
     });
 
@@ -55,8 +52,7 @@ void main() {
 
       String? mapper(List<String> row) => row.join('|');
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['a|b""c|d']);
     });
 
@@ -65,8 +61,7 @@ void main() {
 
       String? mapper(List<String> row) => row.join('|');
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['a||c', '|b|', 'x||']);
     });
 
@@ -75,8 +70,7 @@ void main() {
 
       String? mapper(List<String> row) => row.join('|');
 
-      final result =
-          await stream.transform(MappedCsvRowDecoder(mapper)).toList();
+      final result = await stream.transform(CsvMappedDecoder(mapper)).toList();
       expect(result, ['a|b|c"|d']);
     });
 
@@ -85,7 +79,7 @@ void main() {
       final List<String> received = [];
 
       final sub = controller.stream
-          .transform(MappedCsvRowDecoder((row) => row.join(',')))
+          .transform(CsvMappedDecoder((row) => row.join(',')))
           .listen(received.add);
 
       final future = sub.asFuture();
@@ -101,7 +95,7 @@ void main() {
       final List<String> received = [];
 
       final sub = controller.stream
-          .transform(MappedCsvRowDecoder((row) => row.join(',')))
+          .transform(CsvMappedDecoder((row) => row.join(',')))
           .listen(received.add);
 
       sub.pause();
@@ -125,12 +119,12 @@ void main() {
       // Test baseline with a single large chunk
       final baselineStream = Stream.fromIterable([csvData]);
       final baselineResult =
-          await baselineStream.transform(MappedCsvRowDecoder(mapper)).toList();
+          await baselineStream.transform(CsvMappedDecoder(mapper)).toList();
 
       // Test with 1-character chunks
       final charStream = Stream.fromIterable(csvData.split(''));
       final charResult =
-          await charStream.transform(MappedCsvRowDecoder(mapper)).toList();
+          await charStream.transform(CsvMappedDecoder(mapper)).toList();
 
       // Test with 2-character chunks
       final List<String> chunksOf2 = [];
@@ -140,7 +134,7 @@ void main() {
       }
       final twoCharStream = Stream.fromIterable(chunksOf2);
       final twoCharResult =
-          await twoCharStream.transform(MappedCsvRowDecoder(mapper)).toList();
+          await twoCharStream.transform(CsvMappedDecoder(mapper)).toList();
 
       expect(charResult, equals(baselineResult),
           reason: '1-char chunks should match baseline');
