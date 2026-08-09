@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import '../common/chunked_only_converter.dart';
+import 'jsonl_base_chunk_sink.dart';
 
 class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(dynamic) fromJson;
@@ -17,19 +19,16 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   }
 }
 
-class _JsonlMappedBatchDecoderSink<T> implements ChunkedConversionSink<String> {
-  final Sink<List<T>> _outSink;
+class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>> {
   final T? Function(dynamic) _fromJson;
   final bool ignoreExceptions;
-  String _carry = '';
+  List<T> _batch = [];
 
-  _JsonlMappedBatchDecoderSink(
-    this._outSink,
-    this._fromJson, {
-    this.ignoreExceptions = false,
-  });
+  _JsonlMappedBatchDecoderSink(super.outSink, this._fromJson,
+      {this.ignoreExceptions = false});
 
-  void _processLine(String line, List<T> batch) {
+  @override
+  void processLine(String line) {
     if (line.endsWith('\r')) {
       line = line.substring(0, line.length - 1);
     }
@@ -38,7 +37,7 @@ class _JsonlMappedBatchDecoderSink<T> implements ChunkedConversionSink<String> {
         final json = jsonDecode(line);
         final mapped = _fromJson(json);
         if (mapped != null) {
-          batch.add(mapped);
+          _batch.add(mapped);
         }
       } catch (e) {
         if (!ignoreExceptions) {
@@ -49,40 +48,10 @@ class _JsonlMappedBatchDecoderSink<T> implements ChunkedConversionSink<String> {
   }
 
   @override
-  void add(String chunk) {
-    final batch = <T>[];
-    int start = 0;
-    while (true) {
-      final newlineIndex = chunk.indexOf('\n', start);
-      if (newlineIndex == -1) {
-        _carry += chunk.substring(start);
-        break;
-      }
-
-      String line = chunk.substring(start, newlineIndex);
-      if (_carry.isNotEmpty) {
-        line = _carry + line;
-        _carry = '';
-      }
-      _processLine(line, batch);
-      start = newlineIndex + 1;
+  void onChunkEnd() {
+    if (_batch.isNotEmpty) {
+      outSink.add(_batch);
+      _batch = [];
     }
-
-    if (batch.isNotEmpty) {
-      _outSink.add(batch);
-    }
-  }
-
-  @override
-  void close() {
-    if (_carry.isNotEmpty) {
-      final batch = <T>[];
-      _processLine(_carry, batch);
-      if (batch.isNotEmpty) {
-        _outSink.add(batch);
-      }
-      _carry = '';
-    }
-    _outSink.close();
   }
 }

@@ -1,3 +1,7 @@
+## 0.0.38
+
+- Performs massive DRY refactoring on chunked decoders by extracting duplicated structural parsing logic into `CsvBaseChunkSink` and `JsonlBaseChunkSink`.
+
 ## 0.0.37
 
 - Extracts duplicate `convert` implementation from chunked decoders into a common `ChunkedOnlyConverter` base class.
