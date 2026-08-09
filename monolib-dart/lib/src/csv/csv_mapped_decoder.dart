@@ -1,22 +1,18 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
-class CsvMappedDecoder<T> extends Converter<String, T> {
+class CsvMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final T? Function(List<String> row) mapper;
 
   const CsvMappedDecoder(this.mapper);
 
   @override
-  T convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
-
-  @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
-    return _CsvChunkedDecoderSink<T>(sink, mapper);
+    return _CsvMappedDecoderSink<T>(sink, mapper);
   }
 }
 
-class _CsvChunkedDecoderSink<T> implements ChunkedConversionSink<String> {
+class _CsvMappedDecoderSink<T> implements ChunkedConversionSink<String> {
   final Sink<T> _outSink;
   final T? Function(List<String> row) _mapper;
 
@@ -26,7 +22,7 @@ class _CsvChunkedDecoderSink<T> implements ChunkedConversionSink<String> {
   String _carry = '';
   int _unprocessedTailLen = 0;
 
-  _CsvChunkedDecoderSink(this._outSink, this._mapper);
+  _CsvMappedDecoderSink(this._outSink, this._mapper);
 
   void _emitRow() {
     if (_currentRow.isNotEmpty) {

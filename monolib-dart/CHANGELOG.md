@@ -1,3 +1,8 @@
+## 0.0.37
+
+- Extracts duplicate `convert` implementation from chunked decoders into a common `ChunkedOnlyConverter` base class.
+- Resolves internal private sink naming collisions for mapped CSV decoders.
+
 ## 0.0.36
 
 - Renames `CsvRowDecoder` to `CsvChunkedDecoder` and `JsonlMapper` to `JsonlChunkedDecoder` to complete the decoder API matrix unification.

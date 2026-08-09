@@ -1,22 +1,18 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
-class CsvMappedBatchDecoder<T> extends Converter<String, List<T>> {
+class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(List<String> row) mapper;
 
   const CsvMappedBatchDecoder(this.mapper);
 
   @override
-  List<T> convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
-
-  @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
-    return _CsvBatchDecoderSink<T>(sink, mapper);
+    return _CsvMappedBatchDecoderSink<T>(sink, mapper);
   }
 }
 
-class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
+class _CsvMappedBatchDecoderSink<T> implements ChunkedConversionSink<String> {
   final Sink<List<T>> _outSink;
   final T? Function(List<String> row) _mapper;
 
@@ -26,7 +22,7 @@ class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
   String _carry = '';
   int _unprocessedTailLen = 0;
 
-  _CsvBatchDecoderSink(this._outSink, this._mapper);
+  _CsvMappedBatchDecoderSink(this._outSink, this._mapper);
 
   void _emitRow(List<T> batch) {
     if (_currentRow.isNotEmpty) {

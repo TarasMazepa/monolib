@@ -1,12 +1,8 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
-class CsvChunkedDecoder extends Converter<String, List<String>> {
+class CsvChunkedDecoder extends ChunkedOnlyConverter<String, List<String>> {
   const CsvChunkedDecoder();
-
-  @override
-  List<String> convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
 
   @override
   Sink<String> startChunkedConversion(Sink<List<String>> sink) {

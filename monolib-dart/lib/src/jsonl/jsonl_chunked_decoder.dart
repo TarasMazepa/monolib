@@ -1,14 +1,10 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
 /// A Converter that handles chunked string boundaries and parses JSON,
 /// dropping nulls along the way. Emits raw dynamic objects.
-class JsonlChunkedDecoder extends Converter<String, dynamic> {
+class JsonlChunkedDecoder extends ChunkedOnlyConverter<String, dynamic> {
   const JsonlChunkedDecoder();
-
-  @override
-  dynamic convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
 
   @override
   Sink<String> startChunkedConversion(Sink<dynamic> sink) {

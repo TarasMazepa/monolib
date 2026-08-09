@@ -1,15 +1,11 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
-class JsonlMappedBatchDecoder<T> extends Converter<String, List<T>> {
+class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(dynamic) fromJson;
   final bool ignoreExceptions;
 
   const JsonlMappedBatchDecoder(this.fromJson, {this.ignoreExceptions = false});
-
-  @override
-  List<T> convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
 
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {

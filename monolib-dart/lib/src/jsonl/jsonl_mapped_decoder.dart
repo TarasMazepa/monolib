@@ -1,17 +1,13 @@
 import 'dart:convert';
+import '../common/chunked_only_converter.dart';
 
 /// A Converter that fuses line-splitting directly into JSON mapping,
 /// avoiding the stream event overhead of LineSplitterConverter.
-class JsonlMappedDecoder<T> extends Converter<String, T> {
+class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final T? Function(dynamic) fromJson;
   final bool ignoreExceptions;
 
   const JsonlMappedDecoder(this.fromJson, {this.ignoreExceptions = false});
-
-  @override
-  T convert(String input) {
-    throw UnsupportedError('This converter only supports chunked conversion');
-  }
 
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
