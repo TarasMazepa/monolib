@@ -12,11 +12,11 @@ class CsvMappedDecoder<T> extends Converter<String, T> {
 
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
-    return _CsvRowDecoderSink<T>(sink, mapper);
+    return _CsvChunkedDecoderSink<T>(sink, mapper);
   }
 }
 
-class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
+class _CsvChunkedDecoderSink<T> implements ChunkedConversionSink<String> {
   final Sink<T> _outSink;
   final T? Function(List<String> row) _mapper;
 
@@ -26,7 +26,7 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
   String _carry = '';
   int _unprocessedTailLen = 0;
 
-  _CsvRowDecoderSink(this._outSink, this._mapper);
+  _CsvChunkedDecoderSink(this._outSink, this._mapper);
 
   void _emitRow() {
     if (_currentRow.isNotEmpty) {

@@ -1,3 +1,8 @@
+## 0.0.36
+
+- Renames `CsvRowDecoder` to `CsvChunkedDecoder` and `JsonlMapper` to `JsonlChunkedDecoder` to complete the decoder API matrix unification.
+- Rewrites `JsonlChunkedDecoder` to handle its own chunk boundary line splitting, maximizing performance.
+
 ## 0.0.35
 
 - Adds `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder` for high-throughput batch-emitting stream optimizations.

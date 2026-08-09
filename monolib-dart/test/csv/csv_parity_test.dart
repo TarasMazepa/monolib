@@ -7,23 +7,23 @@ import 'package:test/scaffolding.dart';
 void main() {
   group('rfc4180 parity tests', () {
     final csvCodec = CsvCodec();
-    const csvRowDecoder = CsvRowDecoder();
+    const csvRowDecoder = CsvChunkedDecoder();
 
     Future<void> testDecode(String input, List<List<String>> expected) async {
       // Test synchronous CsvDecoder
       expect(csvCodec.decode(input), expected, reason: 'CsvDecoder failed');
 
-      // Test asynchronous CsvRowDecoder (single chunk)
+      // Test asynchronous CsvChunkedDecoder (single chunk)
       final streamResult1 = await Stream.value(
         input,
       ).transform(csvRowDecoder).toList();
       expect(
         streamResult1,
         expected,
-        reason: 'CsvRowDecoder (single chunk) failed',
+        reason: 'CsvChunkedDecoder (single chunk) failed',
       );
 
-      // Test asynchronous CsvRowDecoder (char by char chunks)
+      // Test asynchronous CsvChunkedDecoder (char by char chunks)
       final charChunks = input.split('');
       final streamResult2 = await Stream.fromIterable(
         charChunks,
@@ -31,7 +31,7 @@ void main() {
       expect(
         streamResult2,
         expected,
-        reason: 'CsvRowDecoder (char chunks) failed',
+        reason: 'CsvChunkedDecoder (char chunks) failed',
       );
     }
 
