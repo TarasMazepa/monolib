@@ -24,6 +24,7 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
   List<String> _currentRow = [];
   int _previousChar = -1;
   String _carry = '';
+  int _unprocessedTailLen = 0;
 
   _CsvRowDecoderSink(this._outSink, this._mapper);
 
@@ -118,18 +119,21 @@ class _CsvRowDecoderSink<T> implements ChunkedConversionSink<String> {
       _previousChar = chunk.codeUnitAt(leftIndex - 1);
     }
     _carry = chunk.substring(leftIndex);
+    _unprocessedTailLen = chunk.length - rightIndex;
   }
 
   @override
   void close() {
     if (_carry.isNotEmpty || _previousChar == 44) {
+      final validCarry =
+          _carry.substring(0, _carry.length - _unprocessedTailLen);
       if (_isInsideDoubleQuotes) {
-        _currentRow.add(_carry.replaceAll('""', '"'));
+        _currentRow.add(validCarry.replaceAll('""', '"'));
       } else {
-        if (_carry.isEmpty && _previousChar == 34) {
+        if (validCarry.isEmpty && _previousChar == 34) {
           // handled
         } else {
-          _currentRow.add(_carry);
+          _currentRow.add(validCarry);
         }
       }
       _carry = '';

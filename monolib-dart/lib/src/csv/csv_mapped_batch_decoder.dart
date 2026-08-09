@@ -24,6 +24,7 @@ class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
   List<String> _currentRow = [];
   int _previousChar = -1;
   String _carry = '';
+  int _unprocessedTailLen = 0;
 
   _CsvBatchDecoderSink(this._outSink, this._mapper);
 
@@ -119,6 +120,7 @@ class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
       _previousChar = chunk.codeUnitAt(leftIndex - 1);
     }
     _carry = chunk.substring(leftIndex);
+    _unprocessedTailLen = chunk.length - rightIndex;
 
     if (batch.isNotEmpty) {
       _outSink.add(batch);
@@ -128,19 +130,30 @@ class _CsvBatchDecoderSink<T> implements ChunkedConversionSink<String> {
   @override
   void close() {
     final batch = <T>[];
+
+    void emitRow(List<String> row) {
+      final mapped = _mapper(row);
+      if (mapped != null) {
+        batch.add(mapped);
+      }
+    }
+
     if (_carry.isNotEmpty || _previousChar == 44) {
+      final validCarry =
+          _carry.substring(0, _carry.length - _unprocessedTailLen);
+      final row = <String>[..._currentRow];
       if (_isInsideDoubleQuotes) {
-        _currentRow.add(_carry.replaceAll('""', '"'));
+        row.add(validCarry.replaceAll('""', '"'));
       } else {
-        if (_carry.isEmpty && _previousChar == 34) {
+        if (validCarry.isEmpty && _previousChar == 34) {
           // handled
         } else {
-          _currentRow.add(_carry);
+          row.add(validCarry);
         }
       }
+      emitRow(row);
       _carry = '';
     }
-    _emitRow(batch);
     if (batch.isNotEmpty) {
       _outSink.add(batch);
     }
