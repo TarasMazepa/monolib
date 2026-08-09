@@ -44,7 +44,8 @@ void main() {
 
     test('exhaustively tests all chunk boundaries by feeding 1 char at a time',
         () async {
-      final csvData = 'a,"b""\nc",d\n"e,f",g\n\r\n"h\r\ni",j"k"\r\nlast,,';
+      final csvData =
+          'a,"b""\nc",d\n"e,f",g\n\r\n"h\r\ni",j"k"\r\nlast,,\n"aaa","b""bb","ccc"';
 
       String? mapper(List<String> row) => row.join('|');
 
