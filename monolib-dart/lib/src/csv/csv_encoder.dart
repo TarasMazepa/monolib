@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'csv_cell_writer.dart';
+
 class CsvEncoder extends Converter<List<dynamic>, String> {
   const CsvEncoder();
 
@@ -21,32 +23,7 @@ class CsvEncoder extends Converter<List<dynamic>, String> {
         if (cell is! String) {
           cell = '$cell';
         }
-        if (cell.isEmpty) {
-          // do nothing
-        } else {
-          int index = 0;
-          bool needsEscaping = cell[0] == '"';
-          while (!needsEscaping && index < cell.length) {
-            final current = cell[index++];
-            needsEscaping = switch (current) {
-              ',' => true,
-              '\n' => true,
-              _ => false,
-            };
-          }
-          if (needsEscaping) {
-            result.write('"');
-            for (int i = 0; i < cell.length; i++) {
-              result.write(switch (cell[i]) {
-                '"' => '""',
-                final symbol => symbol,
-              });
-            }
-            result.write('"');
-          } else {
-            result.write(cell);
-          }
-        }
+        writeCsvCell(cell, result);
         if (i == item.length - 1) {
           result.write('\r\n');
         } else {
