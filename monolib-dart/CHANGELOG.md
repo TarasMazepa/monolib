@@ -1,3 +1,7 @@
+## 0.0.42
+
+- Complete API symmetry for JSONL decoders by propagating `jsonCodec` through `JsonlMappedDecoder` and `JsonlMappedBatchDecoder`, allowing custom JSON decoders to be injected.
+
 ## 0.0.41
 
 - Added `always_use_package_imports` lint rule and applied it project-wide.

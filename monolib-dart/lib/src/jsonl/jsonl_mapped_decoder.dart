@@ -7,15 +7,18 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// avoiding the stream event overhead of LineSplitterConverter.
 class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final T? Function(dynamic) fromJson;
+  final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  const JsonlMappedDecoder(this.fromJson, {this.ignoreExceptions = false});
+  const JsonlMappedDecoder(this.fromJson,
+      {this.ignoreExceptions = false, this.jsonCodec = const JsonCodec()});
 
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
     return _JsonlMappedDecoderSink<T>(
       sink,
       fromJson,
+      jsonCodec,
       ignoreExceptions: ignoreExceptions,
     );
   }
@@ -23,15 +26,16 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
 
 class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
   final T? Function(dynamic) _fromJson;
+  final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  _JsonlMappedDecoderSink(super.outSink, this._fromJson,
+  _JsonlMappedDecoderSink(super.outSink, this._fromJson, this.jsonCodec,
       {this.ignoreExceptions = false});
 
   @override
   void processLine(String line) {
     try {
-      final json = jsonDecode(line);
+      final json = jsonCodec.decode(line);
       final mapped = _fromJson(json);
       if (mapped != null) {
         outSink.add(mapped);
