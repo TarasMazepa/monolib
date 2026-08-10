@@ -11,9 +11,8 @@ void main() {
         '{"id":2',
         '}\n{"id":3}',
       ]);
-      final result = await stream
-          .transform(const JsonlChunkedDecoder())
-          .toList();
+      final result =
+          await stream.transform(const JsonlChunkedDecoder()).toList();
       expect(result, [
         {"id": 1},
         {"id": 2},
@@ -26,9 +25,8 @@ void main() {
         '\r\n{"id":1}\r\n',
         '\r\n\r\n{"id":2}\n',
       ]);
-      final result = await stream
-          .transform(const JsonlChunkedDecoder())
-          .toList();
+      final result =
+          await stream.transform(const JsonlChunkedDecoder()).toList();
       expect(result, [
         {"id": 1},
         {"id": 2},
@@ -49,9 +47,8 @@ void main() {
 
         // Test with 1-character chunks
         final charStream = Stream.fromIterable(jsonlData.split(''));
-        final charResult = await charStream
-            .transform(const JsonlChunkedDecoder())
-            .toList();
+        final charResult =
+            await charStream.transform(const JsonlChunkedDecoder()).toList();
 
         // Test with 2-character chunks
         final List<String> chunksOf2 = [];
@@ -64,9 +61,8 @@ void main() {
           );
         }
         final twoCharStream = Stream.fromIterable(chunksOf2);
-        final twoCharResult = await twoCharStream
-            .transform(const JsonlChunkedDecoder())
-            .toList();
+        final twoCharResult =
+            await twoCharStream.transform(const JsonlChunkedDecoder()).toList();
 
         expect(
           charResult,

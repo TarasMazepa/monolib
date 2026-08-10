@@ -15,8 +15,7 @@ Future<void> jsonEncodeAsync({
   }
 
   bool ownsSink = false;
-  late StringSink activeSink =
-      sink ??
+  late StringSink activeSink = sink ??
       () {
         ownsSink = true;
         return sinkProvider!();

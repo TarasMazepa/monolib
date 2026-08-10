@@ -10,10 +10,8 @@ void main() {
           [3],
           [4, 5],
         ]);
-        final result = await stream
-            .asAccumulating()
-            .map((l) => [...l])
-            .toList();
+        final result =
+            await stream.asAccumulating().map((l) => [...l]).toList();
         expect(result, [
           [1, 2],
           [1, 2, 3],
