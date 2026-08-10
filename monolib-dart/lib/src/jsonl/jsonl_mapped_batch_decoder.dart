@@ -29,20 +29,15 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>> {
 
   @override
   void processLine(String line) {
-    if (line.endsWith('\r')) {
-      line = line.substring(0, line.length - 1);
-    }
-    if (line.isNotEmpty) {
-      try {
-        final json = jsonDecode(line);
-        final mapped = _fromJson(json);
-        if (mapped != null) {
-          _batch.add(mapped);
-        }
-      } catch (e) {
-        if (!ignoreExceptions) {
-          rethrow;
-        }
+    try {
+      final json = jsonDecode(line);
+      final mapped = _fromJson(json);
+      if (mapped != null) {
+        _batch.add(mapped);
+      }
+    } catch (e) {
+      if (!ignoreExceptions) {
+        rethrow;
       }
     }
   }

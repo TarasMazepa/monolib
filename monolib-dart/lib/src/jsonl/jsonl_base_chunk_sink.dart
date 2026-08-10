@@ -11,6 +11,15 @@ abstract class JsonlBaseChunkSink<TOut>
 
   void onChunkEnd() {}
 
+  void _handleRawLine(String line) {
+    if (line.endsWith('\r')) {
+      line = line.substring(0, line.length - 1);
+    }
+    if (line.isNotEmpty) {
+      processLine(line);
+    }
+  }
+
   @override
   void add(String chunk) {
     int start = 0;
@@ -26,7 +35,7 @@ abstract class JsonlBaseChunkSink<TOut>
         line = _carry + line;
         _carry = '';
       }
-      processLine(line);
+      _handleRawLine(line);
       start = newlineIndex + 1;
     }
     onChunkEnd();
@@ -35,7 +44,7 @@ abstract class JsonlBaseChunkSink<TOut>
   @override
   void close() {
     if (_carry.isNotEmpty) {
-      processLine(_carry);
+      _handleRawLine(_carry);
       _carry = '';
     }
     onChunkEnd();

@@ -19,14 +19,9 @@ class _JsonlChunkedDecoderSink extends JsonlBaseChunkSink<dynamic> {
 
   @override
   void processLine(String line) {
-    if (line.endsWith('\r')) {
-      line = line.substring(0, line.length - 1);
-    }
-    if (line.isNotEmpty) {
-      final json = jsonDecode(line);
-      if (json != null) {
-        outSink.add(json);
-      }
+    final json = jsonDecode(line);
+    if (json != null) {
+      outSink.add(json);
     }
   }
 }
