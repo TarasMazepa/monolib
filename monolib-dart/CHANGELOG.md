@@ -1,3 +1,7 @@
+## 0.0.44
+
+- Adds `flattenToList({bool cancelOnError = true, bool sync = false})` extension method to `Stream<List<T>>` to efficiently gather and flatten all emitted lists into a single `Future<List<T>>`.
+
 ## 0.0.43
 
 - **BREAKING:** `csvEncodeAsync` now uses named arguments (`{required Object items, StringSink? sink, StringSink Function()? sinkProvider}`) to match `jsonlEncodeAsync`.
