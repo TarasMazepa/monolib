@@ -1,3 +1,7 @@
+## 0.0.40
+
+- Performs DRY cleanup on JSONL decoders by moving line sanitization (stripping carriage returns and empty line checks) directly into `JsonlBaseChunkSink`.
+
 ## 0.0.39
 
 - **BREAKING:** Removed `csvEncodeAsyncForIOSink`, `jsonlEncodeAsyncForIOSink`, and `jsonEncodeAsyncForIOSink` utilities.
