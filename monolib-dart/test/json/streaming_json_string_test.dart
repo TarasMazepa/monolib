@@ -10,7 +10,9 @@ class _CustomWritable implements AsyncJsonWritable {
 
   @override
   Future<void> writeJsonAsync(
-      StringSink sink, JsonEncoderCallback encode) async {
+    StringSink sink,
+    JsonEncoderCallback encode,
+  ) async {
     sink.write('{"custom":');
     await encode(value);
     sink.write('}');
@@ -23,10 +25,7 @@ void main() {
       final buffer = StringBuffer();
       final obj = {'key': _CustomWritable('testValue')};
 
-      await jsonEncodeAsync(
-        object: obj,
-        sink: buffer,
-      );
+      await jsonEncodeAsync(object: obj, sink: buffer);
 
       expect(buffer.toString(), '{"key":{"custom":"testValue"}}');
     });
@@ -36,13 +35,10 @@ void main() {
 
       final streamController = StreamController<String>();
       final obj = {
-        'streamedString': StreamingJsonString(streamController.stream)
+        'streamedString': StreamingJsonString(streamController.stream),
       };
 
-      final encodeFuture = jsonEncodeAsync(
-        object: obj,
-        sink: buffer,
-      );
+      final encodeFuture = jsonEncodeAsync(object: obj, sink: buffer);
 
       streamController.add('chunk 1, ');
       streamController.add('chunk with "quotes"');
@@ -52,8 +48,10 @@ void main() {
       await encodeFuture;
 
       // Expected result: {"streamedString":"chunk 1, chunk with \"quotes\"\nand newlines"}
-      expect(buffer.toString(),
-          '{"streamedString":"chunk 1, chunk with \\"quotes\\"\\nand newlines"}');
+      expect(
+        buffer.toString(),
+        '{"streamedString":"chunk 1, chunk with \\"quotes\\"\\nand newlines"}',
+      );
     });
   });
 }

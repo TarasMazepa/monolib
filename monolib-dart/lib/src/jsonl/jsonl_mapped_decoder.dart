@@ -10,8 +10,11 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  const JsonlMappedDecoder(this.fromJson,
-      {this.ignoreExceptions = false, this.jsonCodec = const JsonCodec()});
+  const JsonlMappedDecoder(
+    this.fromJson, {
+    this.ignoreExceptions = false,
+    this.jsonCodec = const JsonCodec(),
+  });
 
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
@@ -29,8 +32,12 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  _JsonlMappedDecoderSink(super.outSink, this._fromJson, this.jsonCodec,
-      {this.ignoreExceptions = false});
+  _JsonlMappedDecoderSink(
+    super.outSink,
+    this._fromJson,
+    this.jsonCodec, {
+    this.ignoreExceptions = false,
+  });
 
   @override
   void processLine(String line) {

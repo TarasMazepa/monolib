@@ -8,10 +8,7 @@ void main() {
   group('JsonlMappedDecoder', () {
     test('convert() throws UnsupportedError', () {
       const mapper = JsonlMappedDecoder<Map<String, dynamic>>(_castMap);
-      expect(
-        () => mapper.convert('{"a":1}'),
-        throwsA(isA<UnsupportedError>()),
-      );
+      expect(() => mapper.convert('{"a":1}'), throwsA(isA<UnsupportedError>()));
     });
 
     test('parses basic JSONL stream', () async {
@@ -20,9 +17,7 @@ void main() {
       ]);
 
       final result = await stream
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
+          .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
           .toList();
 
       expect(result, [
@@ -40,9 +35,7 @@ void main() {
       ]);
 
       final result = await stream
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
+          .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
           .toList();
 
       expect(result, [
@@ -52,14 +45,10 @@ void main() {
     });
 
     test('supports CRLF newlines', () async {
-      final stream = Stream.fromIterable([
-        '{"id":1}\r\n{"id":2}\r\n',
-      ]);
+      final stream = Stream.fromIterable(['{"id":1}\r\n{"id":2}\r\n']);
 
       final result = await stream
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
+          .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
           .toList();
 
       expect(result, [
@@ -68,33 +57,27 @@ void main() {
       ]);
     });
 
-    test('processes leftover carry when stream closes without trailing newline',
-        () async {
-      final stream = Stream.fromIterable([
-        '{"id":1}\n{"id":2}',
-      ]);
+    test(
+      'processes leftover carry when stream closes without trailing newline',
+      () async {
+        final stream = Stream.fromIterable(['{"id":1}\n{"id":2}']);
 
-      final result = await stream
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
-          .toList();
+        final result = await stream
+            .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
+            .toList();
 
-      expect(result, [
-        {'id': 1},
-        {'id': 2},
-      ]);
-    });
+        expect(result, [
+          {'id': 1},
+          {'id': 2},
+        ]);
+      },
+    );
 
     test('skips empty lines and multiple consecutive newlines', () async {
-      final stream = Stream.fromIterable([
-        '\n\n{"id":1}\n\n\r\n{"id":2}\n\n',
-      ]);
+      final stream = Stream.fromIterable(['\n\n{"id":1}\n\n\r\n{"id":2}\n\n']);
 
       final result = await stream
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
+          .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
           .toList();
 
       expect(result, [
@@ -129,9 +112,7 @@ void main() {
 
       expect(
         () => stream
-            .transform(
-              const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-            )
+            .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
             .toList(),
         throwsA(isA<FormatException>()),
       );
@@ -159,14 +140,14 @@ void main() {
 
     test('fuses with utf8.decoder on byte streams', () async {
       final input = utf8.encode('{"val":"test1"}\n{"val":"test2"}\n');
-      final stream = Stream<List<int>>.fromIterable(
-          [input.sublist(0, 10), input.sublist(10)]);
+      final stream = Stream<List<int>>.fromIterable([
+        input.sublist(0, 10),
+        input.sublist(10),
+      ]);
 
       final result = await stream
           .transform(utf8.decoder)
-          .transform(
-            const JsonlMappedDecoder<Map<String, dynamic>>(_castMap),
-          )
+          .transform(const JsonlMappedDecoder<Map<String, dynamic>>(_castMap))
           .toList();
 
       expect(result, [
