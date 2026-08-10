@@ -1,6 +1,6 @@
-import 'pillar_entry.dart';
-import 'pillar_scope.dart';
-import 'scope_tracking_pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/pillar_entry.dart';
+import 'package:monolib_dart/src/pillar/pillar_scope.dart';
+import 'package:monolib_dart/src/pillar/scope_tracking_pillar_accessor.dart';
 
 class ScopeEnforcingPillarAccessor extends ScopeTrackingPillarAccessor {
   final PillarEntry requestingEntry;

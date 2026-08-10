@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'csv_cell_writer.dart';
+import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
 class CsvEncoder extends Converter<List<dynamic>, String> {
   const CsvEncoder();

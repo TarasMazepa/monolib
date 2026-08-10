@@ -1,4 +1,4 @@
-import 'pillar_key.dart';
+import 'package:monolib_dart/src/pillar/pillar_key.dart';
 
 abstract class PillarAccessor {
   T get<T>({PillarKey? key, String? token});

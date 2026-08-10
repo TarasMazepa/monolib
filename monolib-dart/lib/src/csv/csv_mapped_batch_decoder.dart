@@ -1,5 +1,6 @@
-import '../common/chunked_only_converter.dart';
-import 'csv_base_chunk_sink.dart';
+import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
+import 'package:monolib_dart/src/common/chunked_only_converter.dart';
+import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 
 class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(List<String> row) mapper;
@@ -12,9 +13,9 @@ class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   }
 }
 
-class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>> {
+class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>>
+    with BatchingSinkMixin<T> {
   final T? Function(List<String> row) _mapper;
-  List<T> _batch = [];
 
   _CsvMappedBatchDecoderSink(super.outSink, this._mapper);
 
@@ -22,15 +23,12 @@ class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>> {
   void handleRow(List<String> row) {
     final mapped = _mapper(row);
     if (mapped != null) {
-      _batch.add(mapped);
+      addToBatch(mapped);
     }
   }
 
   @override
   void onChunkEnd() {
-    if (_batch.isNotEmpty) {
-      outSink.add(_batch);
-      _batch = [];
-    }
+    flushBatchOnChunkEnd();
   }
 }

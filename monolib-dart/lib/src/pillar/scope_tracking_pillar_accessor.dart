@@ -1,8 +1,8 @@
-import 'pillar.dart';
-import 'pillar_accessor.dart';
-import 'pillar_entry.dart';
-import 'pillar_key.dart';
-import 'pillar_scope.dart';
+import 'package:monolib_dart/src/pillar/pillar.dart';
+import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/pillar_entry.dart';
+import 'package:monolib_dart/src/pillar/pillar_key.dart';
+import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 
 class ScopeTrackingPillarAccessor implements PillarAccessor {
   final PillarEntry Function<T>({PillarKey? key, String? token}) entryGetter;

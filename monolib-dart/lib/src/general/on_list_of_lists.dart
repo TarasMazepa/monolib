@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'on_list.dart';
-import 'table_cell_align_right.dart';
+import 'package:monolib_dart/src/general/on_list.dart';
+import 'package:monolib_dart/src/general/table_cell_align_right.dart';
 
 extension OnListOfLists on List<List> {
   void formatTable(StringSink sink) {
