@@ -15,9 +15,8 @@ void main() {
         return null;
       }
 
-      final result = await stream
-          .transform(CsvMappedBatchDecoder(mapper))
-          .toList();
+      final result =
+          await stream.transform(CsvMappedBatchDecoder(mapper)).toList();
       expect(result, [
         ['name: age'],
         ['John: 30'],
@@ -36,9 +35,8 @@ void main() {
         return '${row[0]}: ${row[1]}';
       }
 
-      final result = await stream
-          .transform(CsvMappedBatchDecoder(mapper))
-          .toList();
+      final result =
+          await stream.transform(CsvMappedBatchDecoder(mapper)).toList();
       expect(result, [
         ['John: 30'],
       ]);

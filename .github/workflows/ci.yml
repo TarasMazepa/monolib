@@ -21,16 +21,16 @@ jobs:
           cache: true
           cache-sdk: true
 
-      - run: dart format --output=none --set-exit-if-changed .
-        working-directory: monolib-dart
-
-      - run: dart format --output=none --set-exit-if-changed .
-        working-directory: monolib-flutter
-
       - run: dart pub get
         working-directory: monolib-dart
 
+      - run: dart format --output=none --set-exit-if-changed .
+        working-directory: monolib-dart
+
       - run: flutter pub get
+        working-directory: monolib-flutter
+
+      - run: dart format --output=none --set-exit-if-changed .
         working-directory: monolib-flutter
 
       - run: dart analyze --fatal-infos

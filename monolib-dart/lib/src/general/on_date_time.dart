@@ -5,11 +5,8 @@ extension Iso8601WithTimeZone on DateTime {
 
     // Extract hours and minutes
     final hours = duration.inHours.abs().toString().padLeft(2, '0');
-    final minutes = duration.inMinutes
-        .remainder(60)
-        .abs()
-        .toString()
-        .padLeft(2, '0');
+    final minutes =
+        duration.inMinutes.remainder(60).abs().toString().padLeft(2, '0');
 
     // Determine the sign (+ or -)
     final sign = duration.isNegative ? '-' : '+';

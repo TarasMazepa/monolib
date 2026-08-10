@@ -1,4 +1,42 @@
+import 'dart:async';
+
 extension OnStreamOfLists<T> on Stream<List<T>> {
+  /// Gathers all lists emitted by this stream and flattens them into a single list.
+  ///
+  /// - [cancelOnError]: If `true` (default), the stream subscription is cancelled
+  ///   immediately upon the first error. If `false`, the stream continues to drain
+  ///   in the background, but the returned Future completes with the first error.
+  /// - [sync]: If `true`, the internal Completer is created as `Completer.sync()`,
+  ///   completing the Future synchronously upon the stream's `onDone` event.
+  Future<List<T>> flattenToList({
+    bool cancelOnError = true,
+    bool sync = false,
+  }) {
+    final completer = sync ? Completer<List<T>>.sync() : Completer<List<T>>();
+    final accumulated = <T>[];
+
+    listen(
+      (list) {
+        if (!completer.isCompleted) {
+          accumulated.addAll(list);
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!completer.isCompleted) {
+          completer.completeError(error, stackTrace);
+        }
+      },
+      onDone: () {
+        if (!completer.isCompleted) {
+          completer.complete(accumulated);
+        }
+      },
+      cancelOnError: cancelOnError,
+    );
+
+    return completer.future;
+  }
+
   /// Accumulates the lists emitted by this stream into a single list.
   ///
   /// Note: This yields the same [List] instance on every event, so consumers
