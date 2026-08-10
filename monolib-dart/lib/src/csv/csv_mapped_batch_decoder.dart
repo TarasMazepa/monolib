@@ -1,6 +1,6 @@
-import '../common/batching_sink_mixin.dart';
-import '../common/chunked_only_converter.dart';
-import 'csv_base_chunk_sink.dart';
+import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
+import 'package:monolib_dart/src/common/chunked_only_converter.dart';
+import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 
 class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(List<String> row) mapper;

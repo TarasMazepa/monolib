@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'csv_decoder.dart';
-import 'csv_encoder.dart';
+import 'package:monolib_dart/src/csv/csv_decoder.dart';
+import 'package:monolib_dart/src/csv/csv_encoder.dart';
 
 class CsvCodec extends Codec<List<dynamic>, String> {
   @override

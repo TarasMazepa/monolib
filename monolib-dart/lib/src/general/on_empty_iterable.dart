@@ -1,4 +1,4 @@
-import 'on_empty_iterator.dart';
+import 'package:monolib_dart/src/general/on_empty_iterator.dart';
 
 class OnEmptyIterable<T> extends Iterable<T> {
   final Iterable<T> _source;

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../common/async_iterator_util.dart';
-import 'csv_cell_writer.dart';
+import 'package:monolib_dart/src/common/async_iterator_util.dart';
+import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
 Future<void> csvEncodeAsync(Object items, StringSink sink) async {
   Future<void> writeRow(dynamic item_) async {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import '../common/chunked_only_converter.dart';
-import 'jsonl_base_chunk_sink.dart';
+import 'package:monolib_dart/src/common/chunked_only_converter.dart';
+import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
 /// A Converter that handles chunked string boundaries and parses JSON,
 /// dropping nulls along the way. Emits raw dynamic objects.

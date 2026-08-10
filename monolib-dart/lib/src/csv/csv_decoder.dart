@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:monolib_dart/src/common/list_accumulator_sink.dart';
 
-import 'csv_chunked_decoder.dart';
+import 'package:monolib_dart/src/csv/csv_chunked_decoder.dart';
 
 class CsvDecoder extends Converter<String, List<List<String>>> {
   const CsvDecoder();

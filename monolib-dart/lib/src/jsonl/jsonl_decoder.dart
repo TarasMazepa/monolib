@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:monolib_dart/src/common/list_accumulator_sink.dart';
 
-import 'jsonl_chunked_decoder.dart';
+import 'package:monolib_dart/src/jsonl/jsonl_chunked_decoder.dart';
 
 class JsonlDecoder extends Converter<String, List<dynamic>> {
   final Codec<Object?, String> jsonCodec;

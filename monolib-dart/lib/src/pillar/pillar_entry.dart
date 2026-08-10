@@ -1,6 +1,6 @@
-import 'pillar.dart';
-import 'pillar_key.dart';
-import 'pillar_scope.dart';
+import 'package:monolib_dart/src/pillar/pillar.dart';
+import 'package:monolib_dart/src/pillar/pillar_key.dart';
+import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 
 class PillarEntry {
   final PillarKey key;

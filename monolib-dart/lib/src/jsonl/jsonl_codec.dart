@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'jsonl_decoder.dart';
-import 'jsonl_encoder.dart';
+import 'package:monolib_dart/src/jsonl/jsonl_decoder.dart';
+import 'package:monolib_dart/src/jsonl/jsonl_encoder.dart';
 
 class JsonlCodec extends Codec<List<dynamic>, String> {
   final Codec<Object?, String> jsonCodec;

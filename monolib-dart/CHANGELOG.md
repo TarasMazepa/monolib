@@ -1,3 +1,7 @@
+## 0.0.42
+
+- Added `always_use_package_imports` lint rule and applied it project-wide.
+
 ## 0.0.41
 
 - DRY up in-memory `CsvDecoder` and `JsonlDecoder` by delegating structural parsing to their respective chunked decoders.

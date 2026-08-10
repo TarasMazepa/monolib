@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../common/async_iterator_util.dart';
-import '../json/json_encode_async.dart';
+import 'package:monolib_dart/src/common/async_iterator_util.dart';
+import 'package:monolib_dart/src/json/json_encode_async.dart';
 
 Future<void> jsonlEncodeAsync({
   required Object items,

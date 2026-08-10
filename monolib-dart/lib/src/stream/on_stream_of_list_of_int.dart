@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'line_splitter_converter.dart';
+import 'package:monolib_dart/src/stream/line_splitter_converter.dart';
 
 extension OnStreamOfListOfInt on Stream<List<int>> {
   Future<String> readLine() {

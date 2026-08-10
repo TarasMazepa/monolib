@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../general/on_list.dart';
+import 'package:monolib_dart/src/general/on_list.dart';
 
 extension type const StreamWithClose<T>._(
     ({

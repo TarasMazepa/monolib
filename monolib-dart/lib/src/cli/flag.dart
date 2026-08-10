@@ -1,7 +1,7 @@
-import '../../monolib_dart.dart';
-import 'flag_find_result.dart';
-import 'flag_find_type.dart';
-import 'optional_flag_result.dart';
+import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/src/cli/flag_find_result.dart';
+import 'package:monolib_dart/src/cli/flag_find_type.dart';
+import 'package:monolib_dart/src/cli/optional_flag_result.dart';
 
 class Flag {
   final String? short;
