@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../common/async_iterator_util.dart';
 import '../json/json_encode_async.dart';
 
 Future<void> jsonlEncodeAsync({
@@ -20,30 +21,13 @@ Future<void> jsonlEncodeAsync({
       }();
 
   try {
-    switch (items) {
-      case Stream stream:
-        await for (final item in stream) {
-          try {
-            await jsonEncodeAsync(object: item, sink: activeSink);
-          } finally {
-            activeSink.writeln();
-          }
-        }
-
-      case Iterable iterable:
-        for (final item in iterable) {
-          try {
-            await jsonEncodeAsync(object: item, sink: activeSink);
-          } finally {
-            activeSink.writeln();
-          }
-        }
-
-      default:
-        throw ArgumentError(
-          'The "items" parameter must be an Iterable or a Stream.',
-        );
-    }
+    await iterateStreamOrIterable(items, (item) async {
+      try {
+        await jsonEncodeAsync(object: item, sink: activeSink);
+      } finally {
+        activeSink.writeln();
+      }
+    });
   } finally {
     if (ownsSink) {
       if (activeSink is StreamSink) {

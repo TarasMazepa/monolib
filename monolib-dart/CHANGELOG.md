@@ -1,3 +1,9 @@
+## 0.0.41
+
+- DRY up in-memory `CsvDecoder` and `JsonlDecoder` by delegating structural parsing to their respective chunked decoders.
+- Extract `BatchingSinkMixin` to remove batching boilerplate from mapped batch decoders.
+- Extract `iterateStreamOrIterable` to consolidate stream/iterable iteration in async encoders.
+
 ## 0.0.40
 
 - Performs DRY cleanup on JSONL decoders by moving line sanitization (stripping carriage returns and empty line checks) directly into `JsonlBaseChunkSink`.
