@@ -1,4 +1,4 @@
-import 'pillar_listenable.dart';
+import 'package:monolib_dart/src/pillar/pillar_listenable.dart';
 
 class PillarChangeNotifier implements PillarListenable {
   final List<void Function()> _listeners = [];

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'async_json_writable.dart';
+import 'package:monolib_dart/src/json/async_json_writable.dart';
 
 Future<void> jsonEncodeAsync({
   required Object? object,

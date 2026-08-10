@@ -1,12 +1,12 @@
-import '../../monolib_dart.dart';
-import 'pillar_accessor.dart';
-import 'pillar_change_notifier_internal.dart';
-import 'pillar_entry.dart';
-import 'pillar_key.dart';
-import 'pillar_listenable.dart';
-import 'pillar_scope.dart';
-import 'scope_enforcing_pillar_accessor.dart';
-import 'scope_tracking_pillar_accessor.dart';
+import 'package:monolib_dart/monolib_dart.dart';
+import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/pillar_change_notifier_internal.dart';
+import 'package:monolib_dart/src/pillar/pillar_entry.dart';
+import 'package:monolib_dart/src/pillar/pillar_key.dart';
+import 'package:monolib_dart/src/pillar/pillar_listenable.dart';
+import 'package:monolib_dart/src/pillar/pillar_scope.dart';
+import 'package:monolib_dart/src/pillar/scope_enforcing_pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/scope_tracking_pillar_accessor.dart';
 
 typedef PillarFactory<T> = T Function(PillarAccessor);
 typedef PillarPureFactory<T> = T Function();

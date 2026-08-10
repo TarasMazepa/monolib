@@ -1,5 +1,5 @@
-import '../common/chunked_only_converter.dart';
-import 'csv_base_chunk_sink.dart';
+import 'package:monolib_dart/src/common/chunked_only_converter.dart';
+import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 
 class CsvMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final T? Function(List<String> row) mapper;

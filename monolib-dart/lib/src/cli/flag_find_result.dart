@@ -1,5 +1,5 @@
-import 'flag.dart';
-import 'flag_find_type.dart';
+import 'package:monolib_dart/src/cli/flag.dart';
+import 'package:monolib_dart/src/cli/flag_find_type.dart';
 
 class FlagFindResult {
   final int index;

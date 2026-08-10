@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'csv_cell_writer.dart';
+import 'package:monolib_dart/src/common/async_iterator_util.dart';
+import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
 Future<void> csvEncodeAsync(Object items, StringSink sink) async {
   Future<void> writeRow(dynamic item_) async {
@@ -42,20 +43,5 @@ Future<void> csvEncodeAsync(Object items, StringSink sink) async {
     }
   }
 
-  switch (items) {
-    case Stream stream:
-      await for (final item in stream) {
-        await writeRow(item);
-      }
-
-    case Iterable iterable:
-      for (final item in iterable) {
-        await writeRow(item);
-      }
-
-    default:
-      throw ArgumentError(
-        'The "items" parameter must be an Iterable or a Stream.',
-      );
-  }
+  await iterateStreamOrIterable(items, writeRow);
 }

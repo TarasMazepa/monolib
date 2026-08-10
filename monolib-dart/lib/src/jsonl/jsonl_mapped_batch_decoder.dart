@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import '../common/chunked_only_converter.dart';
-import 'jsonl_base_chunk_sink.dart';
+import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
+import 'package:monolib_dart/src/common/chunked_only_converter.dart';
+import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
 class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(dynamic) fromJson;
@@ -19,10 +20,10 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   }
 }
 
-class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>> {
+class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
+    with BatchingSinkMixin<T> {
   final T? Function(dynamic) _fromJson;
   final bool ignoreExceptions;
-  List<T> _batch = [];
 
   _JsonlMappedBatchDecoderSink(super.outSink, this._fromJson,
       {this.ignoreExceptions = false});
@@ -33,7 +34,7 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>> {
       final json = jsonDecode(line);
       final mapped = _fromJson(json);
       if (mapped != null) {
-        _batch.add(mapped);
+        addToBatch(mapped);
       }
     } catch (e) {
       if (!ignoreExceptions) {
@@ -44,9 +45,6 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>> {
 
   @override
   void onChunkEnd() {
-    if (_batch.isNotEmpty) {
-      outSink.add(_batch);
-      _batch = [];
-    }
+    flushBatchOnChunkEnd();
   }
 }

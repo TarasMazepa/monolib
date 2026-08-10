@@ -1,4 +1,4 @@
-import 'pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
 
 extension OnFunction1<T, P0> on T Function(P0) {
   T Function(PillarAccessor) toPillarFactory() =>
