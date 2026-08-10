@@ -1,3 +1,8 @@
+## 0.0.43
+
+- **BREAKING:** `csvEncodeAsync` now uses named arguments (`{required Object items, StringSink? sink, StringSink Function()? sinkProvider}`) to match `jsonlEncodeAsync`.
+- Align `CsvCodec` with `JsonlCodec` by introducing a `const` constructor and migrating `encoder` and `decoder` fields to getters.
+
 ## 0.0.42
 
 - Complete API symmetry for JSONL decoders by propagating `jsonCodec` through `JsonlMappedDecoder` and `JsonlMappedBatchDecoder`, allowing custom JSON decoders to be injected.
