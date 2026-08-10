@@ -14,10 +14,11 @@ class SingleValueCachingStream<T> extends Stream<T> {
     Function? onError,
     void Function()? onDone,
     bool? cancelOnError,
-  }) => Stream.value(value).listen(
-    onData,
-    onError: onError,
-    onDone: onDone,
-    cancelOnError: cancelOnError,
-  );
+  }) =>
+      Stream.value(value).listen(
+        onData,
+        onError: onError,
+        onDone: onDone,
+        cancelOnError: cancelOnError,
+      );
 }
