@@ -1,6 +1,6 @@
 import 'package:monolib_dart/zalgo.dart';
 
-import 'zalgo_text_range.dart';
+import 'package:monolib_flutter/src/zalgo/zalgo_text_range.dart';
 
 List<ZalgoTextRange> mapZalgoRanges(String input) {
   final result = <ZalgoTextRange>[];
