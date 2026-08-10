@@ -9,8 +9,11 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  const JsonlMappedBatchDecoder(this.fromJson,
-      {this.ignoreExceptions = false, this.jsonCodec = const JsonCodec()});
+  const JsonlMappedBatchDecoder(
+    this.fromJson, {
+    this.ignoreExceptions = false,
+    this.jsonCodec = const JsonCodec(),
+  });
 
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
@@ -29,8 +32,12 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
 
-  _JsonlMappedBatchDecoderSink(super.outSink, this._fromJson, this.jsonCodec,
-      {this.ignoreExceptions = false});
+  _JsonlMappedBatchDecoderSink(
+    super.outSink,
+    this._fromJson,
+    this.jsonCodec, {
+    this.ignoreExceptions = false,
+  });
 
   @override
   void processLine(String line) {

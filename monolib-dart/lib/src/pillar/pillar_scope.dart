@@ -2,9 +2,7 @@ class PillarScope {
   final String name;
   final PillarScope? parent;
 
-  const PillarScope.global()
-      : name = 'global',
-        parent = null;
+  const PillarScope.global() : name = 'global', parent = null;
 
   const PillarScope({required this.name, required PillarScope this.parent});
 

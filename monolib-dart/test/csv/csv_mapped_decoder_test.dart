@@ -110,37 +110,52 @@ void main() {
       await controller.close();
     });
 
-    test('exhaustively tests all chunk boundaries by feeding 1 char at a time',
-        () async {
-      final csvData =
-          'a,"b""\nc",d\n"e,f",g\n\r\n"h\r\ni",j"k"\r\nlast,,\n"aaa","b""bb","ccc"';
+    test(
+      'exhaustively tests all chunk boundaries by feeding 1 char at a time',
+      () async {
+        final csvData =
+            'a,"b""\nc",d\n"e,f",g\n\r\n"h\r\ni",j"k"\r\nlast,,\n"aaa","b""bb","ccc"';
 
-      String? mapper(List<String> row) => row.join('|');
+        String? mapper(List<String> row) => row.join('|');
 
-      // Test baseline with a single large chunk
-      final baselineStream = Stream.fromIterable([csvData]);
-      final baselineResult =
-          await baselineStream.transform(CsvMappedDecoder(mapper)).toList();
+        // Test baseline with a single large chunk
+        final baselineStream = Stream.fromIterable([csvData]);
+        final baselineResult = await baselineStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
-      // Test with 1-character chunks
-      final charStream = Stream.fromIterable(csvData.split(''));
-      final charResult =
-          await charStream.transform(CsvMappedDecoder(mapper)).toList();
+        // Test with 1-character chunks
+        final charStream = Stream.fromIterable(csvData.split(''));
+        final charResult = await charStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
-      // Test with 2-character chunks
-      final List<String> chunksOf2 = [];
-      for (int i = 0; i < csvData.length; i += 2) {
-        chunksOf2.add(csvData.substring(
-            i, i + 2 > csvData.length ? csvData.length : i + 2));
-      }
-      final twoCharStream = Stream.fromIterable(chunksOf2);
-      final twoCharResult =
-          await twoCharStream.transform(CsvMappedDecoder(mapper)).toList();
+        // Test with 2-character chunks
+        final List<String> chunksOf2 = [];
+        for (int i = 0; i < csvData.length; i += 2) {
+          chunksOf2.add(
+            csvData.substring(
+              i,
+              i + 2 > csvData.length ? csvData.length : i + 2,
+            ),
+          );
+        }
+        final twoCharStream = Stream.fromIterable(chunksOf2);
+        final twoCharResult = await twoCharStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
-      expect(charResult, equals(baselineResult),
-          reason: '1-char chunks should match baseline');
-      expect(twoCharResult, equals(baselineResult),
-          reason: '2-char chunks should match baseline');
-    });
+        expect(
+          charResult,
+          equals(baselineResult),
+          reason: '1-char chunks should match baseline',
+        );
+        expect(
+          twoCharResult,
+          equals(baselineResult),
+          reason: '2-char chunks should match baseline',
+        );
+      },
+    );
   });
 }

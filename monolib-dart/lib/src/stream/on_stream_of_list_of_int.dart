@@ -11,7 +11,8 @@ extension OnStreamOfListOfInt on Stream<List<int>> {
   }
 
   Stream<String> utf8DecodeAndLineSplit() {
-    return cast<List<int>>()
-        .transform(utf8.decoder.fuse(const LineSplitterConverter()));
+    return cast<List<int>>().transform(
+      utf8.decoder.fuse(const LineSplitterConverter()),
+    );
   }
 }

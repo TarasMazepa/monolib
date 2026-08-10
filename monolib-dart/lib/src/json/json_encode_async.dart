@@ -10,11 +10,13 @@ Future<void> jsonEncodeAsync({
 }) async {
   if ((sink == null) == (sinkProvider == null)) {
     throw ArgumentError(
-        'Exactly one of sink or sinkProvider must be provided.');
+      'Exactly one of sink or sinkProvider must be provided.',
+    );
   }
 
   bool ownsSink = false;
-  late StringSink activeSink = sink ??
+  late StringSink activeSink =
+      sink ??
       () {
         ownsSink = true;
         return sinkProvider!();

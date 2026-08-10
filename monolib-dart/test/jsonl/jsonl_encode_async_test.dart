@@ -31,36 +31,36 @@ void main() {
       expect(buffer.toString(), '{"id":1}\n{"id":2}\n');
     });
 
-    test('writes newline in finally block when iterable item encoding fails',
-        () async {
-      final items = [
-        _FailingItem(),
-      ];
-      final buffer = StringBuffer();
+    test(
+      'writes newline in finally block when iterable item encoding fails',
+      () async {
+        final items = [_FailingItem()];
+        final buffer = StringBuffer();
 
-      await expectLater(
-        () => jsonlEncodeAsync(items: items, sink: buffer),
-        throwsA(isA<Exception>()),
-      );
+        await expectLater(
+          () => jsonlEncodeAsync(items: items, sink: buffer),
+          throwsA(isA<Exception>()),
+        );
 
-      // The sink should still receive a newline from the finally block
-      expect(buffer.toString(), '\n');
-    });
+        // The sink should still receive a newline from the finally block
+        expect(buffer.toString(), '\n');
+      },
+    );
 
-    test('writes newline in finally block when stream item encoding fails',
-        () async {
-      final stream = Stream.fromIterable([
-        _FailingItem(),
-      ]);
-      final buffer = StringBuffer();
+    test(
+      'writes newline in finally block when stream item encoding fails',
+      () async {
+        final stream = Stream.fromIterable([_FailingItem()]);
+        final buffer = StringBuffer();
 
-      await expectLater(
-        () => jsonlEncodeAsync(items: stream, sink: buffer),
-        throwsA(isA<Exception>()),
-      );
+        await expectLater(
+          () => jsonlEncodeAsync(items: stream, sink: buffer),
+          throwsA(isA<Exception>()),
+        );
 
-      // The sink should still receive a newline from the finally block
-      expect(buffer.toString(), '\n');
-    });
+        // The sink should still receive a newline from the finally block
+        expect(buffer.toString(), '\n');
+      },
+    );
   });
 }

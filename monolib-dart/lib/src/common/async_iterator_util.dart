@@ -1,7 +1,9 @@
 import 'dart:async';
 
 Future<void> iterateStreamOrIterable(
-    Object items, Future<void> Function(dynamic) processItem) async {
+  Object items,
+  Future<void> Function(dynamic) processItem,
+) async {
   switch (items) {
     case Stream stream:
       await for (final item in stream) {

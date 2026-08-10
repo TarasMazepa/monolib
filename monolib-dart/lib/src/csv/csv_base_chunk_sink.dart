@@ -48,7 +48,7 @@ abstract class CsvBaseChunkSink<TOut> implements ChunkedConversionSink<String> {
       final current = chunk.codeUnitAt(rightIndex);
 
       if (_isInsideDoubleQuotes) {
-        if (current == 34 /* '"' */) {
+        if (current == 34 /* '"' */ ) {
           if (rightIndex < chunk.length - 1 &&
               chunk.codeUnitAt(rightIndex + 1) == 34) {
             rightIndex += 2;
@@ -69,16 +69,16 @@ abstract class CsvBaseChunkSink<TOut> implements ChunkedConversionSink<String> {
           _isInsideDoubleQuotes = true;
           leftIndex++;
           rightIndex++;
-        } else if (current == 44 /* ',' */) {
+        } else if (current == 44 /* ',' */ ) {
           if (leftIndex == rightIndex && getPrevChar() == 34) {
             leftIndex = rightIndex = rightIndex + 1;
           } else {
             _currentRow.add(chunk.substring(leftIndex, rightIndex));
             leftIndex = rightIndex = rightIndex + 1;
           }
-        } else if (current == 13 /* '\r' */) {
+        } else if (current == 13 /* '\r' */ ) {
           if (rightIndex < chunk.length - 1 &&
-              chunk.codeUnitAt(rightIndex + 1) == 10 /* '\n' */) {
+              chunk.codeUnitAt(rightIndex + 1) == 10 /* '\n' */ ) {
             if (leftIndex != rightIndex || getPrevChar() == 44) {
               _currentRow.add(chunk.substring(leftIndex, rightIndex));
             }
@@ -89,7 +89,7 @@ abstract class CsvBaseChunkSink<TOut> implements ChunkedConversionSink<String> {
           } else {
             rightIndex++;
           }
-        } else if (current == 10 /* '\n' */) {
+        } else if (current == 10 /* '\n' */ ) {
           if (leftIndex != rightIndex || getPrevChar() == 44) {
             _currentRow.add(chunk.substring(leftIndex, rightIndex));
           }
@@ -113,8 +113,10 @@ abstract class CsvBaseChunkSink<TOut> implements ChunkedConversionSink<String> {
   @override
   void close() {
     if (_carry.isNotEmpty || _previousChar == 44) {
-      final validCarry =
-          _carry.substring(0, _carry.length - _unprocessedTailLen);
+      final validCarry = _carry.substring(
+        0,
+        _carry.length - _unprocessedTailLen,
+      );
       if (_isInsideDoubleQuotes) {
         _currentRow.add(validCarry.replaceAll('""', '"'));
       } else {

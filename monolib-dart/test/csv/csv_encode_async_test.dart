@@ -45,26 +45,32 @@ void main() {
 
     test('throws ArgumentError for invalid input', () async {
       final buffer = StringBuffer();
-      expect(() => csvEncodeAsync(items: 'invalid', sink: buffer),
-          throwsArgumentError);
-    });
-    test('throws ArgumentError if both sink and sinkProvider are provided',
-        () async {
-      final buffer = StringBuffer();
       expect(
-        () =>
-            csvEncodeAsync(items: [], sink: buffer, sinkProvider: () => buffer),
+        () => csvEncodeAsync(items: 'invalid', sink: buffer),
         throwsArgumentError,
       );
     });
+    test(
+      'throws ArgumentError if both sink and sinkProvider are provided',
+      () async {
+        final buffer = StringBuffer();
+        expect(
+          () => csvEncodeAsync(
+            items: [],
+            sink: buffer,
+            sinkProvider: () => buffer,
+          ),
+          throwsArgumentError,
+        );
+      },
+    );
 
-    test('throws ArgumentError if neither sink nor sinkProvider is provided',
-        () async {
-      expect(
-        () => csvEncodeAsync(items: []),
-        throwsArgumentError,
-      );
-    });
+    test(
+      'throws ArgumentError if neither sink nor sinkProvider is provided',
+      () async {
+        expect(() => csvEncodeAsync(items: []), throwsArgumentError);
+      },
+    );
 
     test('uses sinkProvider and closes the sink', () async {
       final items = [

@@ -11,7 +11,9 @@ class StreamingJsonString implements AsyncJsonWritable {
 
   @override
   Future<void> writeJsonAsync(
-      StringSink sink, JsonEncoderCallback encode) async {
+    StringSink sink,
+    JsonEncoderCallback encode,
+  ) async {
     sink.write('"');
     await for (final chunk in stream) {
       // jsonEncode escapes the chunk and adds surrounding quotes (e.g., "chunk\ntext").
