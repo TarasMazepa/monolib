@@ -1,3 +1,8 @@
+## 0.0.39
+
+- **BREAKING:** Removed `csvEncodeAsyncForIOSink`, `jsonlEncodeAsyncForIOSink`, and `jsonEncodeAsyncForIOSink` utilities.
+- Extracts duplicated CSV cell escaping logic into `csv_cell_writer.dart` to DRY up encoders.
+
 ## 0.0.38
 
 - Performs massive DRY refactoring on chunked decoders by extracting duplicated structural parsing logic into `CsvBaseChunkSink` and `JsonlBaseChunkSink`.

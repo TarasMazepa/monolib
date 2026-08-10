@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'csv_cell_writer.dart';
+
 Future<void> csvEncodeAsync(Object items, StringSink sink) async {
   Future<void> writeRow(dynamic item_) async {
     dynamic item = item_;
@@ -31,32 +33,7 @@ Future<void> csvEncodeAsync(Object items, StringSink sink) async {
       if (cell is! String) {
         cell = '$cell';
       }
-      if (cell.isEmpty) {
-        // do nothing
-      } else {
-        int index = 0;
-        bool needsEscaping = cell[0] == '"';
-        while (!needsEscaping && index < cell.length) {
-          final current = cell[index++];
-          needsEscaping = switch (current) {
-            ',' => true,
-            '\n' => true,
-            _ => false,
-          };
-        }
-        if (needsEscaping) {
-          sink.write('"');
-          for (int j = 0; j < cell.length; j++) {
-            sink.write(switch (cell[j]) {
-              '"' => '""',
-              final symbol => symbol,
-            });
-          }
-          sink.write('"');
-        } else {
-          sink.write(cell);
-        }
-      }
+      writeCsvCell(cell, sink);
       if (i == item.length - 1) {
         sink.write('\r\n');
       } else {
