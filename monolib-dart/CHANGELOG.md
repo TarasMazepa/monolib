@@ -1,3 +1,7 @@
+## 0.0.46
+
+- Adds `onBatch` callback to `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder`.
+
 ## 0.0.45
 
 - Adds `csvEncodeBatchAsync` and `jsonlEncodeBatchAsync` to encode streams of batches.

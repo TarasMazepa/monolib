@@ -7,8 +7,9 @@ mixin BatchingSinkMixin<T> {
     _batch.add(item);
   }
 
-  void flushBatchOnChunkEnd() {
+  void flushBatchOnChunkEnd({void Function(List<T> batch)? onBatch}) {
     if (_batch.isNotEmpty) {
+      onBatch?.call(_batch);
       outSink.add(_batch);
       _batch = [];
     }
