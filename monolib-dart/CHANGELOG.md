@@ -1,3 +1,7 @@
+## 0.0.45
+
+- Adds `csvEncodeBatchAsync` and `jsonlEncodeBatchAsync` to encode streams of batches.
+
 ## 0.0.44
 
 - Adds `flattenToList({bool cancelOnError = true, bool sync = false})` extension method to `Stream<List<T>>` to efficiently gather and flatten all emitted lists into a single `Future<List<T>>`.
