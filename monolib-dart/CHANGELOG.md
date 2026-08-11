@@ -1,3 +1,7 @@
+## 0.0.47
+
+- Refactors async encoders to DRY up string sink lazy initialization and batch encoding by introducing `withLazyStringSink` and `encodeBatchAsync` utilities.
+
 ## 0.0.46
 
 - Adds `onBatch` callback to `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder`.
