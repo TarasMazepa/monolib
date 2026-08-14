@@ -53,6 +53,7 @@ class Batcher<T> {
   Timer? _timer;
   bool _isDisposed = false;
   final List<Future<void>> _inflightBatches = <Future<void>>[];
+  Future<void>? _lastBatchTask;
 
   /// Creates a [Batcher] that groups items into batches.
   Batcher({
@@ -84,18 +85,32 @@ class Batcher<T> {
     _timer?.cancel();
     _timer = null;
 
-    if (_buffer.isNotEmpty) {
-      final List<T> batch = _buffer;
-      _buffer = <T>[];
+    if (_buffer.isEmpty) return;
 
-      final Future<void> batchTask = Future<void>.sync(() => onBatch(batch));
-      _inflightBatches.add(batchTask);
-      unawaited(
-        batchTask.whenComplete(() => _inflightBatches.remove(batchTask)),
-      );
+    final List<T> batch = _buffer;
+    _buffer = <T>[];
 
-      await batchTask;
-    }
+    final previousTask = _lastBatchTask;
+    final completer = Completer<void>();
+    _lastBatchTask = completer.future;
+
+    final Future<void> batchTask = Future<void>.sync(() async {
+      try {
+        if (previousTask != null) {
+          await previousTask;
+        }
+        await onBatch(batch);
+      } finally {
+        completer.complete();
+      }
+    });
+
+    _inflightBatches.add(batchTask);
+    unawaited(
+      batchTask.whenComplete(() => _inflightBatches.remove(batchTask)),
+    );
+
+    await batchTask;
   }
 
   /// Cancels any active timers and immediately emits any remaining items in the buffer.
