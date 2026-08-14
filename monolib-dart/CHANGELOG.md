@@ -1,3 +1,7 @@
+## 0.0.48
+
+- Fixes concurrent write crashes in `Batcher` by guaranteeing that internal `onBatch` executions run sequentially, preventing overlapping `IOSink` flush/write errors.
+
 ## 0.0.47
 
 - Refactors async encoders to DRY up string sink lazy initialization and batch encoding by introducing `withLazyStringSink` and `encodeBatchAsync` utilities.
