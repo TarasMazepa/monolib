@@ -1,3 +1,7 @@
+## 0.0.49
+
+- Adds `joinWith` method to `OnList` extension.
+
 ## 0.0.48
 
 - Fixes concurrent write crashes in `Batcher` by guaranteeing that internal `onBatch` executions run sequentially, preventing overlapping `IOSink` flush/write errors.

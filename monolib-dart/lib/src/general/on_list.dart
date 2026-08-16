@@ -69,4 +69,14 @@ extension OnList<T> on List<T> {
     }
     return true;
   }
+
+  String joinWith({
+    String prefix = '',
+    String delimiter = '',
+    String suffix = '',
+    String Function(T)? map,
+  }) {
+    final Iterable<dynamic> iterable = map != null ? this.map(map) : this;
+    return '$prefix${iterable.join(delimiter)}$suffix';
+  }
 }
