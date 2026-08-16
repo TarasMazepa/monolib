@@ -75,7 +75,10 @@ extension OnList<T> on List<T> {
     String delimiter = '',
     String suffix = '',
     String Function(T)? map,
+    String Function()? ifEmpty,
   }) {
+    if (isEmpty && ifEmpty != null) return ifEmpty();
+
     final Iterable<dynamic> iterable = map != null ? this.map(map) : this;
     return '$prefix${iterable.join(delimiter)}$suffix';
   }
