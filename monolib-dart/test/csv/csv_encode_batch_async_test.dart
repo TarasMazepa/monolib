@@ -13,7 +13,7 @@ void main() {
         ],
         [
           ['"quoted"', 'newline\n', 'comma,'],
-        ]
+        ],
       ]);
       final buffer = StringBuffer();
       await csvEncodeBatchAsync(batches: batches, sink: buffer);
@@ -25,32 +25,31 @@ void main() {
 
     test('throws ArgumentError for missing sink arguments', () async {
       final batches = Stream.fromIterable([<List<String>>[]]);
-      expect(
-        () => csvEncodeBatchAsync(batches: batches),
-        throwsArgumentError,
-      );
+      expect(() => csvEncodeBatchAsync(batches: batches), throwsArgumentError);
     });
 
-    test('throws ArgumentError if both sink and sinkProvider are provided',
-        () async {
-      final batches = Stream.fromIterable([<List<String>>[]]);
-      final buffer = StringBuffer();
-      expect(
-        () => csvEncodeBatchAsync(
-          batches: batches,
-          sink: buffer,
-          sinkProvider: () => buffer,
-        ),
-        throwsArgumentError,
-      );
-    });
+    test(
+      'throws ArgumentError if both sink and sinkProvider are provided',
+      () async {
+        final batches = Stream.fromIterable([<List<String>>[]]);
+        final buffer = StringBuffer();
+        expect(
+          () => csvEncodeBatchAsync(
+            batches: batches,
+            sink: buffer,
+            sinkProvider: () => buffer,
+          ),
+          throwsArgumentError,
+        );
+      },
+    );
 
     test('uses sinkProvider and closes the sink', () async {
       final batches = Stream.fromIterable([
         [
           ['a', 'b', 'c'],
           ['1', '2', '3'],
-        ]
+        ],
       ]);
       final sink = _TestSink();
       await csvEncodeBatchAsync(batches: batches, sinkProvider: () => sink);
@@ -64,7 +63,7 @@ void main() {
         [
           ['a', 'b', 'c'],
           ['1', '2', '3'],
-        ]
+        ],
       ]);
       final sink = _TestSink();
       await csvEncodeBatchAsync(batches: batches, sink: sink);

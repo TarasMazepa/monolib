@@ -6,18 +6,11 @@ class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final T? Function(List<String> row) mapper;
   final void Function(List<T> batch)? onBatch;
 
-  const CsvMappedBatchDecoder(
-    this.mapper, {
-    this.onBatch,
-  });
+  const CsvMappedBatchDecoder(this.mapper, {this.onBatch});
 
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
-    return _CsvMappedBatchDecoderSink<T>(
-      sink,
-      mapper,
-      onBatch: onBatch,
-    );
+    return _CsvMappedBatchDecoderSink<T>(sink, mapper, onBatch: onBatch);
   }
 }
 
@@ -26,11 +19,7 @@ class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>>
   final T? Function(List<String> row) _mapper;
   final void Function(List<T> batch)? onBatch;
 
-  _CsvMappedBatchDecoderSink(
-    super.outSink,
-    this._mapper, {
-    this.onBatch,
-  });
+  _CsvMappedBatchDecoderSink(super.outSink, this._mapper, {this.onBatch});
 
   @override
   void handleRow(List<String> row) {
