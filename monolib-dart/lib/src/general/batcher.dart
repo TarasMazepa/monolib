@@ -106,9 +106,7 @@ class Batcher<T> {
     });
 
     _inflightBatches.add(batchTask);
-    unawaited(
-      batchTask.whenComplete(() => _inflightBatches.remove(batchTask)),
-    );
+    unawaited(batchTask.whenComplete(() => _inflightBatches.remove(batchTask)));
 
     await batchTask;
   }

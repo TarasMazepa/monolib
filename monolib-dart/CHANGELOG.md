@@ -1,3 +1,7 @@
+## 0.0.50
+
+- Updates `joinWith` method in `OnList` extension to accept an `ifEmpty` callback.
+
 ## 0.0.49
 
 - Adds `joinWith` method to `OnList` extension.

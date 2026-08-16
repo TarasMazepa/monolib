@@ -22,12 +22,14 @@ class StreamBuilderForList<T> extends StatelessWidget {
       stream: stream,
       builder: (context, asyncSnapshot) {
         return switch (asyncSnapshot) {
-          AsyncSnapshot(error: final error?) => onError != null
-              ? onError!(context, error)
-              : const Align(child: Text('An error occurred.')),
-          AsyncSnapshot(data: null) => onLoading != null
-              ? onLoading!(context)
-              : const Align(child: CircularProgressIndicator()),
+          AsyncSnapshot(error: final error?) =>
+            onError != null
+                ? onError!(context, error)
+                : const Align(child: Text('An error occurred.')),
+          AsyncSnapshot(data: null) =>
+            onLoading != null
+                ? onLoading!(context)
+                : const Align(child: CircularProgressIndicator()),
           AsyncSnapshot(data: []) =>
             onEmpty != null ? onEmpty!(context) : const SizedBox.shrink(),
           AsyncSnapshot(data: final data?) => onData(context, data),

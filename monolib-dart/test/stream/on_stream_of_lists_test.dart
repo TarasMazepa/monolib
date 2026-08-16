@@ -37,33 +37,35 @@ void main() {
       });
 
       test(
-          'respects cancelOnError: false and does not crash on multiple errors',
-          () async {
-        final stream = Stream<List<int>>.multi((controller) {
-          controller.add([1]);
-          controller.addError(Exception('first error'));
-          controller.add([2]); // Should be ignored
-          controller.addError(
-              Exception('second error')); // Should not throw StateError
-          controller.close();
-        });
+        'respects cancelOnError: false and does not crash on multiple errors',
+        () async {
+          final stream = Stream<List<int>>.multi((controller) {
+            controller.add([1]);
+            controller.addError(Exception('first error'));
+            controller.add([2]); // Should be ignored
+            controller.addError(
+              Exception('second error'),
+            ); // Should not throw StateError
+            controller.close();
+          });
 
-        await expectLater(
-          stream.flattenToList(cancelOnError: false),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('first error'),
+          await expectLater(
+            stream.flattenToList(cancelOnError: false),
+            throwsA(
+              isA<Exception>().having(
+                (e) => e.toString(),
+                'message',
+                contains('first error'),
+              ),
             ),
-          ),
-        );
-      });
+          );
+        },
+      );
 
       test('supports sync completer', () async {
         final stream = Stream.fromIterable([
           [1],
-          [2]
+          [2],
         ]);
         final result = await stream.flattenToList(sync: true);
         expect(result, [1, 2]);
@@ -77,8 +79,10 @@ void main() {
           [3],
           [4, 5],
         ]);
-        final result =
-            await stream.asAccumulating().map((l) => [...l]).toList();
+        final result = await stream
+            .asAccumulating()
+            .map((l) => [...l])
+            .toList();
         expect(result, [
           [1, 2],
           [1, 2, 3],

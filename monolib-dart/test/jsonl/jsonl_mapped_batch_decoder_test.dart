@@ -15,8 +15,9 @@ void main() {
         return json['name'] as String?;
       }
 
-      final result =
-          await stream.transform(JsonlMappedBatchDecoder(mapper)).toList();
+      final result = await stream
+          .transform(JsonlMappedBatchDecoder(mapper))
+          .toList();
 
       expect(result, [
         ['John'],
@@ -35,8 +36,9 @@ void main() {
         return json['name'] as String?;
       }
 
-      final result =
-          await stream.transform(JsonlMappedBatchDecoder(mapper)).toList();
+      final result = await stream
+          .transform(JsonlMappedBatchDecoder(mapper))
+          .toList();
 
       expect(result, [
         ['John'],
