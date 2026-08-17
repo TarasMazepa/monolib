@@ -1,3 +1,8 @@
+## 0.0.51
+
+- Adds `tryAddError` to `StreamController` extensions.
+- Adds an optional `ignoreError` boolean to `tryAdd` and `tryAddError` which will catch and suppress exceptions when adding to a stream.
+
 ## 0.0.50
 
 - Updates `joinWith` method in `OnList` extension to accept an `ifEmpty` callback parameter.
