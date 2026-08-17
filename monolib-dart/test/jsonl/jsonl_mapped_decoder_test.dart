@@ -155,6 +155,23 @@ void main() {
         {'val': 'test2'},
       ]);
     });
+
+    test('calls onDone when stream finishes', () async {
+      bool onDoneCalled = false;
+      final decoder = JsonlMappedDecoder<String>(
+        (json) => json['name'] as String?,
+        onDone: () {
+          onDoneCalled = true;
+        },
+      );
+
+      final sink = decoder.startChunkedConversion(StreamController<String>());
+      sink.add('{"name": "John"}\n');
+
+      expect(onDoneCalled, isFalse);
+      sink.close();
+      expect(onDoneCalled, isTrue);
+    });
   });
 }
 

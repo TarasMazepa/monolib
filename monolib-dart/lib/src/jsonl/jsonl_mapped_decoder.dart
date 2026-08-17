@@ -9,11 +9,13 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   final T? Function(dynamic) fromJson;
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
+  final void Function()? onDone;
 
   const JsonlMappedDecoder(
     this.fromJson, {
     this.ignoreExceptions = false,
     this.jsonCodec = const JsonCodec(),
+    this.onDone,
   });
 
   @override
@@ -23,6 +25,7 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
       fromJson,
       jsonCodec,
       ignoreExceptions: ignoreExceptions,
+      onDone: onDone,
     );
   }
 }
@@ -31,12 +34,14 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
   final T? Function(dynamic) _fromJson;
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
+  final void Function()? onDone;
 
   _JsonlMappedDecoderSink(
     super.outSink,
     this._fromJson,
     this.jsonCodec, {
     this.ignoreExceptions = false,
+    this.onDone,
   });
 
   @override
@@ -52,5 +57,11 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
         rethrow;
       }
     }
+  }
+
+  @override
+  void close() {
+    super.close();
+    onDone?.call();
   }
 }
