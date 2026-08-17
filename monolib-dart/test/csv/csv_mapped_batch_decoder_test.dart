@@ -71,5 +71,23 @@ void main() {
         );
       },
     );
+
+    test('calls onDone when stream finishes', () async {
+      bool onDoneCalled = false;
+      final decoder = CsvMappedBatchDecoder<String>(
+        (row) => row.join(','),
+        onDone: () {
+          onDoneCalled = true;
+        },
+      );
+
+      final sink =
+          decoder.startChunkedConversion(StreamController<List<String>>());
+      sink.add('a,b,c\n');
+
+      expect(onDoneCalled, isFalse);
+      sink.close();
+      expect(onDoneCalled, isTrue);
+    });
   });
 }

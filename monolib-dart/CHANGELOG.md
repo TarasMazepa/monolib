@@ -1,3 +1,7 @@
+## 0.0.53
+
+- Adds `onDone` callback to `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder`.
+
 ## 0.0.52
 
 - Refactors `tryAdd` and `tryAddError` extensions to apply to `Sink` and `EventSink` instead of just `StreamController`, enabling broader usage across all sink types while maintaining `StreamController`-specific fast paths.

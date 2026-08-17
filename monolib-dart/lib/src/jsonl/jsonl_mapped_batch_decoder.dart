@@ -9,12 +9,14 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
   final void Function(List<T> batch)? onBatch;
+  final void Function()? onDone;
 
   const JsonlMappedBatchDecoder(
     this.fromJson, {
     this.ignoreExceptions = false,
     this.jsonCodec = const JsonCodec(),
     this.onBatch,
+    this.onDone,
   });
 
   @override
@@ -25,6 +27,7 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
       jsonCodec,
       ignoreExceptions: ignoreExceptions,
       onBatch: onBatch,
+      onDone: onDone,
     );
   }
 }
@@ -35,6 +38,7 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
   final Codec<Object?, String> jsonCodec;
   final bool ignoreExceptions;
   final void Function(List<T> batch)? onBatch;
+  final void Function()? onDone;
 
   _JsonlMappedBatchDecoderSink(
     super.outSink,
@@ -42,6 +46,7 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
     this.jsonCodec, {
     this.ignoreExceptions = false,
     this.onBatch,
+    this.onDone,
   });
 
   @override
@@ -62,5 +67,11 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
   @override
   void onChunkEnd() {
     flushBatchOnChunkEnd(onBatch: onBatch);
+  }
+
+  @override
+  void close() {
+    super.close();
+    onDone?.call();
   }
 }
