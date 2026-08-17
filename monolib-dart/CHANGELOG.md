@@ -1,3 +1,7 @@
+## 0.0.52
+
+- Refactors `tryAdd` and `tryAddError` extensions to apply to `Sink` and `EventSink` instead of just `StreamController`, enabling broader usage across all sink types while maintaining `StreamController`-specific fast paths.
+
 ## 0.0.51
 
 - Adds `tryAddError` to `StreamController` extensions.
