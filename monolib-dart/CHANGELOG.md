@@ -1,3 +1,7 @@
+## 0.0.54
+
+- Adds `onDone` callback to `CsvMappedDecoder` and `JsonlMappedDecoder`.
+
 ## 0.0.53
 
 - Adds `onDone` callback to `CsvMappedBatchDecoder` and `JsonlMappedBatchDecoder`.
