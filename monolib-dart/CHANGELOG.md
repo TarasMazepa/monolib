@@ -1,3 +1,7 @@
+## 0.0.55
+
+- Adds `onError` callbacks to `tryAdd` and `tryAddError` stream extensions to allow reporting of swallowed exceptions.
+
 ## 0.0.54
 
 - Adds `onDone` callback to `CsvMappedDecoder` and `JsonlMappedDecoder`.

@@ -5,6 +5,7 @@ extension OnEventSink<T> on EventSink<T> {
     Object error, {
     StackTrace? stackTrace,
     bool ignoreError = false,
+    void Function(Object error, StackTrace stackTrace)? onError,
   }) {
     final self = this;
     if (self is StreamController<T>) {
@@ -12,7 +13,9 @@ extension OnEventSink<T> on EventSink<T> {
         if (ignoreError) {
           try {
             self.addError(error, stackTrace);
-          } catch (_) {}
+          } catch (e, st) {
+            onError?.call(e, st);
+          }
         } else {
           self.addError(error, stackTrace);
         }
@@ -22,7 +25,8 @@ extension OnEventSink<T> on EventSink<T> {
         addError(error, stackTrace);
       } on StateError {
         // Ignore StateError, which typically means the sink is closed
-      } catch (_) {
+      } catch (e, st) {
+        onError?.call(e, st);
         if (!ignoreError) {
           rethrow;
         }
