@@ -1,4 +1,7 @@
 export 'src/general/batcher.dart';
+export 'src/general/dense_table.dart';
+export 'src/general/float64_table.dart';
+export 'src/general/int32_table.dart';
 export 'src/general/on_bool.dart';
 export 'src/general/on_comparable.dart';
 export 'src/general/on_date_time.dart';
