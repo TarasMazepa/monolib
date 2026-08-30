@@ -1,3 +1,7 @@
+## 0.0.57
+
+- Adds `JsonStringEscapingSink` for streaming JSON string payloads.
+
 ## 0.0.56
 
 - Adds `DenseTable<T>`, `Float64Table`, and `Int32Table` for high-performance, dense 2D data structures backed by single flat lists.
