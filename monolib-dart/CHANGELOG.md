@@ -1,3 +1,7 @@
+## 0.0.56
+
+- Adds `DenseTable<T>`, `Float64Table`, and `Int32Table` for high-performance, dense 2D data structures backed by single flat lists.
+
 ## 0.0.55
 
 - Adds `onError` callbacks to `tryAdd` and `tryAddError` stream extensions to allow reporting of swallowed exceptions.
