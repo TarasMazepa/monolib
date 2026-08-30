@@ -18,7 +18,9 @@ class Float64Table {
   /// Creates a dense table with the given number of [rows] and [columns],
   /// filled with [fillValue].
   Float64Table.filled(int rows, int columns, double fillValue)
-      : _rows = rows,
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
         _columns = columns,
         _data = Float64List(rows * columns)
           ..fillRange(0, rows * columns, fillValue);
@@ -27,18 +29,27 @@ class Float64Table {
   /// generating values dynamically using the [generator] function.
   Float64Table.generate(
       int rows, int columns, double Function(int row, int col) generator)
-      : _rows = rows,
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
         _columns = columns,
         _data = Float64List(rows * columns) {
-    for (int i = 0; i < _data.length; i++) {
-      final int row = i ~/ columns;
-      final int col = i % columns;
-      _data[i] = generator(row, col);
+    int index = 0;
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < columns; c++) {
+        _data[index++] = generator(r, c);
+      }
     }
   }
 
   /// Ensures that the provided [row] and [col] are within the bounds of the table.
   void _checkBounds(int row, int col) {
+    if (_rows == 0) {
+      throw RangeError('Table has 0 rows; index $row is out of bounds.');
+    }
+    if (_columns == 0) {
+      throw RangeError('Table has 0 columns; index $col is out of bounds.');
+    }
     if (row < 0 || row >= _rows) {
       throw RangeError.range(row, 0, _rows - 1, 'row');
     }

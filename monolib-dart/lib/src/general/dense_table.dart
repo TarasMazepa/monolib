@@ -16,7 +16,9 @@ class DenseTable<T> {
   /// Creates a dense table with the given number of [rows] and [columns],
   /// filled with [fillValue].
   DenseTable.filled(int rows, int columns, T fillValue)
-      : _rows = rows,
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
         _columns = columns,
         _data = List<T>.filled(rows * columns, fillValue);
 
@@ -24,16 +26,32 @@ class DenseTable<T> {
   /// generating values dynamically using the [generator] function.
   DenseTable.generate(
       int rows, int columns, T Function(int row, int col) generator)
-      : _rows = rows,
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
         _columns = columns,
-        _data = List<T>.generate(rows * columns, (int index) {
-          final int row = index ~/ columns;
-          final int col = index % columns;
-          return generator(row, col);
-        });
+        _data = (() {
+          int r = 0;
+          int c = 0;
+          return List<T>.generate(rows * columns, (_) {
+            final value = generator(r, c);
+            c++;
+            if (c == columns) {
+              c = 0;
+              r++;
+            }
+            return value;
+          }, growable: false);
+        })();
 
   /// Ensures that the provided [row] and [col] are within the bounds of the table.
   void _checkBounds(int row, int col) {
+    if (_rows == 0) {
+      throw RangeError('Table has 0 rows; index $row is out of bounds.');
+    }
+    if (_columns == 0) {
+      throw RangeError('Table has 0 columns; index $col is out of bounds.');
+    }
     if (row < 0 || row >= _rows) {
       throw RangeError.range(row, 0, _rows - 1, 'row');
     }

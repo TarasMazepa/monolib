@@ -38,6 +38,31 @@ void main() {
       expect(() => table.set(0, -1, 1), throwsRangeError);
       expect(() => table.set(0, 2, 1), throwsRangeError);
     });
+
+    test('empty table bounds checks', () {
+      final table = DenseTable<int>.filled(0, 0, 0);
+      expect(() => table.get(0, 0), throwsRangeError);
+      expect(() => table.set(0, 0, 1), throwsRangeError);
+
+      final tableRow0 = DenseTable<int>.filled(0, 2, 0);
+      expect(() => tableRow0.get(0, 0), throwsRangeError);
+      expect(() => tableRow0.set(0, 0, 1), throwsRangeError);
+
+      final tableCol0 = DenseTable<int>.filled(2, 0, 0);
+      expect(() => tableCol0.get(0, 0), throwsRangeError);
+      expect(() => tableCol0.set(0, 0, 1), throwsRangeError);
+    });
+
+    test('negative dimensions throw assertion errors', () {
+      expect(() => DenseTable<int>.filled(-1, 2, 0),
+          throwsA(isA<AssertionError>()));
+      expect(() => DenseTable<int>.filled(2, -1, 0),
+          throwsA(isA<AssertionError>()));
+      expect(() => DenseTable<int>.generate(-1, 2, (r, c) => 0),
+          throwsA(isA<AssertionError>()));
+      expect(() => DenseTable<int>.generate(2, -1, (r, c) => 0),
+          throwsA(isA<AssertionError>()));
+    });
   });
 
   group('Float64Table', () {
@@ -76,6 +101,31 @@ void main() {
       expect(() => table.set(0, -1, 1.0), throwsRangeError);
       expect(() => table.set(0, 2, 1.0), throwsRangeError);
     });
+
+    test('empty table bounds checks', () {
+      final table = Float64Table.filled(0, 0, 0.0);
+      expect(() => table.get(0, 0), throwsRangeError);
+      expect(() => table.set(0, 0, 1.0), throwsRangeError);
+
+      final tableRow0 = Float64Table.filled(0, 2, 0.0);
+      expect(() => tableRow0.get(0, 0), throwsRangeError);
+      expect(() => tableRow0.set(0, 0, 1.0), throwsRangeError);
+
+      final tableCol0 = Float64Table.filled(2, 0, 0.0);
+      expect(() => tableCol0.get(0, 0), throwsRangeError);
+      expect(() => tableCol0.set(0, 0, 1.0), throwsRangeError);
+    });
+
+    test('negative dimensions throw assertion errors', () {
+      expect(() => Float64Table.filled(-1, 2, 0.0),
+          throwsA(isA<AssertionError>()));
+      expect(() => Float64Table.filled(2, -1, 0.0),
+          throwsA(isA<AssertionError>()));
+      expect(() => Float64Table.generate(-1, 2, (r, c) => 0.0),
+          throwsA(isA<AssertionError>()));
+      expect(() => Float64Table.generate(2, -1, (r, c) => 0.0),
+          throwsA(isA<AssertionError>()));
+    });
   });
 
   group('Int32Table', () {
@@ -113,6 +163,29 @@ void main() {
       expect(() => table.set(2, 0, 1), throwsRangeError);
       expect(() => table.set(0, -1, 1), throwsRangeError);
       expect(() => table.set(0, 2, 1), throwsRangeError);
+    });
+
+    test('empty table bounds checks', () {
+      final table = Int32Table.filled(0, 0, 0);
+      expect(() => table.get(0, 0), throwsRangeError);
+      expect(() => table.set(0, 0, 1), throwsRangeError);
+
+      final tableRow0 = Int32Table.filled(0, 2, 0);
+      expect(() => tableRow0.get(0, 0), throwsRangeError);
+      expect(() => tableRow0.set(0, 0, 1), throwsRangeError);
+
+      final tableCol0 = Int32Table.filled(2, 0, 0);
+      expect(() => tableCol0.get(0, 0), throwsRangeError);
+      expect(() => tableCol0.set(0, 0, 1), throwsRangeError);
+    });
+
+    test('negative dimensions throw assertion errors', () {
+      expect(() => Int32Table.filled(-1, 2, 0), throwsA(isA<AssertionError>()));
+      expect(() => Int32Table.filled(2, -1, 0), throwsA(isA<AssertionError>()));
+      expect(() => Int32Table.generate(-1, 2, (r, c) => 0),
+          throwsA(isA<AssertionError>()));
+      expect(() => Int32Table.generate(2, -1, (r, c) => 0),
+          throwsA(isA<AssertionError>()));
     });
   });
 }
