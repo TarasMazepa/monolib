@@ -1,3 +1,8 @@
+## 0.0.58
+
+- Optimizes `getSink()` caching in `csvEncodeAsync`, `jsonlEncodeAsync`, and `jsonEncodeAsync` by using `late final` for zero-byte stream protection without repetitive closure evaluation overhead.
+- Refactors `jsonEncodeAsync` to use the `withLazyStringSink` utility, unifying sink lifecycle management with CSV and JSONL encoders.
+
 ## 0.0.57
 
 - Adds `JsonStringEscapingSink` for streaming JSON string payloads.

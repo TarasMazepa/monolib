@@ -13,6 +13,7 @@ Future<void> csvEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
+      late final activeSink = getSink();
       Future<void> writeRow(dynamic item_) async {
         dynamic item = item_;
         if (item is Future) {
@@ -43,7 +44,6 @@ Future<void> csvEncodeAsync({
           if (cell is! String) {
             cell = '$cell';
           }
-          final activeSink = getSink();
           writeCsvCell(cell, activeSink);
           if (i == item.length - 1) {
             activeSink.write('\r\n');

@@ -13,8 +13,8 @@ Future<void> jsonlEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
+      late final activeSink = getSink();
       await iterateStreamOrIterable(items, (item) async {
-        final activeSink = getSink();
         try {
           await jsonEncodeAsync(object: item, sink: activeSink);
         } finally {
