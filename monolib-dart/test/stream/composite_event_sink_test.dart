@@ -7,8 +7,13 @@ class MockEventSink<T> implements EventSink<T> {
   final List<Object> addedErrors = [];
   bool isClosed = false;
 
+  final Object? throwOnAdd;
+
+  MockEventSink({this.throwOnAdd});
+
   @override
   void add(T data) {
+    if (throwOnAdd != null) throw throwOnAdd!;
     addedData.add(data);
   }
 
@@ -79,6 +84,57 @@ void main() {
       expect(sink2.isClosed, isTrue);
       expect(sink2.addedData, isEmpty);
       expect(sink2.addedErrors, isEmpty);
+    });
+
+    test('Strict Closure: throws StateError if throwOnClosed is true', () {
+      final strictSink =
+          CompositeEventSink<int>([sink1, sink2], throwOnClosed: true);
+      strictSink.close();
+
+      expect(() => strictSink.add(1), throwsA(isA<StateError>()));
+      expect(
+          () => strictSink.addError(Exception()), throwsA(isA<StateError>()));
+      expect(() => strictSink.close(), throwsA(isA<StateError>()));
+    });
+
+    test(
+        'Swallow Strategy: allows subsequent sinks to function when a previous one throws',
+        () {
+      final throwingSink =
+          MockEventSink<int>(throwOnAdd: Exception('Sink1 error'));
+      final goodSink = MockEventSink<int>();
+
+      final swallowSink = CompositeEventSink<int>(
+        [throwingSink, goodSink],
+        exceptionStrategy: ExceptionStrategy.swallow,
+      );
+
+      swallowSink.add(1);
+
+      expect(goodSink.addedData, equals([1]));
+      expect(throwingSink.addedData, isEmpty);
+    });
+
+    test(
+        'Aggregate Strategy: collects all exceptions and throws CompositeSinkError',
+        () {
+      final error1 = Exception('Sink1 error');
+      final error2 = Exception('Sink2 error');
+      final throwingSink1 = MockEventSink<int>(throwOnAdd: error1);
+      final throwingSink2 = MockEventSink<int>(throwOnAdd: error2);
+
+      final aggregateSink = CompositeEventSink<int>(
+        [throwingSink1, throwingSink2],
+        exceptionStrategy: ExceptionStrategy.aggregate,
+      );
+
+      try {
+        aggregateSink.add(1);
+        fail('Should have thrown CompositeSinkError');
+      } on CompositeSinkError catch (e) {
+        expect(e.errors, hasLength(2));
+        expect(e.errors, containsAll([error1, error2]));
+      }
     });
   });
 }
