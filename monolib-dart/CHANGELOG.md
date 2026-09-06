@@ -1,3 +1,7 @@
+## 0.0.59
+
+- Adds `mappedLastOrNull` to `Stream` extensions (now `OnStream`) to map stream values and return the last non-null mapped result.
+
 ## 0.0.58
 
 - Optimizes `getSink()` caching in `csvEncodeAsync`, `jsonlEncodeAsync`, and `jsonEncodeAsync` by using `late final` for zero-byte stream protection without repetitive closure evaluation overhead.
