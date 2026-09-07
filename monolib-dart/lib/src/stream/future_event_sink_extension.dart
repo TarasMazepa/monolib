@@ -4,7 +4,7 @@ extension FutureEventSinkExtension<T> on Future<EventSink<T>> {
   EventSink<T> asEventSink() {
     final controller = StreamController<T>(sync: true);
 
-    this.then(
+    then(
       (resolvedSink) {
         controller.stream.listen(
           resolvedSink.add,
