@@ -1,7 +1,7 @@
 import 'dart:async';
 
 extension FutureEventSinkExtension<T> on Future<EventSink<T>> {
-  EventSink<T> asEventSink() {
+  EventSink<T> unwrap() {
     final controller = StreamController<T>(sync: true);
 
     then(

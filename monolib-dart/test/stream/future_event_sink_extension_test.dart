@@ -8,7 +8,7 @@ void main() {
     test('buffers events until future resolves and then delivers them',
         () async {
       final completer = Completer<EventSink<int>>();
-      final futureSink = completer.future.asEventSink();
+      final futureSink = completer.future.unwrap();
 
       final resolvedController = StreamController<int>();
       final emittedValues = <int>[];
@@ -33,7 +33,7 @@ void main() {
     test('buffers errors until future resolves and then delivers them',
         () async {
       final completer = Completer<EventSink<int>>();
-      final futureSink = completer.future.asEventSink();
+      final futureSink = completer.future.unwrap();
 
       final resolvedController = StreamController<int>();
       final emittedErrors = <Object>[];
@@ -61,7 +61,7 @@ void main() {
 
     test('buffers close until future resolves and then calls it', () async {
       final completer = Completer<EventSink<int>>();
-      final futureSink = completer.future.asEventSink();
+      final futureSink = completer.future.unwrap();
 
       final resolvedController = StreamController<int>();
       var isDone = false;
@@ -92,7 +92,7 @@ void main() {
       runZonedGuarded(
         () {
           final completer = Completer<EventSink<int>>();
-          final futureSink = completer.future.asEventSink();
+          final futureSink = completer.future.unwrap();
 
           futureSink.add(1); // Should be dropped
 
