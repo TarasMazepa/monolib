@@ -1,3 +1,7 @@
+## 0.0.60
+
+- Adds `CompositeEventSink` to forward events to multiple target sinks.
+
 ## 0.0.59
 
 - Adds `mappedLastOrNull` to `Stream` extensions (now `OnStream`) to map stream values and return the last non-null mapped result.

@@ -8,5 +8,6 @@ export 'src/stream/on_sink.dart';
 export 'src/stream/on_stream_of_list_of_int.dart';
 export 'src/stream/on_stream_of_lists.dart';
 export 'src/stream/single_value_caching_stream.dart';
+export 'src/stream/composite_event_sink.dart';
 export 'src/stream/stream_where_type_extension.dart';
 export 'src/stream/stream_with_close.dart';
