@@ -1,11 +1,8 @@
-import 'dart:async';
-
-import 'composite_sink_error.dart';
-import 'exception_strategy.dart';
+part of 'exception_strategy.dart';
 
 /// Strategy that collects all exceptions thrown by child sinks and throws a single [CompositeSinkError] at the end.
-class AggregateExceptionStrategy implements ExceptionStrategy {
-  const AggregateExceptionStrategy();
+class _AggregateExceptionStrategy implements ExceptionStrategy {
+  const _AggregateExceptionStrategy();
 
   @override
   void dispatch<T>(

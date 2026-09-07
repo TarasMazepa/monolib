@@ -1,3 +1,5 @@
+import 'exception_strategy.dart';
+
 /// An error thrown when [ExceptionStrategy.aggregate] is used and child sinks throw exceptions.
 class CompositeSinkError implements Exception {
   /// The list of exceptions collected from child sinks.

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'exception_strategy.dart';
+import 'composite_event_sink/exception_strategy.dart';
 
 /// A composite event sink that forwards events to multiple target sinks.
 ///

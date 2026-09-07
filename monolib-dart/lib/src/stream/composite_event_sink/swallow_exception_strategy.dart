@@ -1,10 +1,8 @@
-import 'dart:async';
-
-import 'exception_strategy.dart';
+part of 'exception_strategy.dart';
 
 /// Strategy that ignores any exceptions thrown by child sinks, continuing to the next sink.
-class SwallowExceptionStrategy implements ExceptionStrategy {
-  const SwallowExceptionStrategy();
+class _SwallowExceptionStrategy implements ExceptionStrategy {
+  const _SwallowExceptionStrategy();
 
   @override
   void dispatch<T>(

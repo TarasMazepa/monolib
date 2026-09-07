@@ -1,10 +1,8 @@
-import 'dart:async';
-
-import 'exception_strategy.dart';
+part of 'exception_strategy.dart';
 
 /// Strategy that throws the first exception encountered immediately, halting the dispatch.
-class FailFastExceptionStrategy implements ExceptionStrategy {
-  const FailFastExceptionStrategy();
+class _FailFastExceptionStrategy implements ExceptionStrategy {
+  const _FailFastExceptionStrategy();
 
   @override
   void dispatch<T>(
