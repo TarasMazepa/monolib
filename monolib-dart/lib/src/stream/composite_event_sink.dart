@@ -30,10 +30,6 @@ class CompositeEventSink<T> implements EventSink<T> {
         _throwOnClosed = throwOnClosed,
         _exceptionStrategy = exceptionStrategy;
 
-  void _dispatch(void Function(EventSink<T> sink) action) {
-    _exceptionStrategy.dispatch(_sinks, action);
-  }
-
   @override
   void add(T data) {
     if (_closed) {
@@ -42,7 +38,7 @@ class CompositeEventSink<T> implements EventSink<T> {
       }
       return;
     }
-    _dispatch((sink) => sink.add(data));
+    _exceptionStrategy.dispatch(_sinks, (sink) => sink.add(data));
   }
 
   @override
@@ -54,7 +50,7 @@ class CompositeEventSink<T> implements EventSink<T> {
       return;
     }
     _closed = true;
-    _dispatch((sink) => sink.close());
+    _exceptionStrategy.dispatch(_sinks, (sink) => sink.close());
   }
 
   @override
@@ -65,6 +61,6 @@ class CompositeEventSink<T> implements EventSink<T> {
       }
       return;
     }
-    _dispatch((sink) => sink.addError(error, stackTrace));
+    _exceptionStrategy.dispatch(_sinks, (sink) => sink.addError(error, stackTrace));
   }
 }
