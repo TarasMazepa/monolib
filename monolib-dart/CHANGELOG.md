@@ -1,3 +1,7 @@
+## 0.0.61
+
+- Adds `FutureEventSinkExtension` allowing a `Future<EventSink<T>>` to be used synchronously as an `EventSink<T>` by buffering events until it resolves.
+
 ## 0.0.60
 
 - Adds `CompositeEventSink` to forward events to multiple target sinks.
