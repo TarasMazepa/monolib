@@ -15,7 +15,8 @@ Future<void> withLazyStringSink({
   StringSink? initializedSink;
 
   StringSink getSink() {
-    initializedSink ??= sink ??
+    initializedSink ??=
+        sink ??
         () {
           ownsSink = true;
           return sinkProvider!();

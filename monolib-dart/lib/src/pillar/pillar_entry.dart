@@ -15,8 +15,8 @@ class PillarEntry {
     required this.factory,
     this.value,
     this.instanceScope,
-  })  : isInstance = value != null,
-        effectiveScopeIncludingDependencies = instanceScope;
+  }) : isInstance = value != null,
+       effectiveScopeIncludingDependencies = instanceScope;
 
   T _create<T>() {
     final (:value, :scope) = factory();

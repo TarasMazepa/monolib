@@ -17,8 +17,9 @@ void main() {
 
     test('mappedLastOrNull returns the last non-null mapped value', () async {
       final stream = Stream.fromIterable([1, 2, 3, 4, 5]);
-      final result =
-          await stream.mappedLastOrNull((e) => e % 2 == 0 ? e * 10 : null);
+      final result = await stream.mappedLastOrNull(
+        (e) => e % 2 == 0 ? e * 10 : null,
+      );
       expect(result, 40); // 4 * 10 is the last non-null mapped value
     });
 
@@ -28,12 +29,15 @@ void main() {
       expect(result, isNull);
     });
 
-    test('mappedLastOrNull returns null if all mapped values are null',
-        () async {
-      final stream = Stream.fromIterable([1, 3, 5]);
-      final result =
-          await stream.mappedLastOrNull((e) => e % 2 == 0 ? e * 10 : null);
-      expect(result, isNull);
-    });
+    test(
+      'mappedLastOrNull returns null if all mapped values are null',
+      () async {
+        final stream = Stream.fromIterable([1, 3, 5]);
+        final result = await stream.mappedLastOrNull(
+          (e) => e % 2 == 0 ? e * 10 : null,
+        );
+        expect(result, isNull);
+      },
+    );
   });
 }

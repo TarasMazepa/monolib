@@ -21,5 +21,7 @@ abstract class ExceptionStrategy {
 
   /// Dispatches the [action] to the [sinks].
   void dispatch<T>(
-      Iterable<EventSink<T>> sinks, void Function(EventSink<T> sink) action);
+    Iterable<EventSink<T>> sinks,
+    void Function(EventSink<T> sink) action,
+  );
 }

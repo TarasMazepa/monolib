@@ -120,13 +120,15 @@ void main() {
 
         // Test baseline with a single large chunk
         final baselineStream = Stream.fromIterable([csvData]);
-        final baselineResult =
-            await baselineStream.transform(CsvMappedDecoder(mapper)).toList();
+        final baselineResult = await baselineStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
         // Test with 1-character chunks
         final charStream = Stream.fromIterable(csvData.split(''));
-        final charResult =
-            await charStream.transform(CsvMappedDecoder(mapper)).toList();
+        final charResult = await charStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
         // Test with 2-character chunks
         final List<String> chunksOf2 = [];
@@ -139,8 +141,9 @@ void main() {
           );
         }
         final twoCharStream = Stream.fromIterable(chunksOf2);
-        final twoCharResult =
-            await twoCharStream.transform(CsvMappedDecoder(mapper)).toList();
+        final twoCharResult = await twoCharStream
+            .transform(CsvMappedDecoder(mapper))
+            .toList();
 
         expect(
           charResult,

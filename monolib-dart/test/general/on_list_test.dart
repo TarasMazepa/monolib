@@ -8,20 +8,16 @@ void main() {
     });
 
     test('ifEmpty provided - returns custom value', () {
-      expect(
-        <int>[].joinWith(prefix: '[', suffix: ']', ifEmpty: () => ''),
-        '',
-      );
+      expect(<int>[].joinWith(prefix: '[', suffix: ']', ifEmpty: () => ''), '');
     });
 
     test('with items', () {
       expect(
-        [1, 2, 3].joinWith(
-          prefix: '[',
-          delimiter: ',',
-          suffix: ']',
-          map: (e) => '$e',
-        ),
+        [
+          1,
+          2,
+          3,
+        ].joinWith(prefix: '[', delimiter: ',', suffix: ']', map: (e) => '$e'),
         '[1,2,3]',
       );
     });

@@ -1,3 +1,7 @@
+## 0.0.62
+
+- Adds `FileEnsureOpenExtension` with `openWriteEnsureParent` to easily open a file for writing while ensuring its parent directories exist.
+
 ## 0.0.61
 
 - Adds `FutureEventSinkExtension` allowing a `Future<EventSink<T>>` to be used synchronously as an `EventSink<T>` by buffering events until it resolves.

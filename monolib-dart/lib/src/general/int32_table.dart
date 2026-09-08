@@ -18,22 +18,24 @@ class Int32Table {
   /// Creates a dense table with the given number of [rows] and [columns],
   /// filled with [fillValue].
   Int32Table.filled(int rows, int columns, int fillValue)
-      : assert(rows >= 0, 'rows must be non-negative'),
-        assert(columns >= 0, 'columns must be non-negative'),
-        _rows = rows,
-        _columns = columns,
-        _data = Int32List(rows * columns)
-          ..fillRange(0, rows * columns, fillValue);
+    : assert(rows >= 0, 'rows must be non-negative'),
+      assert(columns >= 0, 'columns must be non-negative'),
+      _rows = rows,
+      _columns = columns,
+      _data = Int32List(rows * columns)
+        ..fillRange(0, rows * columns, fillValue);
 
   /// Creates a dense table with the given number of [rows] and [columns],
   /// generating values dynamically using the [generator] function.
   Int32Table.generate(
-      int rows, int columns, int Function(int row, int col) generator)
-      : assert(rows >= 0, 'rows must be non-negative'),
-        assert(columns >= 0, 'columns must be non-negative'),
-        _rows = rows,
-        _columns = columns,
-        _data = Int32List(rows * columns) {
+    int rows,
+    int columns,
+    int Function(int row, int col) generator,
+  ) : assert(rows >= 0, 'rows must be non-negative'),
+      assert(columns >= 0, 'columns must be non-negative'),
+      _rows = rows,
+      _columns = columns,
+      _data = Int32List(rows * columns) {
     int index = 0;
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {

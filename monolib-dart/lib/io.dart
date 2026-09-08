@@ -1,3 +1,4 @@
+export 'src/io/file_ensure_open_extension.dart';
 export 'src/io/jsonl_batch_writer.dart';
 export 'src/io/on_file_system_entity.dart';
 export 'src/io/on_function.dart';

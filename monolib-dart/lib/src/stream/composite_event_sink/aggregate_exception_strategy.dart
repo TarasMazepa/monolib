@@ -6,7 +6,9 @@ class _AggregateExceptionStrategy implements ExceptionStrategy {
 
   @override
   void dispatch<T>(
-      Iterable<EventSink<T>> sinks, void Function(EventSink<T> sink) action) {
+    Iterable<EventSink<T>> sinks,
+    void Function(EventSink<T> sink) action,
+  ) {
     final List<Object> errors = [];
     for (final sink in sinks) {
       try {

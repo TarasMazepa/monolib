@@ -12,7 +12,8 @@ void main() {
         [null, 'Unknown', null], // Test null values
       ];
 
-      final expected = 'Name    Age     Score\n'
+      final expected =
+          'Name    Age     Score\n'
           'Alice        25  95.5\n' // Age and Score (TableCellAlignRight or num) right-aligned
           'Bob          30    80\n'
           'Charlie      22 88.8 \n' // TableCellAlignLeft string left-aligned
