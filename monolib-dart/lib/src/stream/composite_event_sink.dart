@@ -26,9 +26,9 @@ class CompositeEventSink<T> implements EventSink<T> {
     Iterable<EventSink<T>> sinks, {
     bool throwOnClosed = false,
     ExceptionStrategy exceptionStrategy = ExceptionStrategy.failFast,
-  }) : _sinks = sinks.toList(),
-       _throwOnClosed = throwOnClosed,
-       _exceptionStrategy = exceptionStrategy;
+  })  : _sinks = sinks.toList(),
+        _throwOnClosed = throwOnClosed,
+        _exceptionStrategy = exceptionStrategy;
 
   @override
   void add(T data) {

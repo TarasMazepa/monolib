@@ -16,11 +16,11 @@ class DenseTable<T> {
   /// Creates a dense table with the given number of [rows] and [columns],
   /// filled with [fillValue].
   DenseTable.filled(int rows, int columns, T fillValue)
-    : assert(rows >= 0, 'rows must be non-negative'),
-      assert(columns >= 0, 'columns must be non-negative'),
-      _rows = rows,
-      _columns = columns,
-      _data = List<T>.filled(rows * columns, fillValue);
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
+        _columns = columns,
+        _data = List<T>.filled(rows * columns, fillValue);
 
   /// Creates a dense table with the given number of [rows] and [columns],
   /// generating values dynamically using the [generator] function.
@@ -28,23 +28,23 @@ class DenseTable<T> {
     int rows,
     int columns,
     T Function(int row, int col) generator,
-  ) : assert(rows >= 0, 'rows must be non-negative'),
-      assert(columns >= 0, 'columns must be non-negative'),
-      _rows = rows,
-      _columns = columns,
-      _data = (() {
-        int r = 0;
-        int c = 0;
-        return List<T>.generate(rows * columns, (_) {
-          final value = generator(r, c);
-          c++;
-          if (c == columns) {
-            c = 0;
-            r++;
-          }
-          return value;
-        }, growable: false);
-      })();
+  )   : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
+        _columns = columns,
+        _data = (() {
+          int r = 0;
+          int c = 0;
+          return List<T>.generate(rows * columns, (_) {
+            final value = generator(r, c);
+            c++;
+            if (c == columns) {
+              c = 0;
+              r++;
+            }
+            return value;
+          }, growable: false);
+        })();
 
   /// Ensures that the provided [row] and [col] are within the bounds of the table.
   void _checkBounds(int row, int col) {

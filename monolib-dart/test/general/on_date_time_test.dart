@@ -20,11 +20,8 @@ void main() {
       // Calculate the expected offset manually to compare
       final duration = dateTimeLocal.timeZoneOffset;
       final hours = duration.inHours.abs().toString().padLeft(2, '0');
-      final minutes = duration.inMinutes
-          .remainder(60)
-          .abs()
-          .toString()
-          .padLeft(2, '0');
+      final minutes =
+          duration.inMinutes.remainder(60).abs().toString().padLeft(2, '0');
       final sign = duration.isNegative ? '-' : '+';
       final formattedOffset = '$sign$hours:$minutes';
 

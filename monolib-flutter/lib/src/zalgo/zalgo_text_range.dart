@@ -12,8 +12,8 @@ class ZalgoTextRange extends TextRange {
   });
 
   const ZalgoTextRange.collapsed(super.offset)
-    : isZalgo = false,
-      super.collapsed();
+      : isZalgo = false,
+        super.collapsed();
 
   String decodedTextInside(String text) {
     final inside = textInside(text);
