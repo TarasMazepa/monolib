@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:monolib_dart/stream.dart';
 import 'package:test/test.dart';
 
@@ -116,7 +117,7 @@ void main() {
     });
 
     test(
-        'Aggregate Strategy: collects all exceptions and throws CompositeSinkError',
+        'Aggregate Strategy: collects all exceptions and throws CompositeSinkException',
         () {
       final error1 = Exception('Sink1 error');
       final error2 = Exception('Sink2 error');
@@ -130,10 +131,31 @@ void main() {
 
       try {
         aggregateSink.add(1);
-        fail('Should have thrown CompositeSinkError');
-      } on CompositeSinkError catch (e) {
+        fail('Should have thrown CompositeSinkException');
+      } on CompositeSinkException catch (e) {
         expect(e.errors, hasLength(2));
         expect(e.errors, containsAll([error1, error2]));
+      }
+    });
+
+    test(
+        'Aggregate Strategy: throws original exception directly if only one sink throws',
+        () {
+      final error = Exception('Sink error');
+      final throwingSink = MockEventSink<int>(throwOnAdd: error);
+      final goodSink = MockEventSink<int>();
+
+      final aggregateSink = CompositeEventSink<int>(
+        [throwingSink, goodSink],
+        exceptionStrategy: ExceptionStrategy.aggregate,
+      );
+
+      try {
+        aggregateSink.add(1);
+        fail('Should have thrown the original Exception directly');
+      } catch (e) {
+        expect(e, isNot(isA<CompositeSinkException>()));
+        expect(e, equals(error));
       }
     });
   });

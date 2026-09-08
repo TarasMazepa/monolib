@@ -1,29 +1,6 @@
 import 'dart:async';
 
-/// Strategy to handle exceptions thrown by downstream sinks in a [CompositeEventSink].
-enum ExceptionStrategy {
-  /// Throws the first exception encountered immediately, halting the dispatch.
-  failFast,
-
-  /// Ignores any exceptions thrown by child sinks, continuing to the next sink.
-  swallow,
-
-  /// Collects all exceptions thrown by child sinks and throws a single [CompositeSinkError] at the end.
-  aggregate,
-}
-
-/// An error thrown when [ExceptionStrategy.aggregate] is used and child sinks throw exceptions.
-class CompositeSinkError implements Exception {
-  /// The list of exceptions collected from child sinks.
-  final List<Object> errors;
-
-  /// Creates a new composite sink error with the provided [errors].
-  CompositeSinkError(this.errors);
-
-  @override
-  String toString() =>
-      'CompositeSinkError: ${errors.length} error(s) occurred.';
-}
+import 'package:monolib_dart/src/stream/composite_event_sink/exception_strategy.dart';
 
 /// A composite event sink that forwards events to multiple target sinks.
 ///
@@ -53,36 +30,6 @@ class CompositeEventSink<T> implements EventSink<T> {
         _throwOnClosed = throwOnClosed,
         _exceptionStrategy = exceptionStrategy;
 
-  void _dispatch(void Function(EventSink<T> sink) action) {
-    final errors = <Object>[];
-    for (final sink in _sinks) {
-      switch (_exceptionStrategy) {
-        case ExceptionStrategy.failFast:
-          action(sink);
-          break;
-        case ExceptionStrategy.swallow:
-          try {
-            action(sink);
-          } catch (_) {
-            // Swallow exception
-          }
-          break;
-        case ExceptionStrategy.aggregate:
-          try {
-            action(sink);
-          } catch (e) {
-            errors.add(e);
-          }
-          break;
-      }
-    }
-
-    if (_exceptionStrategy == ExceptionStrategy.aggregate &&
-        errors.isNotEmpty) {
-      throw CompositeSinkError(errors);
-    }
-  }
-
   @override
   void add(T data) {
     if (_closed) {
@@ -91,7 +38,7 @@ class CompositeEventSink<T> implements EventSink<T> {
       }
       return;
     }
-    _dispatch((sink) => sink.add(data));
+    _exceptionStrategy.dispatch(_sinks, (sink) => sink.add(data));
   }
 
   @override
@@ -103,7 +50,7 @@ class CompositeEventSink<T> implements EventSink<T> {
       return;
     }
     _closed = true;
-    _dispatch((sink) => sink.close());
+    _exceptionStrategy.dispatch(_sinks, (sink) => sink.close());
   }
 
   @override
@@ -114,6 +61,7 @@ class CompositeEventSink<T> implements EventSink<T> {
       }
       return;
     }
-    _dispatch((sink) => sink.addError(error, stackTrace));
+    _exceptionStrategy.dispatch(
+        _sinks, (sink) => sink.addError(error, stackTrace));
   }
 }
