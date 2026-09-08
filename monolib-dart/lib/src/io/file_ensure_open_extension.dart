@@ -11,7 +11,7 @@ extension FileEnsureOpenExtension on File {
   /// [recursive] is true to ensure all non-existent parent directories are created.
   /// Returns the standard [IOSink] by calling [openWrite] with [mode] and [encoding].
   Future<IOSink> openWriteEnsureParent({
-    bool recursive = true,
+    bool recursive = false,
     FileMode mode = FileMode.write,
     Encoding encoding = utf8,
   }) async {

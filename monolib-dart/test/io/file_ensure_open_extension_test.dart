@@ -28,7 +28,7 @@ void main() {
         expect(await deeplyNestedDir.exists(), isFalse);
         expect(await file.exists(), isFalse);
 
-        final sink = await file.openWriteEnsureParent();
+        final sink = await file.openWriteEnsureParent(recursive: true);
 
         expect(await deeplyNestedDir.exists(), isTrue);
 
