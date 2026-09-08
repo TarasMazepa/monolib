@@ -39,9 +39,12 @@ void main() {
     test('tryAddError adds an error when not closed', () async {
       final controller = StreamController<int>();
       final errors = <Object>[];
-      controller.stream.listen((_) {}, onError: (e) {
-        errors.add(e);
-      });
+      controller.stream.listen(
+        (_) {},
+        onError: (e) {
+          errors.add(e);
+        },
+      );
 
       controller.tryAddError('error 1');
       controller.tryAddError('error 2');
@@ -66,9 +69,12 @@ void main() {
     test('tryAddError ignores error when closed', () async {
       final controller = StreamController<int>();
       final errors = <Object>[];
-      controller.stream.listen((_) {}, onError: (e) {
-        errors.add(e);
-      });
+      controller.stream.listen(
+        (_) {},
+        onError: (e) {
+          errors.add(e);
+        },
+      );
 
       controller.tryAddError('error 1');
       await controller.close();
@@ -90,14 +96,18 @@ void main() {
 
     test('tryAddError catches exceptions when ignoreError is true', () {
       final controller = ThrowingController<int>();
-      expect(() => controller.tryAddError(Exception(), ignoreError: true),
-          returnsNormally);
+      expect(
+        () => controller.tryAddError(Exception(), ignoreError: true),
+        returnsNormally,
+      );
     });
 
     test('tryAddError throws exceptions when ignoreError is false', () {
       final controller = ThrowingController<int>();
-      expect(() => controller.tryAddError(Exception(), ignoreError: false),
-          throwsException);
+      expect(
+        () => controller.tryAddError(Exception(), ignoreError: false),
+        throwsException,
+      );
       expect(() => controller.tryAddError(Exception()), throwsException);
     });
   });

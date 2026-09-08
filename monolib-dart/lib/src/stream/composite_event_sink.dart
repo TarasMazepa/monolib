@@ -62,6 +62,8 @@ class CompositeEventSink<T> implements EventSink<T> {
       return;
     }
     _exceptionStrategy.dispatch(
-        _sinks, (sink) => sink.addError(error, stackTrace));
+      _sinks,
+      (sink) => sink.addError(error, stackTrace),
+    );
   }
 }

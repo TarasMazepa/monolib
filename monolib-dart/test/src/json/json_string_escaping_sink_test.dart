@@ -11,11 +11,13 @@ void main() {
       sink = JsonStringEscapingSink(buffer);
     });
 
-    test('writes standard strings unescaped (except for json string rules)',
-        () {
-      sink.write('hello world');
-      expect(buffer.toString(), 'hello world');
-    });
+    test(
+      'writes standard strings unescaped (except for json string rules)',
+      () {
+        sink.write('hello world');
+        expect(buffer.toString(), 'hello world');
+      },
+    );
 
     test('writes empty or null strings as nothing', () {
       sink.write('');

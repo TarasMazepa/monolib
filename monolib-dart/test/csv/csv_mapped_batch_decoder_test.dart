@@ -81,8 +81,9 @@ void main() {
         },
       );
 
-      final sink =
-          decoder.startChunkedConversion(StreamController<List<String>>());
+      final sink = decoder.startChunkedConversion(
+        StreamController<List<String>>(),
+      );
       sink.add('a,b,c\n');
 
       expect(onDoneCalled, isFalse);

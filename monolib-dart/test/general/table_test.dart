@@ -54,14 +54,22 @@ void main() {
     });
 
     test('negative dimensions throw assertion errors', () {
-      expect(() => DenseTable<int>.filled(-1, 2, 0),
-          throwsA(isA<AssertionError>()));
-      expect(() => DenseTable<int>.filled(2, -1, 0),
-          throwsA(isA<AssertionError>()));
-      expect(() => DenseTable<int>.generate(-1, 2, (r, c) => 0),
-          throwsA(isA<AssertionError>()));
-      expect(() => DenseTable<int>.generate(2, -1, (r, c) => 0),
-          throwsA(isA<AssertionError>()));
+      expect(
+        () => DenseTable<int>.filled(-1, 2, 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => DenseTable<int>.filled(2, -1, 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => DenseTable<int>.generate(-1, 2, (r, c) => 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => DenseTable<int>.generate(2, -1, (r, c) => 0),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 
@@ -117,14 +125,22 @@ void main() {
     });
 
     test('negative dimensions throw assertion errors', () {
-      expect(() => Float64Table.filled(-1, 2, 0.0),
-          throwsA(isA<AssertionError>()));
-      expect(() => Float64Table.filled(2, -1, 0.0),
-          throwsA(isA<AssertionError>()));
-      expect(() => Float64Table.generate(-1, 2, (r, c) => 0.0),
-          throwsA(isA<AssertionError>()));
-      expect(() => Float64Table.generate(2, -1, (r, c) => 0.0),
-          throwsA(isA<AssertionError>()));
+      expect(
+        () => Float64Table.filled(-1, 2, 0.0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Float64Table.filled(2, -1, 0.0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Float64Table.generate(-1, 2, (r, c) => 0.0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Float64Table.generate(2, -1, (r, c) => 0.0),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 
@@ -182,10 +198,14 @@ void main() {
     test('negative dimensions throw assertion errors', () {
       expect(() => Int32Table.filled(-1, 2, 0), throwsA(isA<AssertionError>()));
       expect(() => Int32Table.filled(2, -1, 0), throwsA(isA<AssertionError>()));
-      expect(() => Int32Table.generate(-1, 2, (r, c) => 0),
-          throwsA(isA<AssertionError>()));
-      expect(() => Int32Table.generate(2, -1, (r, c) => 0),
-          throwsA(isA<AssertionError>()));
+      expect(
+        () => Int32Table.generate(-1, 2, (r, c) => 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => Int32Table.generate(2, -1, (r, c) => 0),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 }

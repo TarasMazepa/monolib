@@ -28,8 +28,10 @@ class Float64Table {
   /// Creates a dense table with the given number of [rows] and [columns],
   /// generating values dynamically using the [generator] function.
   Float64Table.generate(
-      int rows, int columns, double Function(int row, int col) generator)
-      : assert(rows >= 0, 'rows must be non-negative'),
+    int rows,
+    int columns,
+    double Function(int row, int col) generator,
+  )   : assert(rows >= 0, 'rows must be non-negative'),
         assert(columns >= 0, 'columns must be non-negative'),
         _rows = rows,
         _columns = columns,

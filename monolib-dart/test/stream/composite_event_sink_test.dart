@@ -88,75 +88,83 @@ void main() {
     });
 
     test('Strict Closure: throws StateError if throwOnClosed is true', () {
-      final strictSink =
-          CompositeEventSink<int>([sink1, sink2], throwOnClosed: true);
+      final strictSink = CompositeEventSink<int>([
+        sink1,
+        sink2,
+      ], throwOnClosed: true);
       strictSink.close();
 
       expect(() => strictSink.add(1), throwsA(isA<StateError>()));
       expect(
-          () => strictSink.addError(Exception()), throwsA(isA<StateError>()));
+        () => strictSink.addError(Exception()),
+        throwsA(isA<StateError>()),
+      );
       expect(() => strictSink.close(), throwsA(isA<StateError>()));
     });
 
     test(
-        'Swallow Strategy: allows subsequent sinks to function when a previous one throws',
-        () {
-      final throwingSink =
-          MockEventSink<int>(throwOnAdd: Exception('Sink1 error'));
-      final goodSink = MockEventSink<int>();
+      'Swallow Strategy: allows subsequent sinks to function when a previous one throws',
+      () {
+        final throwingSink = MockEventSink<int>(
+          throwOnAdd: Exception('Sink1 error'),
+        );
+        final goodSink = MockEventSink<int>();
 
-      final swallowSink = CompositeEventSink<int>(
-        [throwingSink, goodSink],
-        exceptionStrategy: ExceptionStrategy.swallow,
-      );
+        final swallowSink = CompositeEventSink<int>([
+          throwingSink,
+          goodSink,
+        ], exceptionStrategy: ExceptionStrategy.swallow);
 
-      swallowSink.add(1);
+        swallowSink.add(1);
 
-      expect(goodSink.addedData, equals([1]));
-      expect(throwingSink.addedData, isEmpty);
-    });
-
-    test(
-        'Aggregate Strategy: collects all exceptions and throws CompositeSinkException',
-        () {
-      final error1 = Exception('Sink1 error');
-      final error2 = Exception('Sink2 error');
-      final throwingSink1 = MockEventSink<int>(throwOnAdd: error1);
-      final throwingSink2 = MockEventSink<int>(throwOnAdd: error2);
-
-      final aggregateSink = CompositeEventSink<int>(
-        [throwingSink1, throwingSink2],
-        exceptionStrategy: ExceptionStrategy.aggregate,
-      );
-
-      try {
-        aggregateSink.add(1);
-        fail('Should have thrown CompositeSinkException');
-      } on CompositeSinkException catch (e) {
-        expect(e.errors, hasLength(2));
-        expect(e.errors, containsAll([error1, error2]));
-      }
-    });
+        expect(goodSink.addedData, equals([1]));
+        expect(throwingSink.addedData, isEmpty);
+      },
+    );
 
     test(
-        'Aggregate Strategy: throws original exception directly if only one sink throws',
-        () {
-      final error = Exception('Sink error');
-      final throwingSink = MockEventSink<int>(throwOnAdd: error);
-      final goodSink = MockEventSink<int>();
+      'Aggregate Strategy: collects all exceptions and throws CompositeSinkException',
+      () {
+        final error1 = Exception('Sink1 error');
+        final error2 = Exception('Sink2 error');
+        final throwingSink1 = MockEventSink<int>(throwOnAdd: error1);
+        final throwingSink2 = MockEventSink<int>(throwOnAdd: error2);
 
-      final aggregateSink = CompositeEventSink<int>(
-        [throwingSink, goodSink],
-        exceptionStrategy: ExceptionStrategy.aggregate,
-      );
+        final aggregateSink = CompositeEventSink<int>([
+          throwingSink1,
+          throwingSink2,
+        ], exceptionStrategy: ExceptionStrategy.aggregate);
 
-      try {
-        aggregateSink.add(1);
-        fail('Should have thrown the original Exception directly');
-      } catch (e) {
-        expect(e, isNot(isA<CompositeSinkException>()));
-        expect(e, equals(error));
-      }
-    });
+        try {
+          aggregateSink.add(1);
+          fail('Should have thrown CompositeSinkException');
+        } on CompositeSinkException catch (e) {
+          expect(e.errors, hasLength(2));
+          expect(e.errors, containsAll([error1, error2]));
+        }
+      },
+    );
+
+    test(
+      'Aggregate Strategy: throws original exception directly if only one sink throws',
+      () {
+        final error = Exception('Sink error');
+        final throwingSink = MockEventSink<int>(throwOnAdd: error);
+        final goodSink = MockEventSink<int>();
+
+        final aggregateSink = CompositeEventSink<int>([
+          throwingSink,
+          goodSink,
+        ], exceptionStrategy: ExceptionStrategy.aggregate);
+
+        try {
+          aggregateSink.add(1);
+          fail('Should have thrown the original Exception directly');
+        } catch (e) {
+          expect(e, isNot(isA<CompositeSinkException>()));
+          expect(e, equals(error));
+        }
+      },
+    );
   });
 }

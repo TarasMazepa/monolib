@@ -6,7 +6,9 @@ class _FailFastExceptionStrategy implements ExceptionStrategy {
 
   @override
   void dispatch<T>(
-      Iterable<EventSink<T>> sinks, void Function(EventSink<T> sink) action) {
+    Iterable<EventSink<T>> sinks,
+    void Function(EventSink<T> sink) action,
+  ) {
     for (final sink in sinks) {
       action(sink);
     }
