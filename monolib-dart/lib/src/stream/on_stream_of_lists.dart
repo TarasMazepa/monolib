@@ -49,41 +49,46 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
     return _asAccumulatingSimple();
   }
 
-  Stream<List<T>> _asAccumulatingSimple() async* {
-    final accumulated = <T>[];
-    await for (final list in this) {
-      accumulated.addAll(list);
-      yield accumulated;
-    }
+  Stream<List<T>> _asAccumulatingSimple() {
+    return transform(StreamTransformer.fromBind((stream) {
+      final accumulated = <T>[];
+      return stream.map((list) {
+        accumulated.addAll(list);
+        return accumulated;
+      });
+    }));
   }
 
-  Stream<List<T>> _asAccumulatingWithRefresh() async* {
-    final accumulated = <T>[];
-    bool isFirstEvent = true;
-    bool isRefreshing = false;
+  Stream<List<T>> _asAccumulatingWithRefresh() {
+    return transform(StreamTransformer.fromBind((stream) {
+      final accumulated = <T>[];
+      bool isFirstEvent = true;
+      bool isRefreshing = false;
 
-    await for (final list in this) {
-      switch ((
-        isEmpty: list.isEmpty,
-        isFirstEvent: isFirstEvent,
-        isRefreshing: isRefreshing,
-      )) {
-        case (isEmpty: true, isFirstEvent: true, isRefreshing: _):
-          isFirstEvent = false;
-          yield accumulated;
-        case (isEmpty: true, isFirstEvent: false, isRefreshing: false):
-          accumulated.clear();
-          isRefreshing = true;
-        case (isEmpty: true, isFirstEvent: false, isRefreshing: true):
-          isRefreshing = false;
-          yield accumulated;
-        case _:
-          isFirstEvent = false;
-          isRefreshing = false;
-          accumulated.addAll(list);
-          yield accumulated;
-      }
-    }
+      return stream.expand((list) {
+        switch ((
+          isEmpty: list.isEmpty,
+          isFirstEvent: isFirstEvent,
+          isRefreshing: isRefreshing,
+        )) {
+          case (isEmpty: true, isFirstEvent: true, isRefreshing: _):
+            isFirstEvent = false;
+            return [accumulated];
+          case (isEmpty: true, isFirstEvent: false, isRefreshing: false):
+            accumulated.clear();
+            isRefreshing = true;
+            return const [];
+          case (isEmpty: true, isFirstEvent: false, isRefreshing: true):
+            isRefreshing = false;
+            return [accumulated];
+          case _:
+            isFirstEvent = false;
+            isRefreshing = false;
+            accumulated.addAll(list);
+            return [accumulated];
+        }
+      });
+    }));
   }
 
   /// Maps each list emitted by this stream using [mapper].
@@ -94,18 +99,17 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
   Stream<List<R>> mapLists<R>(
     List<R> Function(List<T>) mapper, {
     bool skipMappedToEmpty = true,
-  }) async* {
-    await for (final list in this) {
+  }) {
+    return expand((list) {
       if (list.isEmpty) {
-        yield <R>[];
-        continue;
+        return const [[]];
       }
       final mapped = mapper(list);
       if (skipMappedToEmpty && mapped.isEmpty) {
-        continue;
+        return const [];
       }
-      yield mapped;
-    }
+      return [mapped];
+    });
   }
 
   /// Filters the elements in each list emitted by this stream using [predicate].
