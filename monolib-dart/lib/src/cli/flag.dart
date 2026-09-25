@@ -23,6 +23,7 @@ class Flag {
         );
 
   String get shortOrLong => (short ?? long)!;
+  String get longOrShort => (long ?? short)!;
 
   FlagFindResult? findAndRemoveFlag(List<String> args) {
     if (long case final longFlag?) {
