@@ -144,6 +144,28 @@ void main() {
       expect(result, isA<FlagNotPresent>());
     });
 
+    test('shortOrLong', () {
+      final flag1 = Flag(short: '-v', long: '--verbose', description: 'Verbose mode');
+      expect(flag1.shortOrLong, '-v');
+
+      final flag2 = Flag(short: '-v', description: 'Verbose mode');
+      expect(flag2.shortOrLong, '-v');
+
+      final flag3 = Flag(long: '--verbose', description: 'Verbose mode');
+      expect(flag3.shortOrLong, '--verbose');
+    });
+
+    test('longOrShort', () {
+      final flag1 = Flag(short: '-v', long: '--verbose', description: 'Verbose mode');
+      expect(flag1.longOrShort, '--verbose');
+
+      final flag2 = Flag(short: '-v', description: 'Verbose mode');
+      expect(flag2.longOrShort, '-v');
+
+      final flag3 = Flag(long: '--verbose', description: 'Verbose mode');
+      expect(flag3.longOrShort, '--verbose');
+    });
+
     test('toString', () {
       final flag1 = Flag(
         short: '-v',
