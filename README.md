@@ -13,3 +13,8 @@ A collection of general purpose libraries for dart projects.
 A collection of general purpose libraries for flutter projects.
 
 [View on pub.dev](https://pub.dev/packages/monolib_flutter)
+
+### monolib_openrouter
+OpenRouter client for dart projects.
+
+[View on pub.dev](https://pub.dev/packages/monolib_openrouter)
