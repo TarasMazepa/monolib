@@ -1,5 +1,4 @@
 export 'src/api/ai_model.dart';
-export 'src/api/ai_vendor.dart';
 export 'src/api/ai_vendor_client.dart';
 export 'src/api/has_ai_model.dart';
 export 'src/api/on_fluent_json.dart';
