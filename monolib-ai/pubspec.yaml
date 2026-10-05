@@ -1,0 +1,17 @@
+name: monolib_ai
+description: AI integration libraries, including OpenRouter APIs.
+version: 0.0.1
+repository: https://github.com/TarasMazepa/monolib
+publish_to: none
+
+environment:
+  sdk: ^3.3.0
+
+dependencies:
+  http: ^1.2.0
+  monolib_dart:
+    path: ../monolib-dart
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
