@@ -1,9 +1,8 @@
-import 'package:monolib_ai/src/api/ai_vendor.dart';
 import 'package:monolib_ai/src/api/has_ai_model.dart';
 
 class AiModel implements HasAiModel {
   final String name;
-  final AiVendor vendor;
+  final String vendor;
 
   const AiModel(this.name, this.vendor);
 
@@ -16,6 +15,6 @@ class AiModel implements HasAiModel {
 
   @override
   String toString() {
-    return '${vendor.name}-$name';
+    return '$vendor-$name';
   }
 }

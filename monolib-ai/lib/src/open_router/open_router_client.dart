@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:monolib_ai/src/api/ai_model.dart';
-import 'package:monolib_ai/src/api/ai_vendor.dart';
 import 'package:monolib_ai/src/api/ai_vendor_client.dart';
 import 'package:monolib_ai/src/http/drop_leading_whitespace.dart';
 import 'package:monolib_ai/src/http/utf8_stream_string_sink.dart';
@@ -22,7 +21,7 @@ class OpenRouterClient extends AiVendorClient {
   final http.Client _client;
 
   @override
-  final vendorsBlocklist = const <AiVendor>{};
+  final vendorsBlocklist = const <String>{};
 
   final _apiUrlString = 'https://openrouter.ai/api/v1/chat/completions';
   late final Uri _apiUrl = Uri.parse(_apiUrlString);
@@ -42,11 +41,7 @@ class OpenRouterClient extends AiVendorClient {
     required String useCase,
   }) {
     final payload = {
-      'model': '${switch (model.vendor) {
-        AiVendor.metaLlama => 'meta-llama',
-        AiVendor.mistral => 'mistralai',
-        _ => model.vendor.name,
-      }}/${model.name}',
+      'model': '${model.vendor}/${model.name}',
       'messages': [
         if (systemPrompt != null) {'role': 'system', 'content': systemPrompt},
         {'role': 'user', 'content': userPrompt},
