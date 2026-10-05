@@ -1,4 +1,4 @@
-import 'package:monolib_ai/src/api/has_ai_model.dart';
+import 'package:monolib_openrouter/src/api/has_ai_model.dart';
 
 class AiModel implements HasAiModel {
   final String name;

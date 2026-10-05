@@ -1,5 +1,5 @@
-name: monolib_ai
-description: AI integration libraries, including OpenRouter APIs.
+name: monolib_openrouter
+description: OpenRouter API client.
 version: 0.0.1
 repository: https://github.com/TarasMazepa/monolib
 publish_to: none

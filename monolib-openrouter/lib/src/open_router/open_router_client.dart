@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:monolib_ai/src/api/ai_model.dart';
-import 'package:monolib_ai/src/api/ai_vendor_client.dart';
-import 'package:monolib_ai/src/http/drop_leading_whitespace.dart';
-import 'package:monolib_ai/src/http/utf8_stream_string_sink.dart';
+import 'package:monolib_openrouter/src/api/ai_model.dart';
+import 'package:monolib_openrouter/src/api/ai_vendor_client.dart';
+import 'package:monolib_openrouter/src/http/drop_leading_whitespace.dart';
+import 'package:monolib_openrouter/src/http/utf8_stream_string_sink.dart';
 import 'package:monolib_dart/fluent_json.dart';
 import 'package:monolib_dart/json_encode_async.dart';
 import 'package:monolib_dart/stream.dart';
-import 'package:monolib_ai/src/api/on_fluent_json.dart';
+import 'package:monolib_openrouter/src/api/on_fluent_json.dart';
 
 class OpenRouterClient extends AiVendorClient {
   OpenRouterClient({
