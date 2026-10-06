@@ -1,6 +1,7 @@
 export 'src/stream/composite_event_sink.dart';
 export 'src/stream/composite_event_sink/composite_sink_exception.dart';
 export 'src/stream/composite_event_sink/exception_strategy.dart';
+export 'src/stream/drop_leading_whitespace_converter.dart';
 export 'src/stream/future_event_sink_extension.dart';
 export 'src/stream/line_splitter_converter.dart';
 export 'src/stream/map_not_null_stream_extension.dart';
@@ -14,3 +15,4 @@ export 'src/stream/on_stream_of_lists.dart';
 export 'src/stream/single_value_caching_stream.dart';
 export 'src/stream/stream_where_type_extension.dart';
 export 'src/stream/stream_with_close.dart';
+export 'src/stream/utf8_stream_string_sink.dart';
