@@ -1,0 +1,33 @@
+name: publish-monolib-openrouter.yml
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'monolib-openrouter-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish-monolib-openrouter:
+    if: startsWith(github.ref, 'refs/tags/monolib-openrouter-v')
+    permissions:
+      id-token: write # Required for authentication using OIDC
+      contents: write # Required to create the GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub get
+        working-directory: monolib-openrouter
+
+      - run: dart pub publish --dry-run
+        working-directory: monolib-openrouter
+
+      - run: dart pub publish -f
+        working-directory: monolib-openrouter
+
+      - run: gh release create "$TAG" --title "Monolib OpenRouter v${TAG#monolib-openrouter-v}" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+          TAG: ${{ github.ref_name }}
