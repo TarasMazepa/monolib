@@ -1,3 +1,8 @@
+## 0.0.2
+
+- Adds `OnFuture` extension with `timeoutAsStream` to turn a future into a stream that closes without emitting on timeout.
+- Adds `OnStream` extension with `timeoutAndClose` to close a stream on timeout instead of emitting a `TimeoutException`.
+
 ## 0.0.1
 
 - Initial package setup.
