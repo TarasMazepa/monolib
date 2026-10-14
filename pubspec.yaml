@@ -1,0 +1,8 @@
+name: monolib_workspace
+environment:
+  sdk: ^3.6.0
+
+workspace:
+  - monolib-dart
+  - monolib-flutter
+  - monolib-openrouter

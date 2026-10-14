@@ -4,7 +4,9 @@ version: 0.0.3
 repository: https://github.com/TarasMazepa/monolib
 
 environment:
-  sdk: ^3.3.0
+  sdk: ^3.6.0
+
+resolution: workspace
 
 dependencies:
   flutter:
@@ -15,9 +17,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-dependency_overrides:
-  monolib_dart:
-    path: ../monolib-dart
 
 flutter:
