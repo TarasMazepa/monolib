@@ -2,6 +2,19 @@ import 'package:monolib_dart/zalgo.dart';
 
 import 'zalgo_text_range.dart';
 
+/// Parses the [input] string into a list of [ZalgoTextRange] objects, distinguishing between Zalgo-encoded and plain text segments.
+///
+/// This function scans the [input] to identify continuous ranges of characters that form Zalgo text
+/// and separates them from normal text. The result is a sequential list of ranges covering the entire [input].
+///
+/// Returns an empty list if the [input] is empty.
+///
+/// Example:
+/// ```dart
+/// final ranges = mapZalgoRanges('Hello e̵̟̎x̴̝̾à̷͜m̷̙͒p̴̲͒l̷̎͜ë̵̲́');
+/// // ranges[0] represents 'Hello ' (isZalgo: false)
+/// // ranges[1] represents 'e̵̟̎x̴̝̾à̷͜m̷̙͒p̴̲͒l̷̎͜ë̵̲́' (isZalgo: true)
+/// ```
 List<ZalgoTextRange> mapZalgoRanges(String input) {
   final result = <ZalgoTextRange>[];
   int left = 0;
