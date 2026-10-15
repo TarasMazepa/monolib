@@ -12,9 +12,9 @@ extension OnListOfStreamControllers<T> on List<StreamController<T>> {
   /// If the list becomes empty as a result of the removal, the optional [onEmpty]
   /// callback will be invoked.
   ///
-  /// Any errors thrown during the removal or by the [onEmpty] callback are caught
-  /// and ignored to ensure the cancelation process completes without interrupting
-  /// the stream lifecycle.
+  /// If removing the [listener] from this list throws an error, the optional
+  /// [onRemoveError] callback will be invoked with the caught error and stack trace.
+  /// Errors thrown by the [onEmpty] callback are not caught, allowing them to propagate.
   ///
   /// Example:
   /// ```dart
@@ -24,24 +24,22 @@ extension OnListOfStreamControllers<T> on List<StreamController<T>> {
   /// controllers.addAndSetupOnCancel(
   ///   controller,
   ///   onEmpty: () => print('All controllers removed!'),
+  ///   onRemoveError: (e, st) => print('Error removing: $e'),
   /// );
   /// ```
   void addAndSetupOnCancel(
     StreamController<T> listener, {
     void Function()? onEmpty,
+    void Function(Object error, StackTrace stackTrace)? onRemoveError,
   }) {
     listener.onCancel = () {
       try {
         remove(listener);
-      } catch (_) {
-        // ignore
+      } catch (e, st) {
+        onRemoveError?.call(e, st);
       }
       if (isEmpty) {
-        try {
-          onEmpty?.call();
-        } catch (_) {
-          // ignore
-        }
+        onEmpty?.call();
       }
     };
     add(listener);
