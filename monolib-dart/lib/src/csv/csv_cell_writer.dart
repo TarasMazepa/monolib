@@ -41,11 +41,16 @@ void writeCsvCell(String cell, StringSink sink) {
 
   if (needsEscaping) {
     sink.write('"');
-    for (int j = 0; j < cell.length; j++) {
-      sink.write(switch (cell[j]) {
-        '"' => '""',
-        final symbol => symbol,
-      });
+    int lastWritten = 0;
+    while (true) {
+      int nextQuote = cell.indexOf('"', lastWritten);
+      if (nextQuote == -1) {
+        sink.write(cell.substring(lastWritten));
+        break;
+      }
+      sink.write(cell.substring(lastWritten, nextQuote));
+      sink.write('""');
+      lastWritten = nextQuote + 1;
     }
     sink.write('"');
   } else {
