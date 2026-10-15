@@ -8,7 +8,7 @@ extension OnFutureFunction<T> on Future<T> Function() {
   /// If all attempts fail, it will rethrow the very first exception encountered.
   ///
   /// By default, [times] is set to 3. If [times] is less than or equal to 0,
-  /// it will not attempt to execute the function and will throw `null`.
+  /// it throws an [ArgumentError].
   ///
   /// Example:
   /// ```dart
@@ -21,8 +21,11 @@ extension OnFutureFunction<T> on Future<T> Function() {
   /// await fetchData.asyncCallWithRetryOnFailure(times: 5);
   /// ```
   Future<T> asyncCallWithRetryOnFailure({int times = 3}) async {
+    if (times <= 0) {
+      throw ArgumentError.value(times, 'times', 'must be greater than 0');
+    }
     dynamic toRethrow;
-    for (int i = 0; i < times && times > 0; i++) {
+    for (int i = 0; i < times; i++) {
       try {
         return await this();
       } catch (e) {
@@ -40,6 +43,8 @@ extension OnFutureFunction<T> on Future<T> Function() {
 /// result is returned immediately. If it throws an exception, it retries up to
 /// [times] total attempts (defaulting to 3). If all attempts fail, the first
 /// exception caught is rethrown.
+///
+/// If [times] is less than or equal to 0, it throws an [ArgumentError].
 ///
 /// Example:
 /// ```dart
