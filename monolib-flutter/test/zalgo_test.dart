@@ -53,29 +53,56 @@ void main() {
       );
     });
 
-    test('mapZalgoRanges parses mixed text', () {
-      final original = 'Zalgo';
-      final encoded = zalgoEncode(original);
-      final text = 'abc${encoded}def';
+    test('mapZalgoRanges parses mixed text into distinct graphemes', () {
+      // Create a string with two distinct zalgo graphemes.
+      // Note: an isolated base character (e.g. 'H') requires at least one modifier to parse as Zalgo.
+      final encodedHi = zalgoEncode('Ha');
+      final encodedI = zalgoEncode('ia');
+      final text = 'a${encodedHi}${encodedI}b';
 
       final ranges = mapZalgoRanges(text);
-      expect(ranges, hasLength(3));
+      // 'a' (normal), 'Ha' (zalgo), 'ia' (zalgo), 'b' (normal)
+      expect(ranges, hasLength(4));
 
+      int startOffset = 0;
+
+      // 'a'
       expect(
         ranges[0],
-        equals(ZalgoTextRange(start: 0, end: 3, isZalgo: false)),
+        equals(ZalgoTextRange(start: startOffset, end: 1, isZalgo: false)),
       );
+      startOffset = 1;
+
+      // 'Ha' encoded
       expect(
         ranges[1],
         equals(
-          ZalgoTextRange(start: 3, end: 3 + encoded.length, isZalgo: true),
+          ZalgoTextRange(
+              start: startOffset,
+              end: startOffset + encodedHi.length,
+              isZalgo: true),
         ),
       );
+      startOffset += encodedHi.length;
+
+      // 'ia' encoded
       expect(
         ranges[2],
         equals(
           ZalgoTextRange(
-            start: 3 + encoded.length,
+              start: startOffset,
+              end: startOffset + encodedI.length,
+              isZalgo: true),
+        ),
+      );
+      startOffset += encodedI.length;
+
+      // 'b'
+      expect(
+        ranges[3],
+        equals(
+          ZalgoTextRange(
+            start: startOffset,
             end: text.length,
             isZalgo: false,
           ),
