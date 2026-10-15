@@ -1,29 +1,24 @@
-/// An interface for objects that can be listened to.
+/// An interface for objects that can be listened to for state or scope changes.
 ///
-/// Classes that implement [PillarListenable] provide a way for observers to
-/// register and unregister themselves to be notified of changes or events.
+/// This provides a pure-Dart notification contract (analogous to Flutter's
+/// `Listenable`) without requiring a dependency on Flutter.
+///
+/// Callers typically encounter this as the return type of [Pillar.changeNotifierFor],
+/// and implementations can use [PillarChangeNotifier] rather than implementing
+/// this interface directly. In Flutter applications, instances can be adapted
+/// using the `.asListenable` extension from `package:monolib_flutter`.
 ///
 /// Example:
 /// ```dart
-/// class MyListenable implements PillarListenable {
-///   final List<void Function()> _listeners = [];
+/// final PillarListenable listenable = pillar.changeNotifierFor(myScope);
 ///
-///   @override
-///   void addListener(void Function() listener) {
-///     _listeners.add(listener);
-///   }
-///
-///   @override
-///   void removeListener(void Function() listener) {
-///     _listeners.remove(listener);
-///   }
-///
-///   void notify() {
-///     for (final listener in _listeners) {
-///       listener();
-///     }
-///   }
+/// void onScopeChanged() {
+///   print('Scope updated!');
 /// }
+///
+/// listenable.addListener(onScopeChanged);
+/// // Later:
+/// listenable.removeListener(onScopeChanged);
 /// ```
 abstract class PillarListenable {
   /// Registers a [listener] callback to be invoked when the object changes.
