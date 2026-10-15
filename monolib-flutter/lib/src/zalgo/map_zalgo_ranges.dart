@@ -9,11 +9,15 @@ import 'zalgo_text_range.dart';
 ///
 /// If the [input] is empty, it returns a single collapsed, non-Zalgo range: `[0, 0)`.
 ///
+/// Note: Zalgo-encoded characters are parsed into individual grapheme clusters. A continuous
+/// sequence of Zalgo text will be returned as multiple distinct [ZalgoTextRange] objects (one per grapheme).
+///
 /// Example:
 /// ```dart
-/// final ranges = mapZalgoRanges('Hello e̵̟̎x̴̝̾à̷͜m̷̙͒p̴̲͒l̷̎͜ë̵̲́');
-/// // ranges[0] represents 'Hello ' (isZalgo: false)
-/// // ranges[1] represents 'e̵̟̎x̴̝̾à̷͜m̷̙͒p̴̲͒l̷̎͜ë̵̲́' (isZalgo: true)
+/// final ranges = mapZalgoRanges('Hi e̵̟̎x̴̝̾');
+/// // ranges[0] represents 'Hi ' (isZalgo: false)
+/// // ranges[1] represents 'e̵̟̎' (isZalgo: true)
+/// // ranges[2] represents 'x̴̝̾' (isZalgo: true)
 /// ```
 List<ZalgoTextRange> mapZalgoRanges(String input) {
   final result = <ZalgoTextRange>[];
