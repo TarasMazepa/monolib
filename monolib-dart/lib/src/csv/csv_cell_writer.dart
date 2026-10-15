@@ -28,16 +28,8 @@
 void writeCsvCell(String cell, StringSink sink) {
   if (cell.isEmpty) return;
 
-  int index = 0;
-  bool needsEscaping = cell[0] == '"';
-  while (!needsEscaping && index < cell.length) {
-    final current = cell[index++];
-    needsEscaping = switch (current) {
-      ',' => true,
-      '\n' => true,
-      _ => false,
-    };
-  }
+  bool needsEscaping =
+      cell[0] == '"' || cell.contains(',') || cell.contains('\n');
 
   if (needsEscaping) {
     sink.write('"');
