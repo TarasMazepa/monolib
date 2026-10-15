@@ -1,3 +1,7 @@
+## 0.0.63
+
+- Updates `callWithRetryOnFailure` and `retryOnFailure` to throw `ArgumentError` when `times <= 0`.
+
 ## 0.0.62
 
 - Adds `FileEnsureOpenExtension` with `openWriteEnsureParent` to easily open a file for writing while ensuring its parent directories exist.
