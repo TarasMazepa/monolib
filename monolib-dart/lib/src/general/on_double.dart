@@ -41,7 +41,10 @@ extension OnDouble on double {
   String toFiveMoonRating() {
     if (this < 0.0 || this > 1.0) {
       throw ArgumentError.value(
-          this, 'value', 'Must be between 0.0 and 1.0 inclusive.');
+        this,
+        'value',
+        'Must be between 0.0 and 1.0 inclusive.',
+      );
     }
     return _fiveMoonRatingMoons[(this * _fiveMoonRatingMoons.length)
         .floor()

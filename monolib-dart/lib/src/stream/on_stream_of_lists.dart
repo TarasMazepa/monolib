@@ -50,45 +50,49 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
   }
 
   Stream<List<T>> _asAccumulatingSimple() {
-    return transform(StreamTransformer.fromBind((stream) {
-      final accumulated = <T>[];
-      return stream.map((list) {
-        accumulated.addAll(list);
-        return accumulated;
-      });
-    }));
+    return transform(
+      StreamTransformer.fromBind((stream) {
+        final accumulated = <T>[];
+        return stream.map((list) {
+          accumulated.addAll(list);
+          return accumulated;
+        });
+      }),
+    );
   }
 
   Stream<List<T>> _asAccumulatingWithRefresh() {
-    return transform(StreamTransformer.fromBind((stream) {
-      final accumulated = <T>[];
-      bool isFirstEvent = true;
-      bool isRefreshing = false;
+    return transform(
+      StreamTransformer.fromBind((stream) {
+        final accumulated = <T>[];
+        bool isFirstEvent = true;
+        bool isRefreshing = false;
 
-      return stream.expand((list) {
-        switch ((
-          isEmpty: list.isEmpty,
-          isFirstEvent: isFirstEvent,
-          isRefreshing: isRefreshing,
-        )) {
-          case (isEmpty: true, isFirstEvent: true, isRefreshing: _):
-            isFirstEvent = false;
-            return [accumulated];
-          case (isEmpty: true, isFirstEvent: false, isRefreshing: false):
-            accumulated.clear();
-            isRefreshing = true;
-            return const [];
-          case (isEmpty: true, isFirstEvent: false, isRefreshing: true):
-            isRefreshing = false;
-            return [accumulated];
-          case _:
-            isFirstEvent = false;
-            isRefreshing = false;
-            accumulated.addAll(list);
-            return [accumulated];
-        }
-      });
-    }));
+        return stream.expand((list) {
+          switch ((
+            isEmpty: list.isEmpty,
+            isFirstEvent: isFirstEvent,
+            isRefreshing: isRefreshing,
+          )) {
+            case (isEmpty: true, isFirstEvent: true, isRefreshing: _):
+              isFirstEvent = false;
+              return [accumulated];
+            case (isEmpty: true, isFirstEvent: false, isRefreshing: false):
+              accumulated.clear();
+              isRefreshing = true;
+              return const [];
+            case (isEmpty: true, isFirstEvent: false, isRefreshing: true):
+              isRefreshing = false;
+              return [accumulated];
+            case _:
+              isFirstEvent = false;
+              isRefreshing = false;
+              accumulated.addAll(list);
+              return [accumulated];
+          }
+        });
+      }),
+    );
   }
 
   /// Maps each list emitted by this stream using [mapper].
