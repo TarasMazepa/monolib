@@ -3,10 +3,8 @@ extension OnFunctionWithNoArguments<T> on T Function() {
   /// Calls the function and retries it up to [times] times if it throws an exception.
   ///
   /// If the function fails [times] times consecutively, the first exception
-  /// caught will be rethrown. If [times] is less than or equal to 0, it behaves
-  /// as if [times] were 0 and the first exception encountered (if any, since it won't run)
-  /// is thrown, but since the loop `times > 0` condition prevents it from running at all
-  /// if `times <= 0`, it throws `null`.
+  /// caught will be rethrown. If [times] is less than or equal to 0, it throws an
+  /// [ArgumentError].
   ///
   /// Example:
   /// ```dart
@@ -14,8 +12,11 @@ extension OnFunctionWithNoArguments<T> on T Function() {
   /// int result = unstableCall.callWithRetryOnFailure(times: 3);
   /// ```
   T callWithRetryOnFailure({int times = 3}) {
+    if (times <= 0) {
+      throw ArgumentError.value(times, 'times', 'must be greater than 0');
+    }
     dynamic toRethrow;
-    for (int i = 0; i < times && times > 0; i++) {
+    for (int i = 0; i < times; i++) {
       try {
         return this();
       } catch (e) {
