@@ -7,7 +7,7 @@ import 'zalgo_text_range.dart';
 /// This function scans the [input] to identify continuous ranges of characters that form Zalgo text
 /// and separates them from normal text. The result is a sequential list of ranges covering the entire [input].
 ///
-/// Returns an empty list if the [input] is empty.
+/// If the [input] is empty, it returns a single collapsed, non-Zalgo range: `[0, 0)`.
 ///
 /// Example:
 /// ```dart
