@@ -1,5 +1,18 @@
 import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
+import 'package:monolib_dart/src/pillar/pillar.dart';
 
+/// Extension methods that elegantly adapt standard Dart positional-argument
+/// constructors or factories into [Pillar]-compatible resolver functions.
+///
+/// Instead of manually calling `accessor.get<Dependency>()` for every single
+/// constructor argument, developers can fluently map constructors:
+/// ```dart
+/// pillar.register<MyService>(
+///   factory: MyService.new.toPillarFactory(),
+/// );
+/// ```
+///
+/// These extensions are provided for functions ranging from 1 to 10 parameters.
 extension OnFunction1<T, P0> on T Function(P0) {
   T Function(PillarAccessor) toPillarFactory() =>
       (PillarAccessor pillar) => this(pillar.get<P0>());

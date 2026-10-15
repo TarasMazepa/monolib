@@ -9,6 +9,13 @@ import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 /// This is typically used to determine the appropriate [PillarScope] for a newly
 /// created instance based on the scopes of the dependencies it requested during
 /// its creation.
+/// A [PillarAccessor] that dynamically resolves dependencies while tracking the
+/// narrowest boundaries (lowest scopes) encountered during resolution.
+///
+/// This accessor is used by the container to wrap factories where an explicit
+/// scope is not provided. By tracking every call to [get], the container can
+/// automatically infer and bind the new object to the lowest common denominator
+/// scope among all its dependencies.
 class ScopeTrackingPillarAccessor implements PillarAccessor {
   /// The function used to retrieve a [PillarEntry] for a given type [T], [key], or [token].
   final PillarEntry Function<T>({PillarKey? key, String? token}) entryGetter;

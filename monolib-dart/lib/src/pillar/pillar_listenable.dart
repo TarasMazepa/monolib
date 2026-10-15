@@ -20,6 +20,14 @@
 /// // Later:
 /// listenable.removeListener(onScopeChanged);
 /// ```
+/// A generalized interface representing an observable source of truth within
+/// the [Pillar] ecosystem.
+///
+/// Because `monolib-dart` targets pure Dart without depending on `dart:ui` or
+/// Flutter, this interface provides an abstract reactive foundation. To use this
+/// safely in Flutter UI layers, consumers in the `monolib-flutter` package apply
+/// the `.asListenable` extension to wrap it in a `PillarListenableAdapter`,
+/// allowing seamless integration with `ListenableBuilder` or `AnimatedBuilder`.
 abstract class PillarListenable {
   /// Registers a [listener] callback to be invoked when the object changes.
   ///

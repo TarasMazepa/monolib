@@ -2,6 +2,13 @@ import 'package:monolib_dart/src/pillar/pillar.dart';
 import 'package:monolib_dart/src/pillar/pillar_key.dart';
 import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 
+/// An internal representation of a registered dependency within the [Pillar] container.
+///
+/// This class holds the metadata required to safely resolve and scope a dependency.
+/// It wraps the factory delegate, the explicitly requested scope (if any), the
+/// lazily instantiated concrete [value], and dynamically tracks the most restrictive
+/// boundary limit ([effectiveScopeIncludingDependencies]) inferred from resolving
+/// its dependencies.
 class PillarEntry {
   final PillarKey key;
   Object? value;
