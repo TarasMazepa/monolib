@@ -7,8 +7,9 @@ void main() {
       expect(0.0.toFiveMoonRating(), '🌑🌑🌑🌑🌑');
       expect(0.5.toFiveMoonRating(), '🌕🌕🌗🌑🌑');
       expect(1.0.toFiveMoonRating(), '🌕🌕🌕🌕🌕');
-      expect(1.5.toFiveMoonRating(), '🌕🌕🌕🌕🌕');
-      expect((-0.5).toFiveMoonRating(), '🌑🌑🌑🌑🌑');
+
+      expect(() => 1.5.toFiveMoonRating(), throwsArgumentError);
+      expect(() => (-0.5).toFiveMoonRating(), throwsArgumentError);
     });
   });
 }
