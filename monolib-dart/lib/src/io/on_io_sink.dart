@@ -1,7 +1,7 @@
 /// Provides an extension on [IOSink] to guarantee safe resource teardown.
 ///
 /// This library ensures that sinks used for asynchronous data streams, file
-/// writing, or network transmission are automatically flushed and closed after
+/// writing, or network transmission are automatically closed after
 /// a scoped execution block, preventing memory leaks or zombie file handles.
 library;
 
@@ -19,7 +19,7 @@ extension OnIoSink on IOSink {
   /// This method safely unwraps and delegates to the provided [call] callback,
   /// supplying it with the current [IOSink] instance. After the [call] completes,
   /// either successfully or by throwing an error, this method guarantees that
-  /// `flush()` and `close()` are awaited on the sink. This is critical for
+  /// `close()` is awaited on the sink. This is critical for
   /// preventing zombie file handles and ensuring all buffered data is written
   /// to the underlying platform before the surrounding logic proceeds.
   ///
@@ -30,14 +30,13 @@ extension OnIoSink on IOSink {
   /// final file = File('data.txt');
   /// await file.openWrite().withIOSink((sink) async {
   ///   sink.writeln('First line');
-  ///   // Sink is automatically flushed and closed when this block ends.
+  ///   // Sink is automatically closed when this block ends.
   /// });
   /// ```
   Future<T> withIOSink<T>(Future<T> Function(IOSink) call) async {
     try {
       return await call(this);
     } finally {
-      await flush();
       await close();
     }
   }
