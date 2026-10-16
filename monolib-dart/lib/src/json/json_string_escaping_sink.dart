@@ -43,13 +43,9 @@ class JsonStringEscapingSink implements StringSink {
     final str = object?.toString();
     if (str == null || str.isEmpty) return;
 
-    // jsonEncode returns a fully escaped string wrapped in double quotes.
-    // e.g., `"escaped\ntext"`
     final escaped = jsonEncode(str);
-    if (escaped.length >= 2) {
-      // Strip the first and last quote from the encoded string.
-      _inner.write(escaped.substring(1, escaped.length - 1));
-    }
+    // With non-empty str, jsonEncode(str) is always >= 3 chars ("x")
+    _inner.write(escaped.substring(1, escaped.length - 1));
   }
 
   /// Iterates over [objects] and sequentially writes their escaped string representations
