@@ -19,12 +19,14 @@ void main() {
       },
     );
 
-    test('writes empty or null strings as nothing', () {
+    test('writes empty strings as nothing', () {
       sink.write('');
       expect(buffer.toString(), '');
+    });
 
+    test('writes null as literal null string', () {
       sink.write(null);
-      expect(buffer.toString(), '');
+      expect(buffer.toString(), 'null');
     });
 
     test('escapes newlines correctly', () {

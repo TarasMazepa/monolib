@@ -35,15 +35,25 @@ class JsonStringEscapingSink implements StringSink {
   /// Converts the given [object] to a string, safely escapes it for JSON embedding,
   /// and writes the resulting characters to the underlying sink.
   ///
-  /// If the [object] is `null` or its string representation is empty, this operation
-  /// is gracefully ignored without writing any data. The escaping logic delegates to
-  /// [jsonEncode] and dynamically strips the outer quotes before appending.
+  /// If the [object] is `null`, it writes the literal `"null"` (without quotes).
+  /// If its string representation is empty, this operation is gracefully ignored
+  /// without writing any data. The escaping logic delegates to [jsonEncode] and
+  /// dynamically strips the outer quotes before appending for string values.
   @override
   void write(Object? object) {
-    final str = object?.toString();
-    if (str == null || str.isEmpty) return;
+    final escaped = jsonEncode(
+      switch (object) {
+        null => null,
+        final str => str.toString(),
+      },
+    );
+    if (escaped == '""') return;
 
-    final escaped = jsonEncode(str);
+    if (escaped == 'null') {
+      _inner.write(escaped);
+      return;
+    }
+
     // With non-empty str, jsonEncode(str) is always >= 3 chars ("x")
     _inner.write(escaped.substring(1, escaped.length - 1));
   }
