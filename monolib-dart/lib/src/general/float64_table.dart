@@ -41,12 +41,12 @@ class Float64Table {
   /// final matrix = Float64Table.filled(2, 2, 0.0);
   /// ```
   Float64Table.filled(int rows, int columns, double fillValue)
-    : assert(rows >= 0, 'rows must be non-negative'),
-      assert(columns >= 0, 'columns must be non-negative'),
-      _rows = rows,
-      _columns = columns,
-      _data = Float64List(rows * columns)
-        ..fillRange(0, rows * columns, fillValue);
+      : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
+        _columns = columns,
+        _data = Float64List(rows * columns)
+          ..fillRange(0, rows * columns, fillValue);
 
   /// Allocates a dense table with the specified [rows] and [columns],
   /// generating values dynamically using the [generator] callback.
@@ -65,11 +65,11 @@ class Float64Table {
     int rows,
     int columns,
     double Function(int row, int col) generator,
-  ) : assert(rows >= 0, 'rows must be non-negative'),
-      assert(columns >= 0, 'columns must be non-negative'),
-      _rows = rows,
-      _columns = columns,
-      _data = Float64List(rows * columns) {
+  )   : assert(rows >= 0, 'rows must be non-negative'),
+        assert(columns >= 0, 'columns must be non-negative'),
+        _rows = rows,
+        _columns = columns,
+        _data = Float64List(rows * columns) {
     int index = 0;
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
