@@ -66,15 +66,19 @@ ${jsonEncode(json)}''';
         "Expected json accessor '$accessor' type to be either String or int but got ${accessor.runtimeType}.",
       );
     }
+    if (accessor is int && accessor < 0) {
+      throw ArgumentError.value(
+          accessor, 'accessor', 'Index must be non-negative.');
+    }
     if (json == null) {
       if (!couldBeNull) {
         throw Exception("Tried to access [$accessor] on 'null'.");
       }
       return null;
     }
-    if (accessor is int &&
+    if (couldBeNull &&
+        accessor is int &&
         json is List &&
-        accessor >= 0 &&
         accessor >= json.length) {
       return null;
     }
@@ -92,7 +96,10 @@ $e''');
   /// Safely attempts to traverse into a child node using a key or index [accessor].
   ///
   /// Unlike [operator []], this method gracefully returns `null` if the child
-  /// node does not exist or if accessing it yields a null value.
+  /// node does not exist, if accessing it yields a null value, or if an integer
+  /// index [accessor] is out-of-bounds (`>= length`).
+  ///
+  /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
   /// ```dart
   /// final OptionalNode? node = json.elementAt('optional_node');
@@ -111,7 +118,11 @@ $e''');
   /// the node to exist and be non-null.
   ///
   /// If the node is missing or evaluates to `null`, this operator throws an explicit
-  /// exception detailing the traversal error and breadcrumbs.
+  /// exception detailing the traversal error and breadcrumbs. If an integer index
+  /// [accessor] is out-of-bounds (`>= length`), it will throw a `RangeError` wrapped
+  /// in the path exception.
+  ///
+  /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
   /// ```dart
   /// final String name = json['user']['name'].unbox();
@@ -171,6 +182,8 @@ ${_describeForException()}''',
   /// If [T] is non-nullable, it employs strict unboxing. If [T] allows nulls,
   /// it relies on [unboxedElementAt] to permit graceful empty access.
   ///
+  /// Throws an [ArgumentError] if [accessor] is a negative integer.
+  ///
   /// ```dart
   /// final String name = json.unboxed<String>('name');
   /// ```
@@ -179,7 +192,9 @@ ${_describeForException()}''',
 
   /// Safely traverses into an optional child using [accessor] and casts it to [T].
   ///
-  /// Returns `null` if the node is absent or un-boxable.
+  /// Returns `null` if the node is absent, un-boxable, or out-of-bounds.
+  ///
+  /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
   /// ```dart
   /// final int? id = json.unboxedElementAt<int>('id');
