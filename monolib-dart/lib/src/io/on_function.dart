@@ -11,12 +11,12 @@ import 'dart:io';
 ///
 /// This extension enables a scoped execution model, centralizing `try-finally` cleanup logic for dynamically instantiated
 /// sinks. By applying [withIOSink] directly to an initialization closure, it removes the need for consumers to manually
-/// track, flush, and close the sink, thus preventing resource leaks.
+/// track and close the sink, thus preventing resource leaks.
 extension OnFunction on IOSink Function() {
   /// Safely executes the provided asynchronous [call] within the lifecycle bounds of the [IOSink] returned by this function.
   ///
   /// This method invokes the factory function to acquire an [IOSink], passes it to the provided [call],
-  /// and guarantees that the sink is flushed and closed when the operation completes—regardless of whether
+  /// and guarantees that the sink is closed when the operation completes—regardless of whether
   /// [call] succeeds or throws an exception.
   ///
   /// This design ensures robust resource cleanup and avoids dangling file handles when writing streams or files.
@@ -36,7 +36,6 @@ extension OnFunction on IOSink Function() {
     try {
       await call(ioSink);
     } finally {
-      await ioSink.flush();
       await ioSink.close();
     }
   }
