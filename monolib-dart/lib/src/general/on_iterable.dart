@@ -37,20 +37,31 @@ extension OnIterable<T> on Iterable<T> {
   /// writing `fold` operations for common numeric types (like `int` and `double`),
   /// while also seamlessly supporting any custom domain objects that implement `+`.
   ///
-  /// Note: This method enforces that the sequence must contain at least one element;
-  /// an empty iterable has no semantic "zero" concept dynamically, so it cannot
-  /// return a default value safely.
+  /// The [zero] parameter acts as a fallback for empty iterables. If [zero] is
+  /// provided, it is returned when the sequence is empty. Furthermore, if `T` is
+  /// natively detected as `int`, `double`, or `num`, the method automatically
+  /// infers and returns `0` or `0.0` without requiring an explicit [zero].
   ///
-  /// Throws a [StateError] if the iterable is completely empty.
+  /// Throws a [StateError] if the iterable is empty and no valid [zero] fallback
+  /// could be resolved.
   ///
   /// ```dart
   /// final expenses = <double>[15.50, 42.0, 9.99];
   /// final total = expenses.sum(); // 67.49
+  ///
+  /// final emptyInts = <int>[];
+  /// final emptyTotal = emptyInts.sum(); // 0 (auto-detected)
   /// ```
-  T sum() {
+  T sum({T? zero}) {
     final iterator = this.iterator;
     if (!iterator.moveNext()) {
-      throw StateError("Empty iterable can't be summed");
+      if (zero != null) return zero;
+      if (T == int) return 0 as T;
+      if (T == double) return 0.0 as T;
+      if (T == num) return 0 as T;
+      throw StateError(
+        "Empty iterable can't be summed without a valid zero fallback.",
+      );
     }
     dynamic result = iterator.current;
     while (iterator.moveNext()) {
@@ -71,16 +82,28 @@ extension OnIterable<T> on Iterable<T> {
   /// The [mapper] should return a type `R` that implements the `+` operator
   /// (such as `num`, `int`, `double`, or a compatible custom class).
   ///
-  /// Throws a [StateError] if the iterable is completely empty.
+  /// The [zero] parameter acts as a fallback for empty iterables. If [zero] is
+  /// provided, it is returned when the sequence is empty. Furthermore, if `R` is
+  /// natively detected as `int`, `double`, or `num`, the method automatically
+  /// infers and returns `0` or `0.0` without requiring an explicit [zero].
+  ///
+  /// Throws a [StateError] if the iterable is empty and no valid [zero] fallback
+  /// could be resolved.
   ///
   /// ```dart
   /// final shoppingCart = [Item(price: 10), Item(price: 25)];
   /// final totalCost = shoppingCart.sumBy((item) => item.price); // 35
   /// ```
-  R sumBy<R>(R Function(T) mapper) {
+  R sumBy<R>(R Function(T) mapper, {R? zero}) {
     final iterator = this.iterator;
     if (!iterator.moveNext()) {
-      throw StateError("Empty iterable can't be summed");
+      if (zero != null) return zero;
+      if (R == int) return 0 as R;
+      if (R == double) return 0.0 as R;
+      if (R == num) return 0 as R;
+      throw StateError(
+        "Empty iterable can't be summed without a valid zero fallback.",
+      );
     }
     dynamic result = mapper(iterator.current);
     while (iterator.moveNext()) {
