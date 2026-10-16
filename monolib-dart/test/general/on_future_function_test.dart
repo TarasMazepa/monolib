@@ -39,8 +39,13 @@ void main() {
 
       await expectLater(
         call.asyncCallWithRetryOnFailure(times: 3),
-        throwsA(isA<Exception>().having(
-            (e) => e.toString(), 'message', 'Exception: Attempt 1 failed')),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            'Exception: Attempt 1 failed',
+          ),
+        ),
       );
       expect(attempts, 3);
     });
@@ -65,14 +70,24 @@ void main() {
 
       await expectLater(
         call.asyncCallWithRetryOnFailure(times: 0),
-        throwsA(isA<ArgumentError>()
-            .having((e) => e.message, 'message', 'must be greater than 0')),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            'must be greater than 0',
+          ),
+        ),
       );
 
       await expectLater(
         call.asyncCallWithRetryOnFailure(times: -1),
-        throwsA(isA<ArgumentError>()
-            .having((e) => e.message, 'message', 'must be greater than 0')),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            'must be greater than 0',
+          ),
+        ),
       );
     });
   });

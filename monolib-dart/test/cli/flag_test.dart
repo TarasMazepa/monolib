@@ -145,8 +145,11 @@ void main() {
     });
 
     test('shortOrLong', () {
-      final flag1 =
-          Flag(short: '-v', long: '--verbose', description: 'Verbose mode');
+      final flag1 = Flag(
+        short: '-v',
+        long: '--verbose',
+        description: 'Verbose mode',
+      );
       expect(flag1.shortOrLong, '-v');
 
       final flag2 = Flag(short: '-v', description: 'Verbose mode');
@@ -157,8 +160,11 @@ void main() {
     });
 
     test('longOrShort', () {
-      final flag1 =
-          Flag(short: '-v', long: '--verbose', description: 'Verbose mode');
+      final flag1 = Flag(
+        short: '-v',
+        long: '--verbose',
+        description: 'Verbose mode',
+      );
       expect(flag1.longOrShort, '--verbose');
 
       final flag2 = Flag(short: '-v', description: 'Verbose mode');

@@ -16,7 +16,8 @@ void main() {
     });
 
     tearDown(() async {
-      await writer.dispose();
+      // Need to handle error for the test that uses a bad file path
+      await writer.dispose(onSinkCloseError: (e) {});
       if (file.existsSync()) {
         file.deleteSync();
       }

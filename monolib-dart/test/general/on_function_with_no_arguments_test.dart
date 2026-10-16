@@ -55,9 +55,13 @@ void main() {
     test('throws ArgumentError if times is <= 0', () {
       int myFunc() => 42;
       expect(
-          () => myFunc.callWithRetryOnFailure(times: 0), throwsArgumentError);
+        () => myFunc.callWithRetryOnFailure(times: 0),
+        throwsArgumentError,
+      );
       expect(
-          () => myFunc.callWithRetryOnFailure(times: -1), throwsArgumentError);
+        () => myFunc.callWithRetryOnFailure(times: -1),
+        throwsArgumentError,
+      );
     });
   });
 }
