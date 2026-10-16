@@ -2,19 +2,45 @@
 ///
 /// This guarantees memory contiguity, eliminates pointer indirection,
 /// and maximizes CPU cache locality.
+library;
+
+/// A high-performance, dense 2-dimensional tabular data structure backed by a single flat array.
+///
+/// Unlike typical `List<List<T>>` implementations which suffer from pointer indirection
+/// and memory fragmentation, [DenseTable] allocates contiguous memory by flattening
+/// two-dimensional coordinates into a single 1-dimensional [List]. This design
+/// maximizes CPU cache locality, drastically improving read/write iteration
+/// performance for data-heavy operations like game grids, pixel buffers, or mathematical matrices.
+///
+/// Elements are stored in row-major order, mapped using the formula `(row * columns) + col`.
+///
+/// **Example usage:**
+/// ```dart
+/// // Create a 3x3 grid initialized to 0
+/// final grid = DenseTable<int>.filled(3, 3, 0);
+///
+/// // Update the center element
+/// grid.set(1, 1, 99);
+///
+/// // Retrieve the top-right element
+/// final val = grid.get(0, 2);
+/// ```
 class DenseTable<T> {
   final List<T> _data;
   final int _rows;
   final int _columns;
 
-  /// The number of rows in the table.
+  /// The total number of horizontal rows in the [DenseTable].
   int get rows => _rows;
 
-  /// The number of columns in the table.
+  /// The total number of vertical columns in the [DenseTable].
   int get columns => _columns;
 
-  /// Creates a dense table with the given number of [rows] and [columns],
-  /// filled with [fillValue].
+  /// Allocates a new [DenseTable] with the specified dimensions, initializing all cells to [fillValue].
+  ///
+  /// This is the most efficient constructor, relying on a single native array fill operation.
+  ///
+  /// Both [rows] and [columns] must be non-negative.
   DenseTable.filled(int rows, int columns, T fillValue)
       : assert(rows >= 0, 'rows must be non-negative'),
         assert(columns >= 0, 'columns must be non-negative'),
@@ -22,8 +48,13 @@ class DenseTable<T> {
         _columns = columns,
         _data = List<T>.filled(rows * columns, fillValue);
 
-  /// Creates a dense table with the given number of [rows] and [columns],
-  /// generating values dynamically using the [generator] function.
+  /// Allocates a new [DenseTable], populating cells dynamically via the [generator] callback.
+  ///
+  /// The [generator] is invoked for every valid `(row, col)` coordinate pair in row-major order.
+  /// To optimize instantiation overhead, this avoids modulo/division arithmetic,
+  /// instead utilizing nested counters to determine the current coordinate.
+  ///
+  /// Both [rows] and [columns] must be non-negative.
   DenseTable.generate(
     int rows,
     int columns,
@@ -46,7 +77,7 @@ class DenseTable<T> {
           }, growable: false);
         })();
 
-  /// Ensures that the provided [row] and [col] are within the bounds of the table.
+  /// Ensures that the requested [row] and [col] coordinates fall within valid table boundaries.
   void _checkBounds(int row, int col) {
     if (_rows == 0) {
       throw RangeError('Table has 0 rows; index $row is out of bounds.');
@@ -62,17 +93,21 @@ class DenseTable<T> {
     }
   }
 
-  /// Retrieves the element at the specified [row] and [col].
+  /// Retrieves the element located at the precise [row] and [col] coordinate.
   ///
-  /// Throws a [RangeError] if [row] or [col] are out of bounds.
+  /// Resolves the 2D coordinate to its 1D internal index in row-major order.
+  ///
+  /// Throws a [RangeError] if [row] or [col] exceed [rows] or [columns] constraints.
   T get(int row, int col) {
     _checkBounds(row, col);
     return _data[(row * _columns) + col];
   }
 
-  /// Sets the [value] at the specified [row] and [col].
+  /// Overwrites the cell at the precise [row] and [col] coordinate with [value].
   ///
-  /// Throws a [RangeError] if [row] or [col] are out of bounds.
+  /// Maps the 2D coordinate to its 1D internal array index and mutates the element in-place.
+  ///
+  /// Throws a [RangeError] if [row] or [col] exceed [rows] or [columns] constraints.
   void set(int row, int col, T value) {
     _checkBounds(row, col);
     _data[(row * _columns) + col] = value;
