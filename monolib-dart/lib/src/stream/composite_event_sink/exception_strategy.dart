@@ -19,6 +19,9 @@ part 'swallow_exception_strategy.dart';
 /// report. This ensures that callers of [CompositeEventSink] can cleanly separate
 /// their data dispatching logic from their error recovery requirements.
 ///
+/// Users can also define custom strategies by creating a new class that implements
+/// [ExceptionStrategy] and providing it to the [CompositeEventSink] constructor.
+///
 /// Example usage:
 /// ```dart
 /// // Create a composite sink that forwards to a local database and a remote server.
