@@ -89,28 +89,29 @@ class JsonlBatchWriter<T> {
   Future<void> dispose({Function? onSinkCloseError}) async {
     await _batcher.dispose();
 
-    if (_sink == null) {
+    final sink = _sink;
+    if (sink == null) {
       return;
     }
 
     switch (onSinkCloseError) {
       case null:
-        await _sink!.close();
+        await sink.close();
       case void Function(Object, StackTrace) handleExceptionAndStacktrace:
         try {
-          await _sink!.close();
+          await sink.close();
         } catch (e, st) {
           handleExceptionAndStacktrace(e, st);
         }
       case void Function(Object) handleException:
         try {
-          await _sink!.close();
+          await sink.close();
         } catch (e) {
           handleException(e);
         }
       default:
         try {
-          await _sink!.close();
+          await sink.close();
         } catch (e, st) {
           // If the user provided a function with an invalid signature,
           // we fall back to calling it dynamically to fail fast or succeed
