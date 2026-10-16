@@ -24,6 +24,8 @@ import 'dart:convert';
 /// buffer.write('"}');
 /// ```
 class JsonStringEscapingSink implements StringSink {
+  static const _encoder = JsonEncoder();
+
   final StringSink _inner;
 
   /// Creates a [JsonStringEscapingSink] that writes escaped characters to the underlying [_inner] sink.
