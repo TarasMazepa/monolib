@@ -43,7 +43,7 @@ class JsonStringEscapingSink implements StringSink {
   /// dynamically strips the outer quotes before appending for string values.
   @override
   void write(Object? object) {
-    final escaped = jsonEncode(
+    final escaped = _encoder.convert(
       switch (object) {
         null => null,
         final str => str.toString(),
@@ -56,7 +56,7 @@ class JsonStringEscapingSink implements StringSink {
       return;
     }
 
-    // With non-empty str, jsonEncode(str) is always >= 3 chars ("x")
+    // With non-empty str, _encoder.convert(str) is always >= 3 chars ("x")
     _inner.write(escaped.substring(1, escaped.length - 1));
   }
 
