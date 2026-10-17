@@ -1,3 +1,6 @@
+/// Provides [CsvCodec], an architectural bridge for bidirectional RFC 4180 CSV conversion.
+library;
+
 import 'dart:convert';
 
 import 'package:monolib_dart/src/csv/csv_decoder.dart';

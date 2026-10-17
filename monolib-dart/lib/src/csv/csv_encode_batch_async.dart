@@ -1,9 +1,12 @@
+/// Provides asynchronous utilities for encoding batched data streams into RFC 4180 CSV format.
+library;
+
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/encode_batch_async.dart';
 import 'package:monolib_dart/src/csv/csv_encode_async.dart';
 
-/// Asynchronously encodes a stream of batches into a CSV format and writes it to a sink.
+/// Asynchronously encodes a stream of batches into an RFC 4180 CSV format and writes it to a sink.
 ///
 /// This function processes a stream of item [batches], encoding each item as a
 /// row in a CSV output. It is useful for handling large datasets in chunks

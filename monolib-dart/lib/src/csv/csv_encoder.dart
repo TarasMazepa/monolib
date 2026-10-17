@@ -1,4 +1,5 @@
-/// A converter that formats Dart objects into RFC 4180 compliant CSV strings.
+/// Provides [CsvEncoder], a synchronous converter for formatting Dart objects
+/// into RFC 4180 compliant CSV strings.
 library;
 
 import 'dart:convert';

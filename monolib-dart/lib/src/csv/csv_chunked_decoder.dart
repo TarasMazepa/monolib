@@ -4,7 +4,7 @@ library;
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 
-/// A streaming converter that parses chunked CSV string data into lists of string columns.
+/// A streaming converter that parses chunked RFC 4180 CSV string data into lists of string columns.
 ///
 /// [CsvChunkedDecoder] acts as the architectural foundation for CSV ingestion.
 /// It strictly operates as a [ChunkedOnlyConverter] to prevent unintended synchronous

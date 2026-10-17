@@ -14,9 +14,10 @@ import 'dart:convert';
 /// edge cases such as fields wrapped in double quotes containing internal line breaks,
 /// escaped quotes, and partial (carry-over) chunks spanning multiple `add` calls.
 ///
-/// By extending [CsvBaseChunkSink], concrete sinks (such as `_CsvChunkedDecoderSink`
-/// and `_CsvMappedDecoderSink`) can delegate the heavy lifting of structural parsing
-/// and focus entirely on domain-specific emission logic via [handleRow] and [onChunkEnd].
+/// By extending [CsvBaseChunkSink], concrete decoders (such as [CsvChunkedDecoder],
+/// [CsvMappedDecoder], and [CsvMappedBatchDecoder]) can delegate the heavy lifting
+/// of structural parsing to their internal sinks, focusing entirely on domain-specific
+/// emission logic via [handleRow] and [onChunkEnd].
 ///
 /// Example implementation:
 /// ```dart

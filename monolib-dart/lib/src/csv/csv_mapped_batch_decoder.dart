@@ -1,5 +1,5 @@
 /// Provides [CsvMappedBatchDecoder], an architectural utility for high-throughput
-/// CSV ingestion that maps parsed rows to domain objects and buffers them into chunks.
+/// RFC 4180 CSV ingestion that maps parsed rows to domain objects and buffers them into chunks.
 library;
 
 import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
@@ -11,10 +11,10 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// and emits them downstream in batched lists using [BatchingSinkMixin].
 ///
 /// Architecturally, this class extends [ChunkedOnlyConverter] to strictly enforce asynchronous
-/// stream processing. By yielding lists of [T] ([List<T>]) rather than individual [T] events,
-/// it significantly reduces Dart's asynchronous event loop overhead when processing massive
-/// CSV files or high-frequency data streams. Invalid or ignored rows can be safely skipped
-/// by returning `null` from the [mapper].
+/// stream processing. By yielding lists of [T] ([List<T>]) rather than individual [T] events
+/// (like [CsvMappedDecoder] does), it significantly reduces Dart's asynchronous event loop
+/// overhead when processing massive CSV files or high-frequency data streams. Invalid or
+/// ignored rows can be safely skipped by returning `null` from the [mapper].
 ///
 /// Example usage within a stream pipeline:
 /// ```dart

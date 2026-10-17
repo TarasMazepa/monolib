@@ -1,7 +1,11 @@
-/// Writes a single [cell] of data to a [StringSink] in a CSV-compatible format.
+/// Provides [writeCsvCell], a utility for formatting and escaping individual CSV cells.
+library;
+
+/// Writes a single [cell] of data to a [StringSink] in an RFC 4180-compatible format.
 ///
-/// This function evaluates the contents of [cell] to determine if escaping
-/// is necessary. Escaping is required if the [cell] starts with a quotation
+/// This function is used internally by encoders like [CsvEncoder] to evaluate
+/// the contents of [cell] and determine if escaping is necessary. Escaping
+/// is required if the [cell] starts with a quotation
 /// mark (`"`), or if it contains any commas (`,`) or newline characters (`\n`).
 /// Internal quotation marks do not trigger full cell escaping on their own.
 ///
