@@ -21,6 +21,11 @@ const _decodableRight = 0x300 + _encodableRight - _encodableLeft;
 /// Valid encodable code units are strictly standard printable ASCII characters
 /// (from space `32` to tilde `126`). Characters outside this range cannot be
 /// reliably mapped to the corresponding Unicode combining block.
+///
+/// See also:
+/// * [isZalgoDecodableCodeUnit], which checks the reverse mapping.
+/// * [assertZalgoEncodableCodeUnit], which enforces this check.
+/// * [zalgoEncode], the primary consumer of this validation logic.
 bool isZalgoEncodableCodeUnit(int codeUnit) {
   return _encodableLeft <= codeUnit && codeUnit <= _encodableRight;
 }
@@ -30,15 +35,26 @@ bool isZalgoEncodableCodeUnit(int codeUnit) {
 ///
 /// Valid decodable code units fall within the specific block of Unicode
 /// combining diacritical marks mapped by this library, starting at `U+0300`.
+///
+/// See also:
+/// * [isZalgoEncodableCodeUnit], which checks the reverse mapping.
+/// * [assertZalgoDecodableCodeUnit], which enforces this check.
+/// * [zalgoDecodeSingle], the primary consumer of this validation logic.
 bool isZalgoDecodableCodeUnit(int codeUnit) {
   return _decodableLeft <= codeUnit && codeUnit <= _decodableRight;
 }
 
 /// Asserts that a [codeUnit] is valid for encoding, returning it if successful.
 ///
+/// Acts as a strict guard in encoding pipelines to prevent malformed grapheme
+/// generation by ensuring the character is supported.
+///
+/// Returns the given [codeUnit] unmodified if [isZalgoEncodableCodeUnit] is `true`.
 /// Throws an [Exception] if the [codeUnit] falls outside the allowed printable
-/// ASCII range `[32, 126]`. This acts as a strict guard in encoding pipelines
-/// to prevent malformed grapheme generation.
+/// ASCII range `[32, 126]`.
+///
+/// See also:
+/// * [zalgoEncode], which relies on this to sanitize input.
 int assertZalgoEncodableCodeUnit(int codeUnit) {
   if (isZalgoEncodableCodeUnit(codeUnit)) return codeUnit;
   throw Exception(
@@ -48,9 +64,15 @@ int assertZalgoEncodableCodeUnit(int codeUnit) {
 
 /// Asserts that a [codeUnit] is a valid Zalgo modifier, returning it if successful.
 ///
-/// Throws an [Exception] if the [codeUnit] is not a recognized mapped combining mark.
 /// This is used internally during decoding to ensure only intended Zalgo segments
 /// are un-shifted back to plain text.
+///
+/// Returns the given [codeUnit] unmodified if [isZalgoDecodableCodeUnit] is `true`.
+/// Throws an [Exception] if the [codeUnit] is not a recognized mapped combining mark
+/// falling within the block starting at `U+0300`.
+///
+/// See also:
+/// * [zalgoDecodeSingle], which relies on this to sanitize input.
 int assertZalgoDecodableCodeUnit(int codeUnit) {
   if (isZalgoDecodableCodeUnit(codeUnit)) return codeUnit;
   throw Exception(
@@ -68,8 +90,9 @@ int assertZalgoDecodableCodeUnit(int codeUnit) {
 /// This function is typically invoked by higher-level adapters (e.g., `ZalgoTextRange.decodedTextInside`)
 /// when a parsed Zalgo segment needs to be read or displayed natively.
 ///
-/// Throws an [Exception] if [input] is empty, or if the base character or
-/// subsequent modifiers fall outside the strictly mapped encodable/decodable ranges.
+/// Throws an [Exception] if [input] is empty. It also throws if the base character
+/// fails [assertZalgoEncodableCodeUnit], or if subsequent modifiers fail
+/// [assertZalgoDecodableCodeUnit].
 ///
 /// Example:
 /// ```dart
@@ -102,7 +125,7 @@ String zalgoDecodeSingle(String input) {
 /// heavily modified "glitch" text clustered around the initial character.
 ///
 /// Throws an [Exception] if [input] is empty, or if any character in the [input]
-/// is not a standard printable ASCII character (as defined by [isZalgoEncodableCodeUnit]).
+/// fails [assertZalgoEncodableCodeUnit] (meaning it is not a standard printable ASCII character).
 ///
 /// Example:
 /// ```dart
