@@ -3,8 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 
-/// An extension on [BuildContext] that provides a clean, fluent API for accessing
-/// deeply nested inherited widgets, reducing boilerplate when traversing the widget tree.
+/// Provides a clean, fluent API for accessing deeply nested inherited widgets,
+/// reducing boilerplate when traversing the widget tree.
 ///
 /// Architecturally, this extension centralizes the retrieval of cross-cutting concerns
 /// (such as theme configurations) directly from the element tree context, making widget
@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 extension OnBuildContext on BuildContext {
   /// Resolves the nearest [ThemeData] from the widget tree hierarchy.
   ///
-  /// This getter delegates directly to `Theme.of(this)`, triggering a rebuild
+  /// This getter delegates directly to [Theme.of], triggering a rebuild
   /// of the consuming widget whenever the inherited [Theme] changes. It provides
   /// a safe, non-nullable return value by falling back to the default Material
   /// theme if no explicit [Theme] widget is found in the ancestor tree.
