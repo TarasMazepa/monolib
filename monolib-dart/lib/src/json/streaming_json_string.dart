@@ -14,17 +14,17 @@ import 'package:monolib_dart/src/json/async_json_writable.dart';
 /// or long AI-generated text responses) can consume excessive memory if buffered
 /// synchronously via a standard [toJson]() method. By implementing [AsyncJsonWritable],
 /// [StreamingJsonString] takes control of the JSON writing process, lazily listening
-/// to the underlying [stream] and writing escaped chunks iteratively.
+/// to the underlying stream returned by [streamProvider] and writing escaped chunks iteratively.
 ///
 /// This avoids large string allocations and allows immediate output consumption
 /// when serialized through a framework that supports asynchronous encoding.
 ///
 /// ```dart
-/// final largeTextStream = File('massive_log.txt').openRead().transform(utf8.decoder);
-///
 /// final jsonObject = {
 ///   'filename': 'massive_log.txt',
-///   'content': StreamingJsonString(largeTextStream),
+///   'content': StreamingJsonString(
+///     () => File('massive_log.txt').openRead().transform(utf8.decoder)
+///   ),
 /// };
 ///
 /// // The file is streamed directly to stdout, properly escaped, without holding
@@ -32,14 +32,14 @@ import 'package:monolib_dart/src/json/async_json_writable.dart';
 /// await jsonEncodeAsync(object: jsonObject, sink: stdout);
 /// ```
 class StreamingJsonString implements AsyncJsonWritable {
-  /// The underlying stream of unescaped string chunks to be written to the JSON sink.
-  final Stream<String> stream;
+  /// A function that provides the underlying stream of unescaped string chunks to be written to the JSON sink.
+  final Stream<String> Function() streamProvider;
 
   /// Creates a new [StreamingJsonString] that will incrementally encode and write
-  /// chunks from the provided [stream].
-  const StreamingJsonString(this.stream);
+  /// chunks from the stream provided by [streamProvider].
+  const StreamingJsonString(this.streamProvider);
 
-  /// Asynchronously reads chunks from the [stream], escapes them for valid JSON,
+  /// Asynchronously reads chunks from the stream returned by [streamProvider], escapes them for valid JSON,
   /// and writes them iteratively into the [sink].
   ///
   /// This method manually manages the surrounding double quotes of the final JSON
@@ -56,7 +56,7 @@ class StreamingJsonString implements AsyncJsonWritable {
     JsonEncoderCallback encode,
   ) async {
     sink.write('"');
-    await for (final chunk in stream) {
+    await for (final chunk in streamProvider()) {
       // jsonEncode escapes the chunk and adds surrounding quotes (e.g., "chunk\ntext").
       final escaped = jsonEncode(chunk);
       if (escaped.length >= 2) {
