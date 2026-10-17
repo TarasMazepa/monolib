@@ -1,7 +1,7 @@
 /// A highly robust, path-tracked wrapper for traversing dynamic JSON structures.
 ///
 /// In the repository's data-parsing architecture, `FluentJson` acts as a safe
-/// wrapper over deeply nested dynamic structures natively parsed by `dart:convert`.
+/// wrapper over deeply nested dynamic structures natively parsed by [dart:convert].
 ///
 /// It aims to eliminate verbose runtime type-checking and manual unboxing logic
 /// at individual call sites. A core feature is maintaining a `breadCrumbs` trail,

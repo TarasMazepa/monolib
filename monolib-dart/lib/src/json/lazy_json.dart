@@ -10,8 +10,8 @@ library;
 /// discarded or queued for a long time.
 ///
 /// By wrapping the payload generation in [LazyJson], the actual execution
-/// is deferred. When a standard serializer like `jsonEncode` or the repository's
-/// asynchronous `jsonEncodeAsync` processes this object, it dynamically invokes
+/// is deferred. When a standard serializer like [jsonEncode] or the repository's
+/// asynchronous [jsonEncodeAsync] processes this object, it dynamically invokes
 /// the [toJson] callback.
 ///
 /// ### Example
@@ -27,10 +27,10 @@ library;
 class LazyJson {
   /// The deferred computation that returns the actual JSON-serializable structure.
   ///
-  /// This function is automatically invoked by native Dart encoders (such as `jsonEncode`)
-  /// or asynchronous encoders (like `jsonEncodeAsync`) because they dynamically look
-  /// for a `toJson` member. The result should be a standard JSON-compatible type
-  /// (e.g., [Map], [List], [String], [int], or another object with a `toJson`).
+  /// This function is automatically invoked by native Dart encoders (such as [jsonEncode])
+  /// or asynchronous encoders (like [jsonEncodeAsync]) because they dynamically look
+  /// for a [toJson] member. The result should be a standard JSON-compatible type
+  /// (e.g., [Map], [List], [String], [int], or another object with a [toJson]).
   final dynamic Function() toJson;
 
   /// Creates a [LazyJson] that will execute [toJson] when serialized.

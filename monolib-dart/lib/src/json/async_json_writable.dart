@@ -1,9 +1,9 @@
 /// Provides the [AsyncJsonWritable] interface for enabling inversion-of-control
 /// during asynchronous JSON encoding.
 ///
-/// This library is a core piece of the `jsonEncodeAsync` architecture, allowing
+/// This library is a core piece of the [jsonEncodeAsync] architecture, allowing
 /// custom objects to dictate their own chunked, unbuffered serialization logic
-/// rather than relying on synchronous, in-memory `toJson()` maps.
+/// rather than relying on synchronous, in-memory [toJson]() maps.
 library;
 
 /// A callback passed into [AsyncJsonWritable.writeJsonAsync] that allows the
@@ -18,7 +18,7 @@ typedef JsonEncoderCallback = Future<void> Function(Object? object);
 /// An interface providing inversion-of-control for objects serialized via
 /// [jsonEncodeAsync].
 ///
-/// By implementing [AsyncJsonWritable], an object bypasses standard `toJson()`
+/// By implementing [AsyncJsonWritable], an object bypasses standard [toJson]()
 /// serialization, gaining direct access to the underlying JSON [StringSink].
 /// This architectural pattern enables massive, dynamic, or chunk-based
 /// data sets (like streaming large strings or reading from file systems) to be
@@ -26,7 +26,7 @@ typedef JsonEncoderCallback = Future<void> Function(Object? object);
 /// memory.
 ///
 /// Real-world usage typically involves streaming classes like
-/// [StreamingJsonString], which writes `Stream<String>` chunks progressively
+/// [StreamingJsonString], which writes [Stream<String>] chunks progressively
 /// to the sink.
 ///
 /// ```dart
