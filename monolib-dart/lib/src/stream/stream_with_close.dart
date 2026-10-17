@@ -6,16 +6,18 @@ import 'dart:async';
 
 import 'package:monolib_dart/src/general/on_list.dart';
 
-/// A composite, zero-cost wrapper that binds a generated [Stream] to the
-/// [StreamSubscription]s and [StreamController] that back it.
+/// A composite disposable wrapper that tightly binds a generated [Stream] to
+/// the underlying infrastructure backing it.
 ///
-/// Architecturally, [StreamWithClose] addresses the challenge of returning a
-/// stream from a complex transformation (such as a pipeline involving multiple
-/// listeners, multiplexing, or external resources) where the caller needs to
-/// safely dispose of the intermediate stream infrastructure once consumption is
-/// finished. By bundling these components into a single return type, it
-/// guarantees that the consumer can invoke [close] to tear down the entire
-/// pipeline without leaking memory or file descriptors.
+/// Within complex asynchronous systems (like multi-source multiplexers or pipelines
+/// pulling from external resources), exposing a bare [Stream] leaves a critical lifecycle
+/// ambiguity: how does the consumer command the producer to tear down its underlying
+/// sockets, timers, or [StreamSubscription]s once consumption finishes?
+///
+/// [StreamWithClose] addresses this architectural gap. By bundling the observable
+/// [stream] together with its source [controller] and internal [subscriptions], it
+/// guarantees that consumers have a standardized, zero-cost mechanism (`.close()`)
+/// to safely dismantle the entire pipeline, preventing zombie listeners and resource leaks.
 ///
 /// Realistic Usage Example:
 /// ```dart

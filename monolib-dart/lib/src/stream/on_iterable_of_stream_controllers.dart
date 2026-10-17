@@ -8,18 +8,20 @@ library;
 import 'dart:async';
 import 'package:monolib_dart/src/stream/composite_event_sink/exception_strategy.dart';
 
-/// An architectural utility that enables safe multiplexing of events across
-/// multiple [StreamController] instances.
+/// A resilient broadcast multiplexer for manually managed subscriber pools.
 ///
-/// When managing custom broadcast architectures (like list-backed subscriber pools
-/// or dynamic event bus routing), individual stream controllers may have been closed
-/// or otherwise become unable to accept new events. This extension abstracts away the
-/// need to manually inspect each controller's state or wrap individual dispatch
-/// operations in `try-catch` blocks.
+/// Within custom reactive architectures (like dynamic event buses, publisher-subscriber
+/// patterns, or list-backed state observers), developers frequently maintain an
+/// `Iterable<StreamController>` representing connected clients. Directly iterating
+/// and invoking `add()` on these controllers is brittle: if any single downstream
+/// consumer has concurrently closed their connection, standard Dart streams throw
+/// an unhandled [StateError], immediately crashing the entire broadcast loop and
+/// leaving subsequent clients unnotified.
 ///
-/// It acts as a resilient fan-out mechanism. By default, it swallows exceptions
-/// (like [StateError] from closed controllers), but this can be customized using
-/// an [ExceptionStrategy].
+/// This extension resolves this architectural fragility by providing safe,
+/// transactional fan-out methods. It abstracts away manual state inspection
+/// (`!controller.isClosed`) and delegates error handling to an [ExceptionStrategy],
+/// ensuring guaranteed delivery topologies even across mixed-state subscriber pools.
 extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
   /// Safely dispatches the given data [event] to all stream controllers in this collection.
   ///
@@ -38,8 +40,10 @@ extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
   /// // The StateError from the second (closed) controller is swallowed.
   /// subscribers.onEachAdd('Update');
   /// ```
-  void onEachAdd(T event,
-      {ExceptionStrategy strategy = ExceptionStrategy.swallow}) {
+  void onEachAdd(
+    T event, {
+    ExceptionStrategy strategy = ExceptionStrategy.swallow,
+  }) {
     strategy.dispatch(this, (sink) => sink.add(event));
   }
 

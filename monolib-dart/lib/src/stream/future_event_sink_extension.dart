@@ -1,12 +1,16 @@
 import 'dart:async';
 
-/// Provides utility methods on [Future]s that resolve to an [EventSink].
+/// An architectural utility bridging synchronous event production with
+/// asynchronous sink initialization pipelines.
 ///
-/// This extension enables seamless, synchronous data pushing to a sink that
-/// is still undergoing asynchronous initialization. It bridges the timing gap
-/// between a synchronous producer that is ready to emit data and an asynchronous
-/// destination that is not yet fully connected or opened (e.g., a file writer,
-/// a database connection, or a network stream).
+/// Within reactive systems, it is common for the initialization of a destination
+/// (like opening a file handler, establishing a network socket, or authenticating a remote API)
+/// to be asynchronous, returning a `Future<EventSink>`. However, the producer of the events
+/// often operates synchronously and expects an immediate [EventSink] to begin dispatching data.
+///
+/// This extension resolves that architectural friction by unwrapping the pending
+/// [Future] into a proxy sink, buffering synchronous events in memory until the underlying
+/// infrastructure is ready to consume them.
 extension FutureEventSinkExtension<T> on Future<EventSink<T>> {
   /// Unwraps the [Future] into a synchronous [EventSink] that immediately accepts
   /// events, buffering them in memory until the underlying sink resolves.
