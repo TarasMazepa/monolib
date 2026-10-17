@@ -8,16 +8,14 @@ import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
-/// A specialized converter designed to aggressively optimize stream processing of JSONL data.
+/// A stream transformer for batched mapping of JSON Lines (JSONL) data.
 ///
-/// Within the repository's data-parsing architecture, [JsonlMappedBatchDecoder] avoids
-/// emitting one event per line. Instead, it aggregates multiple parsed JSON objects into a
-/// single [List] event per underlying data chunk, reducing event loop scheduling overhead and
-/// increasing overall stream throughput.
-///
-/// It extends [ChunkedOnlyConverter] as it relies on [JsonlBaseChunkSink] and [BatchingSinkMixin]
-/// to handle stateful line parsing and batch accumulation across stream boundaries. It is not intended
-/// for synchronous single-value conversions.
+/// Within the repository's data-parsing architecture, [JsonlMappedBatchDecoder]
+/// is a stream transformer extending [ChunkedOnlyConverter]. It mitigates event
+/// loop overhead during high-throughput JSONL ingestion by leveraging
+/// [JsonlBaseChunkSink] to parse chunks, mapping rows to domain objects, and
+/// emitting them in grouped lists via [BatchingSinkMixin] rather than as
+/// individual events.
 ///
 /// Example:
 /// ```dart
@@ -35,9 +33,9 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// // [MyDomainObject(3)]
 /// ```
 class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
-  /// The factory function used to transform parsed dynamic JSON objects into the domain type [T].
+  /// The factory callback used to transform parsed dynamic JSON objects into the domain type [T].
   ///
-  /// If this function returns `null`, the specific item is filtered out and will not be included
+  /// If this callback returns `null`, the specific item is filtered out and will not be included
   /// in the emitted batch, enabling on-the-fly data validation and sanitization.
   final T? Function(dynamic) fromJson;
 

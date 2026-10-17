@@ -6,16 +6,16 @@ import 'package:monolib_dart/src/jsonl/jsonl_encoder.dart';
 /// A [Codec] that encodes and decodes JSON Lines (JSONL) formatted strings.
 ///
 /// Architecturally, this codec serves as the standard integration point between
-/// the `monolib_dart` JSONL utilities and Dart's core `dart:convert` library.
-/// By extending [Codec], it allows JSONL processing to participate in standard
-/// stream transformations (via `Codec.fuse` or `Codec.bind`) and provides a
-/// unified interface for in-memory serialization and deserialization.
+/// the JSONL utilities and Dart's core `dart:convert` library. By extending
+/// [Codec], it allows JSONL processing to participate in standard stream
+/// transformations (via `Codec.fuse` or `Codec.bind`) and provides a unified
+/// interface for in-memory serialization and deserialization.
 ///
-/// In the context of this repository, it acts as a facade that delegates structural
-/// parsing and generation to [JsonlDecoder] and [JsonlEncoder]. When parsing, it
-/// converts a single [String] containing newline-separated JSON strings into a
-/// `List<dynamic>` (where each element is a parsed JSON object). Conversely, it
-/// encodes an `Iterable` or `List` of JSON-serializable objects into a single
+/// It acts as a facade that delegates structural parsing and generation to
+/// [JsonlDecoder] and [JsonlEncoder]. When parsing, it converts a single
+/// [String] containing newline-separated JSON strings into a `List<dynamic>`
+/// (where each element is a parsed JSON object). Conversely, it encodes an
+/// `Iterable` or `List` of JSON-serializable objects into a single
 /// newline-delimited [String].
 ///
 /// **Real-world example:**
@@ -35,7 +35,7 @@ class JsonlCodec extends Codec<List<dynamic>, String> {
   /// The underlying [Codec] used to serialize and deserialize individual JSON lines.
   ///
   /// This delegates the internal mapping of strings to objects to standard JSON
-  /// tools. In most cases, this defaults to dart:convert's [JsonCodec], but it
+  /// tools. In most cases, this defaults to `dart:convert`'s [JsonCodec], but it
   /// can be overridden to inject custom serializers or formatting configurations
   /// (such as customized `toEncodable` logic).
   final Codec<Object?, String> jsonCodec;

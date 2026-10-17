@@ -1,18 +1,13 @@
 import 'dart:convert';
 
-/// An architectural base class providing the structural parsing engine and state
-/// machine for chunked JSON Lines (JSONL) ingestion.
+/// Acts as the architectural base class for chunked JSON Lines (JSONL) ingestion.
 ///
 /// [JsonlBaseChunkSink] implements the [ChunkedConversionSink] interface to
-/// process raw, fragmented `String` chunks directly from a stream. It is designed
-/// to bypass the intermediate stream event overhead typical of Dart's standard
-/// `LineSplitter` by autonomously scanning for newline boundaries, buffering
-/// incomplete lines across discrete stream events in an internal state, and
-/// normalizing carriage returns.
-///
-/// Once a complete, sanitized line is extracted, it delegates the actual JSON
-/// decoding and domain object mapping to concrete subclasses via the abstract
-/// [processLine] hook (e.g., `_JsonlMappedDecoderSink` in `JsonlMappedDecoder`).
+/// process raw, fragmented [String] chunks directly from a stream. It serves
+/// as a state machine that bypasses Dart's `LineSplitter` overhead by manually
+/// buffering incomplete string chunks across stream events. It abstracts line
+/// boundary scanning and sanitization, delegating actual JSON mapping to
+/// subclasses via the [processLine] and [onChunkEnd] hooks.
 ///
 /// Example architecture usage by a subclass:
 /// ```dart
@@ -33,7 +28,7 @@ abstract class JsonlBaseChunkSink<TOut>
   final Sink<TOut> outSink;
   String _carry = '';
 
-  /// Constructs a [JsonlBaseChunkSink] that pipes its final, mapped outputs
+  /// Constructs a [JsonlBaseChunkSink] that pipes final, mapped outputs
   /// into the provided [outSink].
   JsonlBaseChunkSink(this.outSink);
 
