@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:monolib_dart/src/common/list_accumulator_sink.dart';
 import 'package:monolib_dart/src/csv/csv_chunked_decoder.dart';
 
-/// A synchronous [Converter] that decodes a full CSV [String] into a
+/// A synchronous [Converter] that decodes a full RFC 4180 CSV [String] into a
 /// sequence of rows, where each row is a [List] of [String] cells.
 ///
 /// This class serves as the concrete decoding implementation for [CsvCodec.decoder].

@@ -1,10 +1,10 @@
-/// Provides a stream converter for parsing raw CSV chunks into domain-specific objects.
+/// Provides a stream converter for parsing raw RFC 4180 CSV chunks into domain-specific objects.
 library;
 
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 
-/// A [ChunkedOnlyConverter] that decodes raw CSV string chunks into individual,
+/// A [ChunkedOnlyConverter] that decodes raw RFC 4180 CSV string chunks into individual,
 /// domain-specific objects of type [T].
 ///
 /// This decoder acts as a stream transformer. It leverages [CsvBaseChunkSink] to parse
@@ -13,7 +13,7 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// emitted individually down the stream. Returning `null` safely ignores the row.
 ///
 /// Use this class when you need continuous, one-by-one processing of CSV data (e.g., streaming
-/// records into a database). For batch-based processing, see `CsvMappedBatchDecoder`.
+/// records into a database). For batch-based processing, see [CsvMappedBatchDecoder].
 ///
 /// ```dart
 /// final fileStream = File('users.csv').openRead().transform(utf8.decoder);

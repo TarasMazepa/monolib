@@ -7,7 +7,7 @@ import 'package:monolib_dart/src/common/async_iterator_util.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
-/// Asynchronously encodes a sequence of items into a CSV format and writes them
+/// Asynchronously encodes a sequence of items into an RFC 4180 CSV format and writes them
 /// to a string sink.
 ///
 /// This function acts as the foundational CSV encoder within the repository's
