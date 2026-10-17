@@ -20,7 +20,7 @@ import 'dart:convert';
 /// which makes it primarily useful for in-memory batch conversions. For true
 /// asynchronous, chunk-based streaming of large datasets without blocking
 /// or excessive memory buffering, consider the repository's streaming
-/// alternatives like `jsonEncodeAsync`.
+/// alternatives like `jsonlEncodeAsync`.
 ///
 /// **Real-world example:**
 /// ```dart
