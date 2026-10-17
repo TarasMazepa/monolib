@@ -9,13 +9,13 @@ library;
 
 import 'dart:io';
 
-/// Enhances [FileSystemEntity] (such as `File` and `Directory`) with safe, non-throwing
+/// Enhances [FileSystemEntity] (such as [File] and [Directory]) with safe, non-throwing
 /// operations.
 ///
-/// This extension is designed for teardown processes where guaranteeing the removal
-/// of a file or directory is best-effort. It abstracts away the need for boilerplate
-/// `try-catch` blocks around [delete] calls that are otherwise prone to failing if the
-/// file does not exist or access is denied.
+/// This extension acts as a fault-tolerant utility for teardown processes where guaranteeing the removal
+/// of a file or directory is best-effort. It abstracts away the boilerplate of wrapping
+/// native [FileSystemEntity.delete] calls in `try-catch` blocks, which are otherwise prone to failing if the
+/// path does not exist or access is denied.
 extension OnFileSystemEntity on FileSystemEntity {
   /// Asynchronously deletes this [FileSystemEntity] without throwing any exceptions.
   ///

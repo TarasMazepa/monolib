@@ -7,7 +7,7 @@ library;
 
 import 'dart:io';
 
-/// Extends [IOSink] with resource-safe execution scopes.
+/// Bridges [IOSink] into the scoped execution model for resource-safe data streams.
 ///
 /// Architecturally, this extension eliminates the boilerplate of manual
 /// `try`/`finally` blocks typically required when dealing with raw streams
@@ -19,12 +19,13 @@ extension OnIoSink on IOSink {
   /// This method safely unwraps and delegates to the provided [call] callback,
   /// supplying it with the current [IOSink] instance. After the [call] completes,
   /// either successfully or by throwing an error, this method guarantees that
-  /// `close()` is awaited on the sink. This is critical for
+  /// [IOSink.close] is awaited on the sink. This is critical for
   /// preventing zombie file handles and ensuring all buffered data is written
   /// to the underlying platform before the surrounding logic proceeds.
   ///
-  /// The [call] parameter receives the current [IOSink] to perform write operations.
-  /// Returns the generic type [T] produced by the [call].
+  /// - [call]: The block of asynchronous operations to perform using the [IOSink].
+  ///
+  /// Returns a [Future] resolving to the generic type `T` produced by the [call].
   ///
   /// ```dart
   /// final file = File('data.txt');
