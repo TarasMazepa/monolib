@@ -7,9 +7,9 @@ library;
 
 import 'dart:io';
 
-/// Extension on factory functions that return an [IOSink].
+/// Bridges factory functions returning an [IOSink] into the scoped execution model.
 ///
-/// This extension enables a scoped execution model, centralizing `try-finally` cleanup logic for dynamically instantiated
+/// This extension enables a safe lifecycle boundary, centralizing `try-finally` cleanup logic for dynamically instantiated
 /// sinks. By applying [withIOSink] directly to an initialization closure, it removes the need for consumers to manually
 /// track and close the sink, thus preventing resource leaks.
 extension OnFunction on IOSink Function() {
@@ -21,6 +21,10 @@ extension OnFunction on IOSink Function() {
   ///
   /// This design ensures robust resource cleanup and avoids dangling file handles when writing streams or files.
   ///
+  /// - [call]: The block of asynchronous operations to perform using the injected [IOSink].
+  ///
+  /// Returns a [Future] that completes when the [call] and the subsequent sink closure finish.
+  ///
   /// Example:
   /// ```dart
   /// final file = File('data.csv');
@@ -29,8 +33,6 @@ extension OnFunction on IOSink Function() {
   ///   sink.writeln('value1,value2');
   /// });
   /// ```
-  ///
-  /// [call] The block of asynchronous operations to perform using the [IOSink].
   Future<void> withIOSink(Future<void> Function(IOSink) call) async {
     final ioSink = this();
     try {
