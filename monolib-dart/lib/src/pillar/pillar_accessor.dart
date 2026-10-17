@@ -27,8 +27,8 @@ abstract class PillarAccessor {
   /// If the dependency is not found, or if resolving it violates hierarchical scope boundaries
   /// (when using a scope-enforcing implementation), an exception is thrown.
   ///
-  /// [key] An optional exact [PillarKey] to locate the dependency. If provided, it overrides [token].
-  /// [token] An optional string identifier used to differentiate dependencies of the same type [T].
+  /// - [key]: An optional exact [PillarKey] to locate the dependency. If provided, it overrides [token].
+  /// - [token]: An optional string identifier used to differentiate dependencies of the same type [T].
   ///
   /// ```dart
   /// // Resolving a standard singleton or scoped dependency
@@ -53,9 +53,9 @@ extension OnPillarAccessor on PillarAccessor {
   /// of type `T Function(P)`. This method fetches that function using [get] and immediately executes
   /// it by passing [parameter].
   ///
-  /// [parameter] The runtime value of type [P] to pass into the resolved factory.
-  /// [key] An optional [PillarKey] targeting the specific factory registration.
-  /// [token] An optional string token if the factory is registered with a name.
+  /// - [parameter]: The runtime value of type [P] to pass into the resolved factory.
+  /// - [key]: An optional [PillarKey] targeting the specific factory registration.
+  /// - [token]: An optional string token if the factory is registered with a name.
   ///
   /// ```dart
   /// // In the container setup:
