@@ -61,6 +61,7 @@ class Float64Table {
   /// // Create a 3x3 identity matrix
   /// final identity = Float64Table.generate(3, 3, (row, col) => row == col ? 1.0 : 0.0);
   /// ```
+  /// Creates a new table dynamically generating cells via the `generator` callback.
   Float64Table.generate(
     int rows,
     int columns,
@@ -78,10 +79,9 @@ class Float64Table {
     }
   }
 
-  /// Ensures that the provided [row] and [col] coordinate exists within the current table boundaries.
+  /// Validates that the provided [row] and [col] indices are within the grid dimensions.
   ///
-  /// Throws a [RangeError] if the indices are out of bounds, preventing invalid memory access
-  /// on the underlying [Float64List].
+  /// Throws a [RangeError] if the indices are out of bounds.
   void _checkBounds(int row, int col) {
     if (_rows == 0) {
       throw RangeError('Table has 0 rows; index $row is out of bounds.');
