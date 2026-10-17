@@ -1,3 +1,6 @@
+/// General-purpose extensions, widgets, and Pillar adapters for Flutter projects.
+library;
+
 export 'src/general/on_build_context.dart';
 export 'src/general/on_scroll_controller.dart';
 export 'src/general/on_text_editing_value.dart';

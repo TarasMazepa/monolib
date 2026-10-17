@@ -69,9 +69,9 @@ extension type const StreamWithClose<T>._(
 
   /// Safely tears down the stream pipeline by terminating all internal components.
   ///
-  /// It uses [drainMap] (from `OnList`) to destructively iterate over the
-  /// underlying [subscriptions] and cancel each one, and then closes the main
-  /// [controller]. It returns a [Future] that completes when all teardown
+  /// It uses [OnList.drainMap] to destructively iterate over the
+  /// underlying `subscriptions` and cancel each one, and then closes the main
+  /// `controller`. It returns a [Future] that completes when all teardown
   /// operations have finished.
   ///
   /// Calling this method prevents resource leaks, such as dangling periodic timers

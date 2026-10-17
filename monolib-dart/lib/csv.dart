@@ -1,3 +1,6 @@
+/// Streaming and synchronous CSV encoding and decoding utilities.
+library;
+
 export 'src/csv/csv_chunked_decoder.dart';
 export 'src/csv/csv_codec.dart';
 export 'src/csv/csv_decoder.dart';

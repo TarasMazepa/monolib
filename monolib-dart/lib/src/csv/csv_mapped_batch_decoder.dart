@@ -30,12 +30,12 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// }
 /// ```
 class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
-  /// The user-provided function that converts a parsed CSV [row] into a domain object [T].
+  /// The user-provided function that converts a parsed CSV `row` into a domain object [T].
   ///
   /// If this function returns `null`, the row is safely ignored and not added to the current batch.
   final T? Function(List<String> row) mapper;
 
-  /// An optional lifecycle callback invoked with the completed [batch] just before
+  /// An optional lifecycle callback invoked with the completed `batch` just before
   /// it is emitted downstream.
   ///
   /// This is useful for side effects like logging, metrics accumulation, or progress

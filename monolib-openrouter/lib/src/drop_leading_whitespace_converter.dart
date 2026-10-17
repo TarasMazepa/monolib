@@ -11,7 +11,7 @@ import 'package:monolib_dart/stream.dart';
 /// JSON body. By actively filtering these out, it guarantees that downstream
 /// decoders receive a clean starting token.
 ///
-/// This is typically used in front of a [utf8.decoder] and [JsonDecoder] within
+/// This is typically used in front of [Utf8Codec.decoder] (`utf8.decoder`) and [JsonDecoder] within
 /// an HTTP response stream pipeline.
 ///
 /// Example:

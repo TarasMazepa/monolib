@@ -1,3 +1,6 @@
+/// Stream, sink, and stream controller extensions and composite utilities.
+library;
+
 export 'src/stream/composite_event_sink.dart';
 export 'src/stream/composite_event_sink/composite_sink_exception.dart';
 export 'src/stream/composite_event_sink/exception_strategy.dart';

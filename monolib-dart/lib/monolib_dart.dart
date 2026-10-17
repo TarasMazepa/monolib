@@ -1,3 +1,6 @@
+/// General-purpose extensions, data structures, and utilities for Dart projects.
+library;
+
 export 'src/general/batcher.dart';
 export 'src/general/dense_table.dart';
 export 'src/general/float64_table.dart';

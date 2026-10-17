@@ -13,7 +13,7 @@ import 'package:monolib_dart/pillar.dart';
 /// Architecturally, it delegates listener management directly to the underlying
 /// notification source, enabling Pillar scope changes to safely trigger UI
 /// rebuilds. Rather than instantiating this class manually, consumers typically
-/// access it via the [asListenable] extension getter on [PillarListenable].
+/// access it via the `.asListenable` extension getter on [PillarListenable].
 ///
 /// Example:
 /// ```dart
@@ -37,7 +37,7 @@ class PillarListenableAdapter implements Listenable {
 
   /// Creates a new adapter bridging the given [pillarListenable].
   ///
-  /// Generally, developers should use the [asListenable] extension getter on
+  /// Generally, developers should use the `.asListenable` extension getter on
   /// [PillarListenable] instead of explicitly calling this constructor.
   const PillarListenableAdapter(this.pillarListenable);
 

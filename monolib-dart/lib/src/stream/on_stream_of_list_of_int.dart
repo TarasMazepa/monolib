@@ -21,7 +21,7 @@ extension OnStreamOfListOfInt on Stream<List<int>> {
   /// Asynchronously reads the first available text line from the byte stream,
   /// automatically handling UTF-8 decoding and line splitting.
   ///
-  /// This method transforms the byte chunks using [utf8.decoder] and [LineSplitter],
+  /// This method transforms the byte chunks using [Utf8Codec.decoder] (`utf8.decoder`) and [LineSplitter],
   /// resolving with the first emitted string before automatically canceling the
   /// underlying stream subscription. It is specifically designed as a non-blocking
   /// alternative for scenarios like reading prompts from standard input where
@@ -48,7 +48,7 @@ extension OnStreamOfListOfInt on Stream<List<int>> {
   /// Because Dart's core [LineSplitter] is purely a [StreamTransformer] and not a [Converter],
   /// it cannot be directly passed to [Converter.fuse]. To solve this, this method uses
   /// the repository's custom [LineSplitterConverter], which allows it to fuse with
-  /// [utf8.decoder]. This fusion optimizes the pipeline by skipping intermediate string
+  /// [Utf8Codec.decoder] (`utf8.decoder`). This fusion optimizes the pipeline by skipping intermediate string
   /// allocations during the transformation phase, dramatically improving performance for
   /// large text processing.
   ///
