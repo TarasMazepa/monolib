@@ -73,6 +73,8 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
   /// ```
   Iterable<T> average() sync* {
     final iterators = map((iterable) => iterable.iterator).toList();
+
+    /// Synchronously advances all underlying iterators.
     bool moveNext() {
       bool any = false;
       bool all = true;
@@ -87,6 +89,7 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
       return all;
     }
 
+    /// Dynamically divides the aggregated sum by the number of iterables.
     T divide(dynamic what, dynamic divisor) {
       return what ~/ divisor;
     }

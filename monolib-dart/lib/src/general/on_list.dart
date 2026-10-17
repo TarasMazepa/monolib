@@ -62,7 +62,7 @@ extension OnList<T> on List<T> {
   List<E> toMappedList<E>(E Function(T) mapper, {bool growable = true}) =>
       List.generate(length, (i) => mapper(this[i]), growable: growable);
 
-  /// Eagerly converts the list to a new mapped [List], providing the current [index] to the [mapper].
+  /// Eagerly converts the list to a new mapped [List], providing the current index to the [mapper].
   ///
   /// Avoids the overhead of `asMap().entries.map(...)` by directly utilizing a
   /// [List.generate] loop. Useful for index-aware transformations.

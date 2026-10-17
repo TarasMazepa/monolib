@@ -77,7 +77,9 @@ class DenseTable<T> {
           }, growable: false);
         })();
 
-  /// Ensures that the requested [row] and [col] coordinates fall within valid table boundaries.
+  /// Validates that the provided [row] and [col] indices are within the grid dimensions.
+  ///
+  /// Throws a [RangeError] if the indices are out of bounds.
   void _checkBounds(int row, int col) {
     if (_rows == 0) {
       throw RangeError('Table has 0 rows; index $row is out of bounds.');

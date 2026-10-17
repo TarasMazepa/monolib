@@ -47,6 +47,7 @@ library;
 
 import 'dart:async';
 
+/// An architectural primitive for aggregating synchronous, high-frequency events into periodic asynchronous chunks.
 class Batcher<T> {
   /// The maximum item capacity required to trigger an immediate batch emission.
   ///
