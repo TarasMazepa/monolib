@@ -2,12 +2,22 @@ import 'dart:async';
 
 import 'package:monolib_dart/src/stream/composite_event_sink/exception_strategy.dart';
 
-/// A composite event sink that forwards events to multiple target sinks.
+/// A multiplexing [EventSink] that structurally bridges a single event source to
+/// an arbitrary collection of downstream listeners or execution pipelines.
 ///
-/// This class is useful when you have a single source of events but need to
-/// broadcast those events to multiple destinations (sinks). It implements
-/// [EventSink] and distributes [add], [addError], and [close] calls to all
-/// provided child sinks.
+/// Within reactive architectures, it frequently becomes necessary to fork an event stream
+/// dynamically (e.g., dispatching a telemetry event to both a local logger and a remote API).
+/// Instead of manually wiring independent stream subscriptions or repeating `try-catch`
+/// blocks across scattered callbacks, this class unifies the fan-out behavior into a
+/// single sink interface.
+///
+/// It distributes [add], [addError], and [close] signals to all registered child sinks.
+/// Crucially, it isolates the failure domain of independent sinks: if one destination throws
+/// a synchronous error during dispatch (such as writing to a closed socket),
+/// [CompositeEventSink] delegates to its injected [ExceptionStrategy]. This allows
+/// developers to determine whether failures should fail instantly, be swallowed, or be
+/// accumulated into a [CompositeSinkException] while still guaranteeing delivery
+/// to the remaining healthy sinks.
 ///
 /// Example:
 /// ```dart

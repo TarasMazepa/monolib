@@ -6,14 +6,17 @@ import 'dart:convert';
 
 import 'package:monolib_dart/src/stream/line_splitter_converter.dart';
 
-/// Extension on [Stream] of `List<int>` that provides utilities for translating
-/// chunked byte data (such as file reads, network responses, or `stdin`) into
-/// readable text formats.
+/// A high-performance byte-stream processing pipeline for bridging raw I/O to text architectures.
 ///
-/// This extension simplifies common data-ingestion architectures by abstracting
-/// away the boilerplate of UTF-8 decoding and providing optimized methods for
-/// line-by-line consumption, which is critical for processing large payloads
-/// without excessive memory buffering.
+/// When ingesting massive datasets from `dart:io` (such as file reads, network responses,
+/// or continuous `stdin`), the raw output is always a chunked `Stream<List<int>>`. Translating
+/// these disparate byte chunks into meaningful string lines traditionally requires manually
+/// fusing `utf8.decoder` and `LineSplitter`, which adds boilerplate and mental overhead to
+/// data-ingestion systems.
+///
+/// This extension provides optimized, single-call pipeline transformations that abstract away
+/// intermediate string allocations and chunk buffering, enabling clean, memory-efficient
+/// streaming from raw bytes directly to domain-level string manipulation.
 extension OnStreamOfListOfInt on Stream<List<int>> {
   /// Asynchronously reads the first available text line from the byte stream,
   /// automatically handling UTF-8 decoding and line splitting.

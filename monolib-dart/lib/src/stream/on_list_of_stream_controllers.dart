@@ -1,10 +1,17 @@
 import 'dart:async';
 
-/// Extension on a [List] of [StreamController]s.
+/// A self-managing lifecycle bridge for list-backed subscriber architectures.
 ///
-/// Provides utilities to manage a collection of stream controllers, such as
-/// adding a new controller to the list and automatically cleaning up when
-/// the controller is canceled.
+/// In systems implementing manual pub-sub or multiplexing patterns (where listeners
+/// are stored dynamically in a `List<StreamController>`), managing resource teardown
+/// is traditionally error-prone. Failing to evict a [StreamController] from the list
+/// when the downstream client cancels their subscription leads to memory leaks and
+/// zombie connections.
+///
+/// This extension resolves this by establishing an automatic lifecycle linkage.
+/// It intercepts the `onCancel` event of an incoming controller, guaranteeing it
+/// is safely and immediately purged from the active registry without requiring manual
+/// garbage collection sweeps by the host class.
 extension OnListOfStreamControllers<T> on List<StreamController<T>> {
   /// Adds the provided [listener] to this list and configures its [StreamController.onCancel] handler.
   ///

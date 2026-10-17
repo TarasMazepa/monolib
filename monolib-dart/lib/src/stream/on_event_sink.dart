@@ -4,13 +4,20 @@ library;
 
 import 'dart:async';
 
-/// Provides robust, fail-safe error emission capabilities for any [EventSink].
+/// A resilient boundary proxy that shields upstream event producers from asynchronous
+/// sink teardown failures when dispatching errors.
 ///
-/// In standard Dart streams, adding an error to an already closed [EventSink] (such as
-/// a [StreamController]) throws an unhandled [StateError]. This extension mitigates that
-/// by introducing a resilient way to broadcast errors across asynchronous stream pipelines
-/// or multi-sink architectures where the exact lifecycle state of the sink might not be
-/// easily determined at the moment of error emission.
+/// In complex, highly concurrent systems, an upstream error handler often lacks
+/// perfectly synchronized knowledge of a downstream [EventSink]'s exact lifecycle state.
+/// For example, if a background task attempts to push an exception payload to a
+/// [StreamController] that a different subsystem concurrently closed due to a timeout,
+/// standard Dart streams will throw an aggressive, unhandled [StateError] that crashes
+/// the entire isolate.
+///
+/// This extension resolves this by establishing a defensive emission boundary.
+/// It introduces a "try-add-error" paradigm, absorbing expected lifecycle exceptions
+/// (like adding to a closed sink) to maintain pipeline stability without
+/// requiring defensive `isClosed` checks everywhere in the codebase.
 extension OnEventSink<T> on EventSink<T> {
   /// Attempts to safely broadcast an [error] to this sink without throwing
   /// a [StateError] if the sink has already been closed.
