@@ -1,5 +1,3 @@
-library;
-
 /// A zero-cost identifier used by the [Pillar] dependency injection container
 /// to uniquely track and resolve registered dependencies.
 ///
@@ -19,6 +17,8 @@ library;
 /// // Internal registration using a tokenized key
 /// pillar.register<Database>(key: PillarKey.withToken(Database, token: 'cache'), ...);
 /// ```
+library;
+
 extension type const PillarKey._(({Type type, String? token}) _data) {
   /// Creates a default [PillarKey] based solely on the provided [type].
   ///
