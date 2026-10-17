@@ -1,5 +1,4 @@
-/// Provides [BatchingSinkMixin], an architectural utility for buffering
-/// individual decoded items into distinct list chunks during stream processing.
+/// Provides [BatchingSinkMixin], an architectural utility for buffering individual decoded items into distinct list chunks during stream processing.
 library;
 
 /// A mixin that abstracts the boilerplate required for accumulating individual items

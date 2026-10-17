@@ -1,3 +1,6 @@
+/// Provides [ChunkedOnlyConverter], an architectural base class for chunk-based stream transformers.
+library;
+
 import 'dart:convert';
 
 /// An architectural base class designed exclusively for chunked (stream) conversions.
