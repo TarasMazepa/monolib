@@ -40,9 +40,6 @@ class _FailFastExceptionStrategy implements ExceptionStrategy {
   /// Any exception thrown during the execution of [action] on a particular sink
   /// will immediately bubble up, abruptly terminating the `for` loop and
   /// leaving the remaining sinks unprocessed.
-  ///
-  /// - [sinks]: The sequence of child sinks to iterate over.
-  /// - [action]: The closure that performs the dispatch operation (e.g., `add()`, `close()`).
   @override
   void dispatch<T>(
     Iterable<EventSink<T>> sinks,
