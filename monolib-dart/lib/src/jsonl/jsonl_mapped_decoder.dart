@@ -62,7 +62,7 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
 
   /// Creates a [JsonlMappedDecoder] that converts JSONL string chunks into [T].
   ///
-  /// The [fromJson] function is required to map the dynamic JSON object.
+  /// The [fromJson] callback is required to map the dynamic JSON object.
   /// Optionally, you can provide a custom [jsonCodec], swallow errors with
   /// [ignoreExceptions], or perform cleanup using [onDone].
   const JsonlMappedDecoder(

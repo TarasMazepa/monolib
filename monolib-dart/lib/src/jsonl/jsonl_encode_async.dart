@@ -18,7 +18,7 @@ import 'package:monolib_dart/src/json/json_encode_async.dart';
 /// In the repository's architecture, this function acts as the foundational JSONL
 /// serialization engine. It processes streaming or iterable collections chunk-by-chunk,
 /// preventing out-of-memory errors on massive datasets. It is heavily utilized by
-/// higher-level I/O abstractions (such as `JsonlBatchWriter` and `jsonlEncodeBatchAsync`)
+/// higher-level I/O abstractions (such as `JsonlBatchWriter` and [jsonlEncodeBatchAsync])
 /// to decouple asynchronous iteration and individual item serialization from disk
 /// writing and batching mechanics.
 ///
@@ -32,10 +32,10 @@ import 'package:monolib_dart/src/json/json_encode_async.dart';
 ///
 /// Either [sink] or [sinkProvider] MUST be provided, but not both.
 ///
-/// - [items]: The sequence of items to serialize. This supports any `Iterable`
-///   or asynchronous `Stream`. Each individual item is converted to JSON via
-///   [jsonEncodeAsync], which provides universal support for deeply nested `Future`,
-///   `Stream`, `Iterable`, standard `toJson()` serialization, and the custom
+/// - [items]: The sequence of items to serialize. This supports any [Iterable]
+///   or asynchronous [Stream]. Each individual item is converted to JSON via
+///   [jsonEncodeAsync], which provides universal support for deeply nested [Future],
+///   [Stream], [Iterable], standard `toJson()` serialization, and the custom
 ///   `AsyncJsonWritable` interface.
 /// - [sink]: An active, externally managed [StringSink]. If provided, the caller
 ///   retains ownership and MUST handle closing the resource.

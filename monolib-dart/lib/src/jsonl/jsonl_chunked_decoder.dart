@@ -3,21 +3,13 @@ import 'dart:convert';
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
-/// A stream transformer that decodes chunked JSON Lines (JSONL) strings into
-/// distinct JSON objects.
+/// Serves as the asynchronous, stream-based foundation for JSON Lines (JSONL) ingestion.
 ///
-/// Architecturally, [JsonlChunkedDecoder] serves as the asynchronous, stream-based
-/// foundation for JSONL ingestion in the repository. By extending
-/// [ChunkedOnlyConverter], it enforces execution strictly within a streaming
-/// context (bypassing synchronous blocking). It delegates the stateful RFC
-/// 4180 / newline boundary scanning to [JsonlBaseChunkSink], freeing this class
-/// to focus purely on configuring the underlying JSON parsing.
-///
-/// It acts as the core engine powering both native stream-based workflows
-/// (such as processing gigabytes of log files or API responses via
-/// `stream.transform(const JsonlChunkedDecoder())`) and the synchronous
-/// `JsonlDecoder` (which internally funnels complete strings through this chunked
-/// state machine to preserve parsing unity and DRY principles).
+/// Architecturally, [JsonlChunkedDecoder] extends [ChunkedOnlyConverter]. It
+/// bypasses synchronous blocking and delegates stateful newline boundary
+/// scanning to [JsonlBaseChunkSink]. This allows it to act as the core parsing
+/// engine for both native stream pipelines and synchronous adapters like
+/// [JsonlDecoder], maintaining unified parsing logic and adhering to DRY principles.
 ///
 /// It strictly drops any empty lines or lines that evaluate to a `null` JSON
 /// structure.

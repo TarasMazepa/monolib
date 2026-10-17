@@ -11,16 +11,17 @@ import 'dart:convert';
 /// A synchronous converter that transforms a list of JSON-serializable objects
 /// into a single JSON Lines (JSONL) formatted string.
 ///
-/// Architecturally, this class powers the `encoder` property of `JsonlCodec`.
-/// It iterates over a given sequence of objects, serializes each element into
-/// a compact (single-line) JSON string using an underlying [Codec], and appends
-/// a trailing newline character.
+/// Architecturally, [JsonlEncoder] acts as the synchronous serialization engine
+/// for [JsonlCodec], extending `Converter<List<dynamic>, String>`. It iterates
+/// through a list of objects, encoding each into a compact JSON string using an
+/// underlying [Codec] (like [JsonCodec]), and appends a trailing newline to
+/// generate a batched JSON Lines (JSONL) formatted string.
 ///
 /// It strictly outputs a single batched [String] containing multiple lines,
 /// which makes it primarily useful for in-memory batch conversions. For true
 /// asynchronous, chunk-based streaming of large datasets without blocking
 /// or excessive memory buffering, consider the repository's streaming
-/// alternatives like `jsonlEncodeAsync`.
+/// alternatives like [jsonlEncodeAsync].
 ///
 /// **Real-world example:**
 /// ```dart

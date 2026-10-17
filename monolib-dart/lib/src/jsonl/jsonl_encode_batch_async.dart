@@ -12,16 +12,15 @@ import 'package:monolib_dart/src/jsonl/jsonl_encode_async.dart';
 
 /// Asynchronously encodes a continuous stream of [batches] into JSON Lines (JSONL).
 ///
-/// In the repository's streaming architecture, this function is used when upstream data
-/// is naturally grouped into chunks (e.g., a `Stream<List<Data>>` representing pages
-/// of records from a database or CSV parser). It efficiently delegates to [encodeBatchAsync],
-/// serializing each item inside the batch using [jsonlEncodeAsync]. This provides universal
-/// support for deeply nested `Future`, `Stream`, `Iterable`, standard `toJson()`
-/// serialization, and the custom `AsyncJsonWritable` interface.
+/// Acts as an architectural bridge between batched stream processors (like paginated
+/// queries) and the lazy JSON Lines encoding engine ([encodeBatchAsync] and
+/// [jsonlEncodeAsync]). It enables efficient serialization of chunked data to
+/// disk or network without flattening the stream into memory, preserving
+/// batch-level backpressure.
 ///
-/// This approach prevents flattening the stream in memory, preserving batch-level
-/// backpressure while seamlessly writing newline-delimited objects sequentially to
-/// the destination.
+/// It provides universal support for deeply nested [Future], [Stream],
+/// [Iterable], standard `toJson()` serialization, and the custom
+/// `AsyncJsonWritable` interface.
 ///
 /// Either [sink] or [sinkProvider] MUST be provided, but not both.
 ///
