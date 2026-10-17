@@ -3,9 +3,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 
-/// Extension methods for [ScrollController] to enhance scrolling capabilities.
-///
-/// This extension provides convenient scrolling behaviors that are commonly
+/// Provides convenient scrolling behaviors that are commonly
 /// required in user interfaces, such as auto-scrolling to the bottom of
 /// dynamic lists, chat interfaces, or log viewers.
 extension OnScrollController on ScrollController {
