@@ -7,40 +7,40 @@ import 'package:monolib_dart/pillar.dart';
 
 import 'pillar_listenable_adapter.dart';
 
-/// An extension on [PillarListenable] that integrates the Pillar DI framework's
-/// pure Dart reactivity model with Flutter.
+/// Provides architectural bridging utilities that integrate the Pillar dependency injection
+/// framework's pure Dart reactivity model with Flutter's native widget lifecycle.
 ///
-/// In the Pillar framework, lifecycle boundaries and reactivity are managed
-/// via [PillarListenable] within `monolib-dart`, ensuring core business logic
-/// remains decoupled from Flutter dependencies. This extension facilitates
-/// cross-package adaptation by allowing any [PillarListenable] (such as those
-/// returned by [Pillar.changeNotifierFor]) to be easily converted into a standard
-/// Flutter [Listenable].
+/// Within the Pillar framework, lifecycle boundaries and state broadcasts are managed
+/// via [PillarListenable] (found in `monolib-dart`), intentionally decoupling core business logic
+/// from Flutter dependencies. This extension facilitates safe, cross-package adaptation by
+/// allowing any [PillarListenable] (e.g., those returned by `Pillar.changeNotifierFor`)
+/// to be efficiently converted into a standard Flutter [Listenable].
 ///
-/// This enables Flutter UI components (like `ListenableBuilder` or `AnimatedBuilder`)
-/// to seamlessly react to Pillar scope changes without requiring the DI container
-/// to depend on Flutter directly.
+/// Architecturally, this enables native Flutter UI components (like `ListenableBuilder` or
+/// `AnimatedBuilder`) to seamlessly react to Pillar scope state mutations without leaking
+/// Flutter imports into the domain layer.
 extension OnPillarListenable on PillarListenable {
-  /// Adapts this [PillarListenable] into a Flutter [Listenable].
+  /// Adapts this pure Dart [PillarListenable] into a native Flutter [Listenable].
   ///
-  /// This getter wraps the current instance in a [PillarListenableAdapter],
-  /// translating Pillar's internal listener management into Flutter's `VoidCallback`
-  /// notifications. This is structurally necessary to consume Pillar scope updates
-  /// inside Flutter widget trees.
+  /// This getter instantiates a [PillarListenableAdapter] that wraps the current instance.
+  /// It translates Pillar's internal listener management into native Flutter [VoidCallback]
+  /// notifications. This adapter pattern is structurally required to safely inject and consume
+  /// pure Dart scope updates within a Flutter widget tree without manual lifecycle management.
   ///
   /// Example:
   /// ```dart
-  /// final scopeListenable = pillar.changeNotifierFor(myScope);
+  /// // Within a Flutter Widget's build method:
+  /// final scopeNotifier = pillar.changeNotifierFor(myScope);
   ///
   /// return ListenableBuilder(
-  ///   listenable: scopeListenable.asListenable,
+  ///   listenable: scopeNotifier.asListenable, // Adapts the PillarListenable
   ///   builder: (context, child) {
-  ///     return Text('Scope updated!');
+  ///     return const Text('Pillar scope state has been updated!');
   ///   },
   /// );
   /// ```
   ///
-  /// Returns a new [Listenable] that delegates `addListener` and `removeListener`
-  /// calls directly to this underlying [PillarListenable].
+  /// Returns a new [Listenable] proxy that safely delegates all subscriber registrations
+  /// to the underlying [PillarListenable].
   Listenable get asListenable => PillarListenableAdapter(this);
 }
