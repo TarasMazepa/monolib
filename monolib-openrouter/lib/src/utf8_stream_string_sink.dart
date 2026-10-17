@@ -3,8 +3,7 @@ import 'dart:convert';
 
 import 'package:monolib_dart/stream.dart';
 
-/// A [StringSink] that UTF-8 encodes everything written to it and adds the
-/// resulting bytes to an [EventSink] of bytes.
+/// An architectural string processing endpoint that implements [StringSink], eagerly UTF-8 encoding textual input and delegating the resulting bytes to an underlying [EventSink].
 ///
 /// Architecturally, [Utf8StreamStringSink] acts as a non-buffering bridge
 /// between high-throughput string generators (like `jsonEncodeAsync`) and
@@ -22,7 +21,10 @@ import 'package:monolib_dart/stream.dart';
 /// await jsonEncodeAsync({'large': 'payload...'}, stringSink);
 /// ```
 class Utf8StreamStringSink implements StringSink {
+  /// The target endpoint for UTF-8 encoded bytes.
   final EventSink<List<int>> _sink;
+
+  /// An optional callback invoked if the underlying sink throws an exception.
   final void Function(Object error, StackTrace stackTrace)? _onError;
 
   /// Creates a [Utf8StreamStringSink] that wraps the underlying byte [_sink].
