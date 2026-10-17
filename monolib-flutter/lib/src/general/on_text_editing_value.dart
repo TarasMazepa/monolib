@@ -3,10 +3,10 @@ library;
 
 import 'package:flutter/widgets.dart';
 
-/// An architectural extension on [TextEditingValue] providing contextual text evaluation.
+/// Resolves the relevant bounds of user input based on the current
+/// cursor state.
 ///
-/// This extension resolves the relevant bounds of user input based on the current
-/// cursor state. It is primarily used to isolate the active typing context from
+/// Architecturally, it is primarily used to isolate the active typing context from
 /// trailing text, enabling precise pattern matching or text analysis in
 /// input-driven workflows without manual boundary calculation.
 extension OnTextEditingValue on TextEditingValue {
