@@ -78,6 +78,7 @@ class Int32Table {
   /// print(table.get(0, 0)); // Prints 1
   /// print(table.get(0, 1)); // Prints 0
   /// ```
+  /// Creates a new table dynamically generating cells via the `generator` callback.
   Int32Table.generate(
     int rows,
     int columns,
@@ -95,7 +96,9 @@ class Int32Table {
     }
   }
 
-  /// Ensures that the provided [row] and [col] are within the bounds of the table.
+  /// Validates that the provided [row] and [col] indices are within the grid dimensions.
+  ///
+  /// Throws a [RangeError] if the indices are out of bounds.
   void _checkBounds(int row, int col) {
     if (_rows == 0) {
       throw RangeError('Table has 0 rows; index $row is out of bounds.');
