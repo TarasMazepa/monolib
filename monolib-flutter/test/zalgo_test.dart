@@ -58,7 +58,7 @@ void main() {
       // Note: an isolated base character (e.g. 'H') requires at least one modifier to parse as Zalgo.
       final encodedHi = zalgoEncode('Ha');
       final encodedI = zalgoEncode('ia');
-      final text = 'a${encodedHi}${encodedI}b';
+      final text = 'a$encodedHi${encodedI}b';
 
       final ranges = mapZalgoRanges(text);
       // 'a' (normal), 'Ha' (zalgo), 'ia' (zalgo), 'b' (normal)
