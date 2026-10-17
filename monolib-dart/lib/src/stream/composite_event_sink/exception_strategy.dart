@@ -72,7 +72,7 @@ abstract class ExceptionStrategy {
   /// applying this specific error-handling behavior.
   ///
   /// The [action] is typically a closure that invokes [EventSink.add],
-  /// [EventSink.addError], or [EventSink.close] on the individual child [sink].
+  /// [EventSink.addError], or [EventSink.close] on the individual child [EventSink].
   /// Depending on the concrete implementation, exceptions thrown by [action]
   /// might be thrown immediately, caught and stored, or silently discarded.
   void dispatch<T>(

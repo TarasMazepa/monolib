@@ -16,8 +16,8 @@ import 'package:monolib_dart/src/stream/composite_event_sink/exception_strategy.
 /// ### Example
 /// ```dart
 /// final compositeSink = CompositeEventSink<int>(
-///   sinks: [sink1, sink2, sink3],
-///   strategy: ExceptionStrategy.aggregate,
+///   [sink1.sink, sink2.sink, sink3.sink],
+///   exceptionStrategy: ExceptionStrategy.aggregate,
 /// );
 ///
 /// try {
