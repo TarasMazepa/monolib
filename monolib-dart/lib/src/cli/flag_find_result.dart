@@ -28,7 +28,7 @@ import 'package:monolib_dart/src/cli/flag_find_type.dart';
 /// }
 /// ```
 class FlagFindResult {
-  /// The index in the original or partially mutated argument list where the flag
+  /// The [index] in the original or partially mutated argument list where the flag
   /// (or its remaining value) was located after discovery.
   ///
   /// For standalone flags, this index currently points to the subsequent argument
