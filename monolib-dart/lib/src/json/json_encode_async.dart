@@ -16,7 +16,7 @@ import 'package:monolib_dart/src/json/async_json_writable.dart';
 /// Asynchronously encodes an [object] into JSON and writes it to a sink in chunks.
 ///
 /// Unlike standard [jsonEncode], this function is fully stream and future-aware.
-/// It seamlessly resolves nested `Future`s and progressively consumes `Stream`s,
+/// It seamlessly resolves nested [Future]s and progressively consumes [Stream]s,
 /// writing array items or object values as they arrive. This unbuffered approach
 /// prevents blocking the event loop and significantly reduces memory overhead when
 /// serializing massive or delayed structures (e.g. streaming API responses or
@@ -26,8 +26,8 @@ import 'package:monolib_dart/src/json/async_json_writable.dart';
 /// See [withLazyStringSink] for detailed sink lifecycle management semantics.
 ///
 /// - [object]: The root object to serialize. It supports standard primitives, maps,
-///   iterables, natively awaited `Future`s, incrementally consumed `Stream`s, and
-///   custom objects implementing `toJson()` or the streaming [AsyncJsonWritable] interface.
+///   iterables, natively awaited [Future]s, incrementally consumed [Stream]s, and
+///   custom objects implementing [toJson]() or the streaming [AsyncJsonWritable] interface.
 /// - [sink]: An already active, externally managed sink. The caller retains ownership
 ///   and is responsible for closing it.
 /// - [sinkProvider]: A factory that lazily opens a sink (e.g. a file) only when the
