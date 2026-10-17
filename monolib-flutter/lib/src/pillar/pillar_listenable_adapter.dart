@@ -1,55 +1,58 @@
 import 'package:flutter/foundation.dart';
 import 'package:monolib_dart/pillar.dart';
 
-/// An architectural adapter that bridges a pure-Dart [PillarListenable] to
+/// An architectural adapter that bridges a pure Dart [PillarListenable] to
 /// Flutter's native [Listenable] contract.
 ///
 /// Within the Pillar dependency injection framework, [PillarListenable] provides
-/// a way to broadcast state or scope changes without introducing a direct
+/// a way to broadcast state or scope lifecycle changes without introducing a direct
 /// dependency on Flutter. This adapter wraps a [PillarListenable] instance so
-/// it can be seamlessly consumed by Flutter widgets that expect a standard
+/// it can be seamlessly consumed by native Flutter widgets that expect a standard
 /// [Listenable], such as `ListenableBuilder` or `AnimatedBuilder`.
 ///
-/// Rather than instantiating this class manually, consumers typically access
-/// it via the `asListenable` extension getter on any [PillarListenable].
+/// Architecturally, it delegates listener management directly to the underlying
+/// notification source, enabling Pillar scope changes to safely trigger UI
+/// rebuilds. Rather than instantiating this class manually, consumers typically
+/// access it via the [asListenable] extension getter on [PillarListenable].
 ///
 /// Example:
 /// ```dart
-/// final PillarListenable pillarListenable = pillar.changeNotifierFor(myScope);
+/// final PillarListenable scopeNotifier = pillar.changeNotifierFor(myScope);
 ///
-/// // In a Flutter build method:
+/// // Inside a Flutter widget's build method:
 /// return ListenableBuilder(
-///   listenable: pillarListenable.asListenable,
+///   listenable: scopeNotifier.asListenable, // Uses the adapter internally
 ///   builder: (context, child) {
-///     return Text('Scope state updated!');
+///     return const Text('Pillar scope state has been updated!');
 ///   },
 /// );
 /// ```
 class PillarListenableAdapter implements Listenable {
-  /// The underlying pure-Dart notification source being wrapped.
+  /// The underlying pure Dart notification source being structurally proxied.
   ///
-  /// This [PillarListenable] is responsible for the actual event tracking and
-  /// dispatching when [addListener] and [removeListener] are invoked.
+  /// This [PillarListenable] is responsible for the actual internal event tracking
+  /// and dispatching. When [addListener] or [removeListener] are invoked on this
+  /// adapter, they are safely forwarded to this underlying source.
   final PillarListenable pillarListenable;
 
-  /// Creates a new adapter wrapping the given [pillarListenable].
+  /// Creates a new adapter bridging the given [pillarListenable].
   ///
-  /// Generally, developers should use the `asListenable` getter on
-  /// [PillarListenable] instead of calling this constructor directly.
+  /// Generally, developers should use the [asListenable] extension getter on
+  /// [PillarListenable] instead of explicitly calling this constructor.
   const PillarListenableAdapter(this.pillarListenable);
 
-  /// Registers a Flutter [VoidCallback] [listener] with the underlying
-  /// [pillarListenable].
+  /// Registers a Flutter [VoidCallback] [listener] by safely forwarding it
+  /// to the underlying [pillarListenable].
   ///
-  /// The [listener] will be invoked whenever the [PillarListenable] dispatches
-  /// an update.
+  /// The [listener] will be triggered whenever the encapsulated [PillarListenable]
+  /// dispatches a state mutation or lifecycle update.
   @override
   void addListener(VoidCallback listener) {
     pillarListenable.addListener(listener);
   }
 
   /// Unregisters a previously registered Flutter [VoidCallback] [listener]
-  /// from the underlying [pillarListenable].
+  /// by safely removing it from the underlying [pillarListenable].
   @override
   void removeListener(VoidCallback listener) {
     pillarListenable.removeListener(listener);
