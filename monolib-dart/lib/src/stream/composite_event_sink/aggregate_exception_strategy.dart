@@ -23,12 +23,12 @@ part of 'exception_strategy.dart';
 ///
 /// ### Example
 /// ```dart
-/// final sinkA = StreamController<int>()..stream.listen((_) => throw StateError('A failed'));
-/// final sinkB = StreamController<int>(); // Will succeed
-/// final sinkC = StreamController<int>()..stream.listen((_) => throw FormatException('C failed'));
+/// final sinkA = StreamController<int>()..close(); // Closed early, throws StateError on add
+/// final sinkB = StreamController<int>();          // Will succeed
+/// final sinkC = StreamController<int>()..close(); // Closed early, throws StateError on add
 ///
 /// final composite = CompositeEventSink(
-///   [sinkA, sinkB, sinkC],
+///   [sinkA.sink, sinkB.sink, sinkC.sink],
 ///   exceptionStrategy: ExceptionStrategy.aggregate,
 /// );
 ///
