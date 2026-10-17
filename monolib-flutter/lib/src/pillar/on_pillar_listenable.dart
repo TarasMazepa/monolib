@@ -4,8 +4,7 @@ library;
 
 import 'package:flutter/foundation.dart';
 import 'package:monolib_dart/pillar.dart';
-
-import 'pillar_listenable_adapter.dart';
+import 'package:monolib_flutter/src/pillar/pillar_listenable_adapter.dart';
 
 /// Provides architectural bridging utilities that integrate the Pillar dependency injection
 /// framework's pure Dart reactivity model with Flutter's native widget lifecycle.

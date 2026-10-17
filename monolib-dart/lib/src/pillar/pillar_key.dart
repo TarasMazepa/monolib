@@ -1,4 +1,7 @@
-/// A zero-cost identifier used by the [Pillar] dependency injection container
+/// Composite dependency lookup keys for the Pillar dependency injection container.
+library;
+
+/// A zero-cost identifier used by the `Pillar` dependency injection container
 /// to uniquely track and resolve registered dependencies.
 ///
 /// A [PillarKey] acts as a composite dictionary key, pairing a specific Dart
@@ -7,7 +10,7 @@
 /// type by differentiating them with unique tokens, resolving the limitation of
 /// type-only injection systems.
 ///
-/// These keys are heavily utilized by [Pillar] and [PillarAccessor] during
+/// These keys are heavily utilized by `Pillar` and `PillarAccessor` during
 /// dependency registration and resolution lifecycles.
 ///
 /// ```dart
@@ -17,8 +20,6 @@
 /// // Internal registration using a tokenized key
 /// pillar.register<Database>(key: PillarKey.withToken(Database, token: 'cache'), ...);
 /// ```
-library;
-
 extension type const PillarKey._(({Type type, String? token}) _data) {
   /// Creates a default [PillarKey] based solely on the provided [type].
   ///
