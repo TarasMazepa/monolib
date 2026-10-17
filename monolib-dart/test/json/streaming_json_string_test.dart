@@ -35,7 +35,7 @@ void main() {
 
       final streamController = StreamController<String>();
       final obj = {
-        'streamedString': StreamingJsonString(streamController.stream),
+        'streamedString': StreamingJsonString(() => streamController.stream),
       };
 
       final encodeFuture = jsonEncodeAsync(object: obj, sink: buffer);
