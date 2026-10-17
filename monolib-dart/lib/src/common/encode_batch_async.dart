@@ -1,4 +1,4 @@
-/// A shared utility for asynchronously encoding streamed data batches.
+/// Provides [encodeBatchAsync], a shared architectural utility for asynchronously encoding streamed data batches.
 library;
 
 import 'dart:async';
