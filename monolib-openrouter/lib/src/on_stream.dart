@@ -1,7 +1,6 @@
 import 'dart:async';
 
-/// An architectural extension on [Stream] that provides fault-tolerant utilities
-/// for asynchronous event pipelines.
+/// Provides fault-tolerant utilities for asynchronous event pipelines by extending the native capabilities of [Stream].
 ///
 /// This extension bridges standard streams into robust data flows by offering
 /// mechanisms to safely suppress fatal asynchronous exceptions—such as replacing

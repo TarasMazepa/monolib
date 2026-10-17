@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:monolib_dart/stream.dart';
 
-/// A [Converter] that strips leading ASCII whitespace bytes (0x20, 0x0A, 0x0D, 0x09)
+/// An architectural byte-stream transformer extending [Converter] that filters out leading ASCII whitespace bytes (0x20, 0x0A, 0x0D, 0x09)
 /// from a byte stream before passing data downstream.
 ///
 /// Architecturally, this class prevents JSON parse errors when handling streaming
@@ -25,8 +25,7 @@ import 'package:monolib_dart/stream.dart';
 class DropLeadingWhitespaceConverter extends Converter<List<int>, List<int>> {
   /// Called when adding a chunk to the downstream sink fails.
   ///
-  /// Such errors are naturally ignored by the underlying [EventSink] tryAdd
-  /// extensions. Without an [onError] callback provided, they are silently dropped.
+  /// Such errors are naturally ignored by the [OnSink.tryAdd] extension. Without an [onError] callback provided, they are silently dropped.
   final void Function(Object error, StackTrace stackTrace)? onError;
 
   /// Creates a [DropLeadingWhitespaceConverter] that optionally reports downstream
