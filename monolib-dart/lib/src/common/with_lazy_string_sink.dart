@@ -1,3 +1,6 @@
+/// Provides [withLazyStringSink], an architectural utility for lazy resource allocation during asynchronous encoding.
+library;
+
 import 'dart:async';
 
 /// A utility function that manages the lifecycle, lazy initialization, and resource
@@ -16,7 +19,8 @@ import 'dart:async';
 /// of [sinkProvider] until `getSink()` is explicitly invoked by the inner [action],
 /// I/O resources are only allocated when necessary.
 ///
-/// Either [sink] or [sinkProvider] MUST be provided, but not both.
+/// Either [sink] or [sinkProvider] MUST be provided, but not both. Throws an
+/// [ArgumentError] if both are provided, or if neither are provided.
 ///
 /// - [sink]: An active, externally managed [StringSink]. When provided, this utility
 ///   will NOT automatically close the sink after execution.

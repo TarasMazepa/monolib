@@ -1,3 +1,6 @@
+/// Provides [iterateStreamOrIterable], an architectural utility for polymorphic asynchronous iteration.
+library;
+
 import 'dart:async';
 
 /// Iterates over either a [Stream] or an [Iterable], applying the asynchronous

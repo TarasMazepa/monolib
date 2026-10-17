@@ -1,3 +1,6 @@
+/// Provides [ListAccumulatorSink], an in-memory buffering proxy for bridging synchronous and chunked conversions.
+library;
+
 /// A synchronous, in-memory buffering proxy that accumulates events into a single [List].
 ///
 /// Architecturally, [ListAccumulatorSink] bridges stream-based (chunked) processing
