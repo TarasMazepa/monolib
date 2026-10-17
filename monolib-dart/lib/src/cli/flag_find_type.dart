@@ -1,5 +1,8 @@
 library;
 
+import 'package:monolib_dart/src/cli/flag.dart';
+import 'package:monolib_dart/src/cli/flag_find_result.dart';
+
 /// Describes the syntactic format in which a command-line flag was discovered
 /// within a list of arguments.
 ///

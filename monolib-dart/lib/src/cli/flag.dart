@@ -144,7 +144,7 @@ class Flag {
   /// This is a convenience wrapper around [findAndRemoveFlag] that discards the
   /// detailed match structural data and simply returns a boolean indicating presence.
   ///
-  /// **Warning:** This method mutates [args] by removing the matched flag token.
+  /// **Warning:** This method destructively mutates [args] by removing the matched flag token.
   bool hasFlag(List<String> args) {
     return findAndRemoveFlag(args) != null;
   }
@@ -188,7 +188,8 @@ class Flag {
   ///
   /// Unlike [getFlagValue], this method does not throw exceptions if the value
   /// is missing or unparseable. Instead, it returns a sealed [OptionalFlagResult]
-  /// type to explicitly communicate the state of the match:
+  /// type to explicitly communicate the state of the match in this destructive
+  /// parsing architecture:
   ///
   /// - Returns [FlagNotPresent] if the flag does not exist in [args].
   /// - Returns [FlagPresent] containing a `null` value if the flag exists but
