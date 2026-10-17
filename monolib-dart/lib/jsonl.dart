@@ -1,3 +1,6 @@
+/// Streaming and synchronous JSON Lines (JSONL) encoding and decoding utilities.
+library;
+
 export 'src/jsonl/jsonl_chunked_decoder.dart';
 export 'src/jsonl/jsonl_codec.dart';
 export 'src/jsonl/jsonl_decoder.dart';

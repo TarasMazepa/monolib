@@ -10,7 +10,7 @@ library;
 /// It transparently strips out `null` predicates and safely optimizes the execution of the
 /// remaining rules without requiring manual `if` branching or collection filtering.
 extension OnIterableOfNullableBoolFunctions<T> on Iterable<bool Function(T)?> {
-  /// Fuses a collection of optional predicates into a single, strict [bool Function] that
+  /// Fuses a collection of optional predicates into a single, strict `bool Function(T)` that
   /// validates an input against all active rules, analogous to a logical AND (`&&`) operation.
   ///
   /// This getter first filters out any `null` elements from the iterable. The returned function
@@ -45,7 +45,7 @@ extension OnIterableOfNullableBoolFunctions<T> on Iterable<bool Function(T)?> {
         final ps => (x) => ps.every((p) => p(x)),
       };
 
-  /// Fuses a collection of optional predicates into a single, permissive [bool Function] that
+  /// Fuses a collection of optional predicates into a single, permissive `bool Function(T)` that
   /// validates an input against any active rule, analogous to a logical OR (`||`) operation.
   ///
   /// This getter removes all `null` predicates from the iterable. The returned function

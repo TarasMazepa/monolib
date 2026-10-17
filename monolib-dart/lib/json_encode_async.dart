@@ -1,3 +1,6 @@
+/// Asynchronous and streaming JSON serialization utilities.
+library;
+
 export 'src/json/async_json_writable.dart';
 export 'src/json/json_encode_async.dart';
 export 'src/json/json_string_escaping_sink.dart';

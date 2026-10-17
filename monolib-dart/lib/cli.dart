@@ -1,3 +1,6 @@
+/// Command-line argument and flag parsing utilities.
+library;
+
 export 'src/cli/flag.dart';
 export 'src/cli/flag_find_result.dart';
 export 'src/cli/flag_find_type.dart';

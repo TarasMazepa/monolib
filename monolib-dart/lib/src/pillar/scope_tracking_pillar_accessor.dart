@@ -10,7 +10,7 @@ import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 /// created instance based on the scopes of the dependencies it requested during
 /// its creation.
 class ScopeTrackingPillarAccessor implements PillarAccessor {
-  /// The function used to retrieve a [PillarEntry] for a given type [T], [key], or [token].
+  /// The function used to retrieve a [PillarEntry] for a given type `T`, `key`, or `token`.
   final PillarEntry Function<T>({PillarKey? key, String? token}) entryGetter;
 
   /// The lowest [PillarScope] encountered among all tracked dependencies so far.

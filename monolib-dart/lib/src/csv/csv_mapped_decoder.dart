@@ -30,7 +30,7 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// }
 /// ```
 class CsvMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
-  /// The callback responsible for converting a raw CSV [row] into a domain object [T].
+  /// The callback responsible for converting a raw CSV `row` into a domain object [T].
   ///
   /// If this function returns `null`, the row is skipped and not emitted.
   final T? Function(List<String> row) mapper;

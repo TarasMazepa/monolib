@@ -10,7 +10,7 @@ library;
 
 import 'package:monolib_dart/monolib_dart.dart';
 import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
-import 'package:monolib_dart/src/pillar/pillar_change_notifier_internal.dart';
+import 'package:monolib_dart/src/pillar/pillar_change_notifier.dart';
 import 'package:monolib_dart/src/pillar/pillar_entry.dart';
 import 'package:monolib_dart/src/pillar/pillar_key.dart';
 import 'package:monolib_dart/src/pillar/pillar_listenable.dart';
@@ -76,9 +76,9 @@ class Pillar implements PillarAccessor {
   /// corresponding [PillarEntry], which manages instantiation and caching.
   final Map<PillarKey, PillarEntry> _map = {};
 
-  /// A registry tracking [PillarChangeNotifierInternal]s assigned to specific
+  /// A registry tracking [PillarChangeNotifier]s assigned to specific
   /// lifecycle scopes, allowing for targeted state invalidation broadcasting.
-  final Map<PillarScope, PillarChangeNotifierInternal> _scopeChanges = {};
+  final Map<PillarScope, PillarChangeNotifier> _scopeChanges = {};
 
   /// A dummy factory used internally to replace entries via [replace].
   ///
@@ -204,7 +204,7 @@ class Pillar implements PillarAccessor {
       value: instance,
       instanceScope: scope,
     );
-    _scopeChanges[scope]?.notify();
+    _scopeChanges[scope]?.notifyListeners();
   }
 
   /// Invalidates and clears cached instances associated with the given [scope].
@@ -234,6 +234,6 @@ class Pillar implements PillarAccessor {
   /// via `PillarListenableAdapter` in Flutter) to redraw themselves whenever
   /// [replace] is invoked on the targeted [scope].
   PillarListenable changeNotifierFor(PillarScope scope) {
-    return _scopeChanges.putIfAbsent(scope, PillarChangeNotifierInternal.new);
+    return _scopeChanges.putIfAbsent(scope, PillarChangeNotifier.new);
   }
 }

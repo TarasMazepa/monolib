@@ -57,7 +57,7 @@ class StreamBuilderForList<T> extends StatelessWidget {
   /// The builder callback invoked when the stream emits a non-empty [List].
   ///
   /// This callback is provided with the [BuildContext] and the populated list
-  /// of [data] to render the primary UI for the items.
+  /// of `data` to render the primary UI for the items.
   final Widget Function(BuildContext context, List<T> data) onData;
 
   /// The builder callback invoked when the stream emits an empty [List].
@@ -74,7 +74,7 @@ class StreamBuilderForList<T> extends StatelessWidget {
 
   /// The builder callback invoked when the stream emits an error.
   ///
-  /// This callback receives the [BuildContext] and the emitted [error] object.
+  /// This callback receives the [BuildContext] and the emitted `error` object.
   /// If null, defaults to displaying a centered [Text] widget with a generic
   /// error message.
   final Widget Function(BuildContext context, Object error)? onError;

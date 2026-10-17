@@ -1,7 +1,9 @@
+/// Scoped dependency injection and change notification utilities.
+library;
+
 export 'src/pillar/pillar.dart';
 export 'src/pillar/pillar_accessor.dart';
 export 'src/pillar/pillar_change_notifier.dart';
-export 'src/pillar/pillar_change_notifier_internal.dart';
 export 'src/pillar/pillar_entry.dart';
 export 'src/pillar/pillar_key.dart';
 export 'src/pillar/pillar_listenable.dart';
