@@ -2,22 +2,26 @@ import 'package:monolib_dart/zalgo.dart';
 
 import 'zalgo_text_range.dart';
 
-/// Parses the [input] string into a list of [ZalgoTextRange] objects, distinguishing between Zalgo-encoded and plain text segments.
+/// Acts as the core tokenizer state machine for parsing mixed-content strings into structured [ZalgoTextRange] tokens.
 ///
-/// This function scans the [input] to identify continuous ranges of characters that form Zalgo text
-/// and separates them from normal text. The result is a sequential list of ranges covering the entire [input].
+/// Architecturally, this function performs a single-pass scan over the [input] string's code units,
+/// using [isZalgoEncodableCodeUnit] to detect potential base characters and [isZalgoDecodableCodeUnit]
+/// to identify subsequent combining modifiers. It yields a sequential list of [ZalgoTextRange] objects
+/// that collectively cover the entire [input] without overlapping, effectively separating plain text
+/// segments from isolated Zalgo grapheme clusters.
 ///
 /// If the [input] is empty, it returns a single collapsed, non-Zalgo range: `[0, 0)`.
 ///
-/// Note: Zalgo-encoded characters are parsed into individual grapheme clusters. A continuous
-/// sequence of Zalgo text will be returned as multiple distinct [ZalgoTextRange] objects (one per grapheme).
+/// Note: Because Zalgo text is defined at the grapheme level (one base plus modifiers),
+/// contiguous sequences of Zalgo characters are yielded as multiple distinct [ZalgoTextRange]
+/// objects rather than being merged into a single block.
 ///
-/// Example:
 /// ```dart
 /// final ranges = mapZalgoRanges('Hi e̵̟̎x̴̝̾');
-/// // ranges[0] represents 'Hi ' (isZalgo: false)
-/// // ranges[1] represents 'e̵̟̎' (isZalgo: true)
-/// // ranges[2] represents 'x̴̝̾' (isZalgo: true)
+///
+/// // ranges[0] is plain text 'Hi '
+/// // ranges[1] is Zalgo text 'e̵̟̎'
+/// // ranges[2] is Zalgo text 'x̴̝̾'
 /// ```
 List<ZalgoTextRange> mapZalgoRanges(String input) {
   final result = <ZalgoTextRange>[];
