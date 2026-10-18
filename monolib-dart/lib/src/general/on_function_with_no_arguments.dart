@@ -1,15 +1,18 @@
-/// Extension methods for zero-argument functions returning [T].
+/// Extension on zero-argument functions returning [T] that provides retry
+/// logic.
 extension OnFunctionWithNoArguments<T> on T Function() {
-  /// Calls the function and retries it up to [times] times if it throws an exception.
+  /// Invokes this function and retries up to [times] total attempts if it
+  /// throws.
   ///
-  /// If the function fails [times] times consecutively, the first exception
-  /// caught will be rethrown. If [times] is less than or equal to 0, it throws an
-  /// [ArgumentError].
+  /// Returns the result immediately on success. If all [times] attempts throw,
+  /// rethrows the first caught exception.
+  ///
+  /// Throws an [ArgumentError] if [times] is less than or equal to `0`.
   ///
   /// Example:
   /// ```dart
-  /// int unstableCall() { ... }
-  /// int result = unstableCall.callWithRetryOnFailure(times: 3);
+  /// int unstableCall() => 42;
+  /// final result = unstableCall.callWithRetryOnFailure(times: 3);
   /// ```
   T callWithRetryOnFailure({int times = 3}) {
     if (times <= 0) {
@@ -27,15 +30,17 @@ extension OnFunctionWithNoArguments<T> on T Function() {
   }
 }
 
-/// A helper function that executes [call] with retry logic.
+/// Invokes [call] and retries up to [times] total attempts if it throws.
 ///
-/// This behaves identically to [OnFunctionWithNoArguments.callWithRetryOnFailure].
-/// It attempts to execute [call] up to [times] times if it throws an exception.
+/// Convenience wrapper around
+/// [OnFunctionWithNoArguments.callWithRetryOnFailure].
+///
+/// Throws an [ArgumentError] if [times] is less than or equal to `0`.
 ///
 /// Example:
 /// ```dart
-/// int unstableCall() { ... }
-/// int result = retryOnFailure(unstableCall, times: 3);
+/// int unstableCall() => 42;
+/// final result = retryOnFailure(unstableCall, times: 3);
 /// ```
 T retryOnFailure<T>(T Function() call, {int times = 3}) {
   return call.callWithRetryOnFailure(times: times);

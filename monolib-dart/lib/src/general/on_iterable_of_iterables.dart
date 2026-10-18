@@ -1,22 +1,13 @@
-/// Provides architectural utilities for aggregating, interleaving, and performing
-/// cross-sequence mathematical operations on 2D collections (`Iterable<Iterable<T>>`).
-///
-/// This extension simplifies the orchestration of multiple distinct iterables,
-/// allowing them to be processed as a single stream without manually managing
-/// nested loops or multiple [Iterator] states. It is particularly useful for
-/// time-series smoothing, batch result interleaving, or fair-scheduling algorithms.
+/// Extension on [Iterable] of [Iterable]s that provides interleaving and
+/// element-wise averaging.
 extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
-  /// Lazily interleaves elements from all child iterables in a round-robin fashion.
+  /// Lazily interleaves elements from all child iterables in round-robin order.
   ///
-  /// The [mixed] getter iterates horizontally across the sequences. In each pass,
-  /// it pulls one element from each active [Iterable]. When an [Iterable] is exhausted,
-  /// it is safely removed from the rotation, and the interleaving continues with the
-  /// remaining sequences until all are consumed.
+  /// Pulls one element from each active child [Iterable] per pass. Exhausted
+  /// iterables are removed from the rotation until all child iterables have
+  /// been consumed.
   ///
-  /// This is architecturally useful for fair-scheduling tasks or evenly merging
-  /// paginated datasets where elements from different sources should be distributed
-  /// uniformly.
-  ///
+  /// Example:
   /// ```dart
   /// final queries = [
   ///   ['A1', 'A2', 'A3'],
@@ -24,7 +15,7 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
   ///   ['C1', 'C2'],
   /// ];
   ///
-  /// // Yields: 'A1', 'B1', 'C1', 'A2', 'C2', 'A3'
+  /// // ['A1', 'B1', 'C1', 'A2', 'C2', 'A3']
   /// final interleaved = queries.mixed.toList();
   /// ```
   Iterable<T> get mixed sync* {
@@ -44,23 +35,17 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
     }
   }
 
-  /// Lazily calculates the vertical average across all child iterables in lockstep.
+  /// Lazily computes the element-wise truncating average across all child
+  /// iterables in lockstep.
   ///
-  /// The [average] method iterates synchronously through all provided sequences,
-  /// aggregating elements at the exact same index and dividing the sum by the total
-  /// number of iterables to produce a single sequence of averages.
+  /// Sums the elements at each index using `+` and divides the sum by the
+  /// number of child iterables using `~/`. Elements of type [T] must support
+  /// both `+` and `~/`.
   ///
-  /// Because it requires mathematical aggregation, the underlying elements `T` must
-  /// support the `+` operator for addition and the `~/` (truncating division) operator.
-  /// The operations are executed dynamically, making this suitable for types like `int`
-  /// or custom numeric classes that implement these operators.
+  /// Throws a [StateError] if the child iterables do not all have the same
+  /// length.
   ///
-  /// It throws a [StateError] if the iterables are not of identical length, ensuring
-  /// strict structural parity across the sequences being averaged.
-  ///
-  /// This is useful for smoothing time-series data or calculating row-wise means
-  /// across multiple synchronized data channels.
-  ///
+  /// Example:
   /// ```dart
   /// final sensorReads = [
   ///   [10, 20, 30],
@@ -68,7 +53,7 @@ extension OnIterableOfIterables<T> on Iterable<Iterable<T>> {
   ///   [8, 18, 28],
   /// ];
   ///
-  /// // Yields: 10, 20, 30 (e.g. (10+12+8)~/3 = 10)
+  /// // [10, 20, 30]
   /// final smoothed = sensorReads.average().toList();
   /// ```
   Iterable<T> average() sync* {
