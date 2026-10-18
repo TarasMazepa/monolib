@@ -1,20 +1,21 @@
 import 'package:monolib_dart/zalgo.dart';
 import 'package:monolib_flutter/src/zalgo/zalgo_text_range.dart';
 
-/// Acts as the core tokenizer state machine for parsing mixed-content strings into structured [ZalgoTextRange] tokens.
+/// Parses [input] into non-overlapping [ZalgoTextRange] segments of plain text
+/// and Zalgo grapheme clusters.
 ///
-/// Architecturally, this function performs a single-pass scan over the [input] string's code units,
-/// using [isZalgoEncodableCodeUnit] to detect potential base characters and [isZalgoDecodableCodeUnit]
-/// to identify subsequent combining modifiers. It yields a sequential list of [ZalgoTextRange] objects
-/// that collectively cover the entire [input] without overlapping, effectively separating plain text
-/// segments from isolated Zalgo grapheme clusters.
+/// Scans [input]'s code units in a single pass, using
+/// [isZalgoEncodableCodeUnit] to detect potential base characters and
+/// [isZalgoDecodableCodeUnit] to identify subsequent combining modifiers.
 ///
-/// If the [input] is empty, it returns a single collapsed, non-Zalgo range: `[0, 0)`.
+/// If [input] is empty, returns a single collapsed, non-Zalgo range: `[0, 0)`.
 ///
-/// Note: Because Zalgo text is defined at the grapheme level (one base plus modifiers),
-/// contiguous sequences of Zalgo characters are yielded as multiple distinct [ZalgoTextRange]
-/// objects rather than being merged into a single block.
+/// Because Zalgo text is encoded at the grapheme cluster level (one base
+/// character followed by combining modifiers), contiguous Zalgo clusters are
+/// returned as separate [ZalgoTextRange] entries rather than merged into a
+/// single range.
 ///
+/// Example:
 /// ```dart
 /// final ranges = mapZalgoRanges('Hi e̵̟̎x̴̝̾');
 ///

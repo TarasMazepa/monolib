@@ -1,27 +1,17 @@
-/// A specialized [StreamBuilder] wrapper for handling lists of data.
-///
-/// This library provides [StreamBuilderForList] to simplify the boilerplate
-/// of managing [AsyncSnapshot] states (loading, error, empty, and populated)
-/// when consuming a [Stream] of [List]s.
-library;
-
 import 'package:flutter/material.dart';
 
-/// Provides explicit UI states for a [Stream] emitting lists of data.
+/// A [StatelessWidget] that wraps [StreamBuilder] with dedicated builder
+/// callbacks for loading, error, empty, and populated [List] states.
 ///
 /// While [StreamBuilder] exposes a raw [AsyncSnapshot] that requires manual
 /// evaluation of data availability and error states, [StreamBuilderForList]
-/// abstracts this boilerplate. Architecturally, it leverages pattern matching on the
-/// [AsyncSnapshot] to delegate rendering to distinct builder callbacks based
-/// on the stream's current state: loading, error, empty list, or populated list.
+/// delegates rendering to distinct callbacks based on the snapshot's state.
 ///
-/// This is particularly useful for list-based UI patterns (like displaying a
-/// [ListView] of items fetched from a stream) where an empty list often requires
-/// a different visual representation (e.g., a "No items found" message) than a
-/// list containing elements. By distinguishing between a `null` data state (loading)
-/// and an empty `[]` list state, it ensures correct UI rendering during data fetching.
+/// By distinguishing between a `null` data state (loading) and an empty `[]`
+/// list state, it simplifies list-based UI patterns (such as rendering a
+/// [ListView] with an empty-state placeholder).
 ///
-/// Example usage:
+/// Example:
 /// ```dart
 /// StreamBuilderForList<String>(
 ///   stream: myStringListStream,
