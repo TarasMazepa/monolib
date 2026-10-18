@@ -1,70 +1,59 @@
-/// Provides [JsonlMappedDecoder], a stream transformer for decoding JSON Lines.
-library;
-
 import 'dart:convert';
 
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
-/// A [Converter] that efficiently parses chunked JSON Lines (JSONL) string data
-/// and maps each decoded JSON object into a strongly-typed instance of [T].
+/// A streaming converter that parses chunked JSON Lines (JSONL) string data and
+/// maps each decoded JSON object into a domain object of type [T].
 ///
-/// This decoder acts as a stream transformer specifically designed to fuse
-/// line-splitting directly into JSON string decoding and object mapping. By
-/// bypassing the intermediate stream events typical of Dart's `LineSplitter`, it
-/// reduces overhead and memory allocations when reading high-throughput data
-/// streams, such as from files or network responses.
+/// [JsonlMappedDecoder] extends [ChunkedOnlyConverter] and uses
+/// [JsonlBaseChunkSink] to split incoming string chunks into individual lines.
+/// Each line is decoded with [jsonCodec] and passed to [fromJson]; non-null
+/// results are emitted individually downstream, while `null` results are
+/// skipped.
 ///
-/// It extends [ChunkedOnlyConverter], emphasizing its architectural role as a
-/// stream-processing utility. Invoking the synchronous `convert` method directly
-/// will throw an [UnsupportedError].
-///
-/// The user-provided [fromJson] callback is invoked on every successfully parsed
-/// JSON object. If [fromJson] returns `null`, the row is safely ignored,
-/// allowing for inline filtering.
+/// For batched emission of mapped items per chunk, see [JsonlMappedBatchDecoder].
 ///
 /// Example:
 /// ```dart
-/// final stream = File('data.jsonl').openRead().transform(utf8.decoder);
+/// final fileStream = File('data.jsonl').openRead().transform(utf8.decoder);
 ///
-/// final objects = stream.transform(
+/// final modelStream = fileStream.transform(
 ///   JsonlMappedDecoder<MyModel>(
 ///     (json) => MyModel.fromJson(json as Map<String, dynamic>),
 ///     ignoreExceptions: true,
 ///   ),
 /// );
 ///
-/// await for (final model in objects) {
+/// await for (final model in modelStream) {
 ///   print(model.id);
 /// }
 /// ```
 class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
-  /// The mapping callback invoked to convert a parsed JSON object into [T].
+  /// The callback invoked to convert a decoded JSON value into an instance of [T].
   ///
-  /// If this callback returns `null`, the value is skipped and not emitted
-  /// into the output stream.
+  /// Returning `null` skips the line without emitting an event.
   final T? Function(dynamic) fromJson;
 
-  /// The underlying [Codec] used to parse the extracted line strings into JSON.
+  /// The underlying [Codec] used to decode individual JSON lines.
   ///
-  /// Defaults to standard [JsonCodec].
+  /// Defaults to [JsonCodec].
   final Codec<Object?, String> jsonCodec;
 
-  /// Whether to suppress exceptions during JSON decoding or mapping.
+  /// Whether to suppress exceptions thrown during JSON decoding or [fromJson] mapping.
   ///
-  /// If `true`, lines that fail to decode or throw during [fromJson] evaluation
-  /// are silently skipped. If `false` (default), the error propagates to the
-  /// stream's error channel.
+  /// When `true`, lines that fail to decode or map are silently skipped. When
+  /// `false` (the default), exceptions propagate to the stream.
   final bool ignoreExceptions;
 
-  /// An optional callback triggered exactly once when the source stream closes.
+  /// An optional callback invoked once when the input stream closes.
   final void Function()? onDone;
 
-  /// Creates a [JsonlMappedDecoder] that converts JSONL string chunks into [T].
+  /// Creates a [JsonlMappedDecoder] that maps decoded JSON lines using [fromJson].
   ///
-  /// The [fromJson] callback is required to map the dynamic JSON object.
-  /// Optionally, you can provide a custom [jsonCodec], swallow errors with
-  /// [ignoreExceptions], or perform cleanup using [onDone].
+  /// Optionally configures a custom [jsonCodec], suppresses errors when
+  /// [ignoreExceptions] is `true`, and invokes [onDone] when the input stream
+  /// completes.
   const JsonlMappedDecoder(
     this.fromJson, {
     this.ignoreExceptions = false,
@@ -72,9 +61,8 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
     this.onDone,
   });
 
-  /// Initiates a chunked conversion by returning a specialized sink.
-  ///
-  /// This bridges the incoming raw `String` chunks to the outgoing [sink] for [T].
+  /// Starts a chunked conversion that parses incoming JSONL string chunks, maps
+  /// each line using [fromJson], and emits non-null [T] values to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
     return _JsonlMappedDecoderSink<T>(
@@ -87,27 +75,22 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   }
 }
 
-/// The internal [ChunkedConversionSink] utilized by [JsonlMappedDecoder] to
-/// buffer strings and map JSON objects.
-///
-/// This delegates the raw string splitting to [JsonlBaseChunkSink], which
-/// handles carrying over incomplete segments across asynchronous stream chunks.
-/// When a full line is yielded via [processLine], it parses it using [jsonCodec]
-/// and maps it via [_fromJson].
+/// Internal [JsonlBaseChunkSink] implementation for [JsonlMappedDecoder].
 class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
-  /// The callback responsible for mapping parsed JSON to [T].
+  /// The callback applied to every decoded JSON value.
   final T? Function(dynamic) _fromJson;
 
-  /// The codec used for JSON decoding of the string line.
+  /// The codec used to decode individual JSON lines.
   final Codec<Object?, String> jsonCodec;
 
-  /// If true, swallows format or mapping exceptions.
+  /// Whether to suppress decoding and mapping exceptions.
   final bool ignoreExceptions;
 
-  /// Executed when the stream is completely closed.
+  /// An optional callback invoked when the sink is closed.
   final void Function()? onDone;
 
-  /// Constructs the sink, chaining the mapped output to [outSink].
+  /// Creates a sink that decodes JSONL lines with [jsonCodec], maps them with
+  /// [_fromJson], and forwards non-null results to [outSink].
   _JsonlMappedDecoderSink(
     super.outSink,
     this._fromJson,
@@ -116,11 +99,10 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
     this.onDone,
   });
 
-  /// Processes a single, complete line of JSON text.
+  /// Decodes [line] using [jsonCodec], maps the result with [_fromJson], and
+  /// emits it to [outSink] if non-null.
   ///
-  /// Attempts to decode the string using [jsonCodec], pass it through
-  /// [_fromJson], and forward non-null values to the target `outSink`.
-  /// Honors the [ignoreExceptions] flag if decoding or mapping fails.
+  /// Rethrows any exception unless [ignoreExceptions] is `true`.
   @override
   void processLine(String line) {
     try {
@@ -136,9 +118,8 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
     }
   }
 
-  /// Flushes any remaining incomplete lines and signals completion.
-  ///
-  /// Invokes [onDone] before finally closing the underlying `outSink`.
+  /// Flushes any remaining buffered data, closes [outSink], and invokes
+  /// [onDone] if provided.
   @override
   void close() {
     super.close();
