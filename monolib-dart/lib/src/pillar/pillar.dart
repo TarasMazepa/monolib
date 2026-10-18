@@ -1,13 +1,3 @@
-/// The core dependency injection container and lifecycle manager for the Pillar framework.
-///
-/// This library provides the main [Pillar] class, which acts as the central registry
-/// for dependencies. It manages the mapping between [PillarKey]s and [PillarEntry]s,
-/// enforcing hierarchical lifecycle boundaries via [PillarScope]. By bridging
-/// dependency resolution through the [PillarAccessor] interface, it securely
-/// tracks scopes during instantiation and handles lifecycle invalidations (e.g.,
-/// [Pillar.discard] or [Pillar.replace]) without leaking instances across scopes.
-library;
-
 import 'package:monolib_dart/monolib_dart.dart';
 import 'package:monolib_dart/src/pillar/pillar_accessor.dart';
 import 'package:monolib_dart/src/pillar/pillar_change_notifier.dart';
@@ -20,42 +10,39 @@ import 'package:monolib_dart/src/pillar/scope_tracking_pillar_accessor.dart';
 
 /// A factory function signature for resolving a dependency using a [PillarAccessor].
 ///
-/// Functions of this type are typically registered with [Pillar.register] to
-/// provide lazy instantiation of objects that require their own dependencies
-/// to be injected from the container.
+/// Functions of this type are registered with [Pillar.register] to lazily
+/// instantiate objects that require dependencies from the container.
 typedef PillarFactory<T> = T Function(PillarAccessor);
 
-/// A factory function signature for instantiating a dependency without requiring
-/// access to the DI container.
+/// A factory function signature for instantiating a dependency without
+/// accessing the dependency injection container.
 ///
-/// This is used for simple objects that have no downstream dependencies and
-/// can be created pure, independent of a [PillarAccessor].
+/// Used for objects that have no dependencies in the container and can be
+/// created independently of a [PillarAccessor].
 typedef PillarPureFactory<T> = T Function();
 
-/// An internal factory type used to construct dependencies while dynamically
-/// tracking the lowest [PillarScope] encountered during their resolution.
+/// An internal factory signature that constructs a dependency and returns the
+/// lowest [PillarScope] encountered during its resolution.
 ///
-/// This ensures that instances caching their state do not outlive the shortest
-/// lifecycle boundary of any of their nested dependencies.
+/// This ensures that cached instances do not outlive the shortest lifecycle
+/// boundary of any of their transitive dependencies.
 typedef PillarFactoryWithScopeTracking<T> = ({T value, PillarScope? scope})
     Function();
 
-/// The primary dependency injection container and lifecycle manager.
+/// The dependency injection container and scope lifecycle manager.
 ///
-/// [Pillar] is responsible for registering, caching, and retrieving dependencies.
-/// It implements [PillarAccessor] to expose a read-only resolution API, but
-/// internally, it maintains the mutable registry of [PillarEntry] objects.
+/// [Pillar] registers, caches, and resolves dependencies mapped by [PillarKey]
+/// to [PillarEntry]. It implements [PillarAccessor] to expose a read-only
+/// resolution interface while managing the underlying registry.
 ///
-/// Architecturally, [Pillar] heavily leverages [PillarScope] to enforce strict
-/// hierarchical boundaries. It tracks the lowest scope of dependencies accessed
-/// during instantiation (via [ScopeTrackingPillarAccessor]) and enforces those
-/// boundaries (via [ScopeEnforcingPillarAccessor]), preventing architectural flaws
-/// like a global singleton holding onto a short-lived user session object.
+/// During resolution, [Pillar] uses [ScopeTrackingPillarAccessor] to record the
+/// lowest [PillarScope] accessed by a factory and [ScopeEnforcingPillarAccessor]
+/// to prevent longer-lived scoped entries from depending on shorter-lived ones.
 ///
 /// Example:
 /// ```dart
 /// final pillar = Pillar();
-/// final globalScope = PillarScope.global();
+/// const globalScope = PillarScope.global();
 ///
 /// // Register a singleton scoped globally
 /// pillar.register<HttpClient>(
@@ -228,11 +215,8 @@ class Pillar implements PillarAccessor {
     }
   }
 
-  /// Returns a [PillarListenable] tied to the specific [scope].
-  ///
-  /// This provides an architectural bridge for reactive UI components (e.g.,
-  /// via `PillarListenableAdapter` in Flutter) to redraw themselves whenever
-  /// [replace] is invoked on the targeted [scope].
+  /// Returns a [PillarListenable] that notifies listeners whenever [replace] is
+  /// called for [scope].
   PillarListenable changeNotifierFor(PillarScope scope) {
     return _scopeChanges.putIfAbsent(scope, PillarChangeNotifier.new);
   }

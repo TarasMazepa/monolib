@@ -57,6 +57,7 @@ class ScopeTrackingPillarAccessor implements PillarAccessor {
   /// - `scope`: The lowest [PillarScope] encountered during the factory execution,
   ///   which is the final value of [trackedDependenciesScope].
   ///
+  /// Example:
   /// ```dart
   /// final accessor = ScopeTrackingPillarAccessor(myEntryGetter);
   /// final result = accessor.wrapFactory((a) => MyClass(a.get<Dependency>()));
