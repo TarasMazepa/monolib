@@ -1,14 +1,10 @@
-/// Provides contextual text evaluation utilities for editing states.
-library;
-
 import 'package:flutter/widgets.dart';
 
-/// Resolves the relevant bounds of user input based on the current
-/// cursor state.
+/// Extension on [TextEditingValue] that resolves the active text range based on
+/// the current cursor selection.
 ///
-/// Architecturally, it is primarily used to isolate the active typing context from
-/// trailing text, enabling precise pattern matching or text analysis in
-/// input-driven workflows without manual boundary calculation.
+/// Primarily used to isolate the active typing context from trailing text for
+/// pattern matching or autocomplete in text input workflows.
 extension OnTextEditingValue on TextEditingValue {
   /// Resolves the contextual [TextRange] of [text] that should be evaluated
   /// based on the current [selection] state.
@@ -20,6 +16,7 @@ extension OnTextEditingValue on TextEditingValue {
   ///   ignoring trailing text ahead of the cursor to isolate the user's current typing context.
   /// * Active Selection: Returns the highlighted [selection] itself.
   ///
+  /// Example:
   /// ```dart
   /// final value = TextEditingValue(
   ///   text: 'hello world',

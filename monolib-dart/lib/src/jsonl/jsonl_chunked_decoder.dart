@@ -3,26 +3,21 @@ import 'dart:convert';
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
-/// Serves as the asynchronous, stream-based foundation for JSON Lines (JSONL) ingestion.
+/// A streaming converter that parses chunked JSON Lines (JSONL) string data
+/// into decoded JSON objects.
 ///
-/// Architecturally, [JsonlChunkedDecoder] extends [ChunkedOnlyConverter]. It
-/// bypasses synchronous blocking and delegates stateful newline boundary
-/// scanning to [JsonlBaseChunkSink]. This allows it to act as the core parsing
-/// engine for both native stream pipelines and synchronous adapters like
-/// [JsonlDecoder], maintaining unified parsing logic and adhering to DRY principles.
+/// [JsonlChunkedDecoder] extends [ChunkedOnlyConverter] and delegates stateful
+/// line boundary scanning to [JsonlBaseChunkSink]. It transforms asynchronous
+/// `Stream<String>` pipelines directly into streams of decoded JSON values and
+/// also underpins synchronous converters such as `JsonlDecoder`.
 ///
-/// It strictly drops any empty lines or lines that evaluate to a `null` JSON
-/// structure.
+/// Empty lines and lines that decode to `null` are skipped.
 ///
-/// **Real-world example:**
+/// Example:
 /// ```dart
-/// final Stream<String> byteStream = File('massive_data.jsonl')
+/// final jsonStream = File('data.jsonl')
 ///     .openRead()
-///     .transform(utf8.decoder);
-///
-/// // Transform the stream of raw string chunks directly into a stream
-/// // of parsed JSON objects.
-/// final Stream<dynamic> jsonStream = byteStream
+///     .transform(utf8.decoder)
 ///     .transform(const JsonlChunkedDecoder());
 ///
 /// await for (final jsonObject in jsonStream) {
@@ -30,48 +25,36 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// }
 /// ```
 class JsonlChunkedDecoder extends ChunkedOnlyConverter<String, dynamic> {
-  /// The underlying [Codec] used to parse the isolated string lines.
+  /// The underlying [Codec] used to decode individual JSON lines.
   ///
-  /// This typically defaults to `dart:convert`'s [JsonCodec], but can be
-  /// overridden to inject customized decoding strategies.
+  /// Defaults to [JsonCodec], or can be customized to supply a custom decoding
+  /// strategy.
   final Codec<Object?, String> jsonCodec;
 
-  /// Creates a new [JsonlChunkedDecoder].
+  /// Creates a [JsonlChunkedDecoder].
   ///
-  /// The [jsonCodec] defaults to a standard [JsonCodec] to evaluate standard
-  /// JSON strings.
+  /// Uses [jsonCodec] (defaulting to `const JsonCodec()`) to decode each line.
   const JsonlChunkedDecoder({this.jsonCodec = const JsonCodec()});
 
-  /// Instantiates the stateful chunking sink that will handle the incoming
-  /// stream data.
-  ///
-  /// This method returns a [_JsonlChunkedDecoderSink], configuring it with the
-  /// downstream [sink] and the required [jsonCodec].
+  /// Starts a chunked conversion that parses incoming JSONL string chunks and
+  /// emits decoded JSON objects to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<dynamic> sink) {
     return _JsonlChunkedDecoderSink(sink, jsonCodec);
   }
 }
 
-/// The internal chunk sink that pairs with [JsonlChunkedDecoder].
-///
-/// Architecturally, this acts as the state machine delegate. It extends
-/// [JsonlBaseChunkSink] to automatically buffer incomplete chunks and isolate
-/// distinct lines. It then applies the provided [jsonCodec] to map the raw
-/// strings to JSON, selectively pushing valid objects to the [outSink].
+/// Internal [JsonlBaseChunkSink] implementation for [JsonlChunkedDecoder].
 class _JsonlChunkedDecoderSink extends JsonlBaseChunkSink<dynamic> {
-  /// The underlying codec used to deserialize individual lines, inherited
-  /// from the parent [JsonlChunkedDecoder].
+  /// The underlying codec used to decode individual lines.
   final Codec<Object?, String> jsonCodec;
 
-  /// Creates the state machine sink, wrapping the provided [outSink] and
-  /// injecting the required [jsonCodec].
+  /// Creates a sink that decodes lines with [jsonCodec] and forwards non-null
+  /// results to [outSink].
   _JsonlChunkedDecoderSink(super.outSink, this.jsonCodec);
 
-  /// Receives an isolated, fully-formed line from the parent [JsonlBaseChunkSink].
-  ///
-  /// This attempts to parse the [line] into a dynamic JSON object using [jsonCodec].
-  /// If the result is not `null`, it is eagerly forwarded to the downstream output sink.
+  /// Decodes [line] using [jsonCodec] and emits the result to [outSink] if
+  /// non-null.
   @override
   void processLine(String line) {
     final json = jsonCodec.decode(line);

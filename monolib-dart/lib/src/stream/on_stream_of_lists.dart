@@ -1,30 +1,19 @@
 import 'dart:async';
 
-/// An architectural extension providing functional transformation and aggregation
-/// utilities for stream pipelines emitting chunked or batched payloads, such as
-/// paginated API results, bulk database queries, or buffered event streams.
-///
-/// This extension enables expressive, fluid chaining of operations on
-/// `Stream<List<T>>` to consolidate fragmented payloads into continuous lists,
-/// accumulate historical events, or project transformations across nested collections
-/// without writing manual nested stream mappers.
+/// Extension on [Stream] of [List] that provides flattening, accumulation,
+/// batch mapping, and element filtering utilities.
 extension OnStreamOfLists<T> on Stream<List<T>> {
-  /// Consolidates all lists asynchronously emitted by this stream into a single
-  /// fully-buffered list, typically used to aggregate chunked file reads or paginated
-  /// data into memory once the stream completes.
+  /// Collects all lists emitted by this stream into a single flattened [List].
   ///
-  /// - [cancelOnError]: If `true` (default), the underlying stream subscription is
-  ///   immediately cancelled upon encountering the first error, and the returned
-  ///   future completes with that error. If `false`, the stream silently continues
-  ///   to drain remaining background events, but the returned [Future] still completes
-  ///   with the earliest encountered error.
-  /// - [sync]: If `true`, the internal [Completer] operates synchronously. This causes
-  ///   the returned [Future] to complete within the same microtask as the stream's
-  ///   `onDone` event, prioritizing immediate continuation for tight execution loops.
+  /// - [cancelOnError]: If `true` (the default), cancels the subscription on
+  ///   the first error and completes the returned [Future] with that error. If
+  ///   `false`, continues draining the stream while still completing the
+  ///   returned [Future] with the first error encountered.
+  /// - [sync]: If `true`, uses a synchronous [Completer] (`Completer.sync()`).
   ///   Defaults to `false`.
   ///
+  /// Example:
   /// ```dart
-  /// // Gathers batched CSV rows into a final dense table structure.
   /// final Stream<List<String>> rowStream = readCsvRows();
   /// final List<String> allRows = await rowStream.flattenToList();
   /// ```
@@ -57,21 +46,18 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
     return completer.future;
   }
 
-  /// Transforms the stream to emit a progressively growing list that retains all
-  /// elements from previously emitted chunks, serving as a stateful aggregator
-  /// for cumulative logs or infinite scrolling models.
+  /// Transforms this stream to emit a cumulatively growing list containing all
+  /// elements from chunks received so far.
   ///
-  /// If [emptyMeansRefresh] is `true`, an incoming empty list `[]` acts as a
-  /// flush signal. It clears the ongoing accumulation state and emits a fresh
-  /// empty list, seamlessly resetting the buffer without tearing down the stream.
+  /// If [emptyMeansRefresh] is `true`, an incoming empty list `[]` clears the
+  /// accumulated buffer and resets accumulation for subsequent events.
   ///
-  /// **Warning:** For performance optimization, the *same* [List] instance is mutated
-  /// and yielded on every event. Consumers (like reactive UI builders) should use
-  /// the spread operator (`[...event]`) to create defensive copies if they need to
-  /// compare sequential states or retain historical snapshots.
+  /// Note: The same internal [List] instance is mutated and emitted on each
+  /// event. Create a copy (for example, `[...event]`) if you need to retain
+  /// immutable snapshots across emissions.
   ///
+  /// Example:
   /// ```dart
-  /// // Incrementally build a chat message history as batches arrive.
   /// streamOfBatches
   ///   .asAccumulating(emptyMeansRefresh: true)
   ///   .listen((allMessages) => renderUI(allMessages));
@@ -129,18 +115,16 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
     );
   }
 
-  /// Applies a projection [mapper] across each batched chunk emitted by the stream,
-  /// generating a new stream of structurally modified lists.
+  /// Transforms each non-empty list chunk emitted by this stream using
+  /// [mapper].
   ///
-  /// If [skipMappedToEmpty] is `true` (the default), any non-empty input chunk that
-  /// becomes completely empty after mapping is suppressed. This avoids polluting
-  /// the downstream pipeline with accidental "ghost" events caused by exhaustive
-  /// filtering. Conversely, explicitly emitted empty chunks from the source stream
-  /// (such as deliberate refresh signals handled by [asAccumulating]) are intentionally
-  /// preserved and passed through.
+  /// If [skipMappedToEmpty] is `true` (the default), any non-empty input list
+  /// that maps to an empty list is omitted from the output stream, whereas
+  /// empty lists emitted by the source stream (such as refresh signals for
+  /// [asAccumulating]) are passed through as empty lists.
   ///
+  /// Example:
   /// ```dart
-  /// // Parse raw JSON dict batches into domain models.
   /// jsonListStream.mapLists((batch) {
   ///   return batch.map((json) => User.fromJson(json)).toList();
   /// });
@@ -161,18 +145,18 @@ extension OnStreamOfLists<T> on Stream<List<T>> {
     });
   }
 
-  /// Non-destructively retains elements in each batched chunk that satisfy the
-  /// Boolean [predicate], acting as an inline batch-filter.
+  /// Filters elements in each emitted list in place using [predicate].
   ///
-  /// If [predicate] is dynamically resolved to `null`, the stream bypasses filtering
-  /// entirely and returns itself unchanged, optimizing out unnecessary list cloning.
+  /// Mutates each incoming list via [List.retainWhere] so that only elements
+  /// satisfying [predicate] remain. If [predicate] is `null`, returns this
+  /// stream unchanged.
   ///
-  /// Operates using [mapLists] internally, meaning the [skipMappedToEmpty] flag
-  /// applies identical logic: non-empty chunks that are entirely filtered out will
-  /// be dropped from the stream to prevent spurious empty triggers.
+  /// Uses [mapLists] internally: when [skipMappedToEmpty] is `true` (the
+  /// default), non-empty chunks whose elements are all removed by [predicate]
+  /// are omitted from the output stream.
   ///
+  /// Example:
   /// ```dart
-  /// // Exclude disabled items before processing a bulk update.
   /// itemBatches.whereElements((item) => item.isActive);
   /// ```
   Stream<List<T>> whereElements(

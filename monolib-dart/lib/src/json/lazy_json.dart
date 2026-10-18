@@ -1,38 +1,25 @@
-/// Provides architectural utilities to defer JSON evaluation during serialization.
-library;
-
-/// A wrapper that delays the computation or generation of a JSON structure until
-/// the exact moment it is serialized.
+/// A wrapper that defers computing a JSON-serializable value until it is
+/// serialized.
 ///
-/// In asynchronous or performance-sensitive architectures, pre-computing large
-/// JSON trees (like mapping deeply nested domain models to maps) can block
-/// the isolate or unnecessarily consume memory if the object is ultimately
-/// discarded or queued for a long time.
+/// Wrapping a computation in [LazyJson] delays evaluation until a serializer
+/// such as `jsonEncode` or `jsonEncodeAsync` invokes [toJson].
 ///
-/// By wrapping the payload generation in [LazyJson], the actual execution
-/// is deferred. When a standard serializer like [jsonEncode] or the repository's
-/// asynchronous [jsonEncodeAsync] processes this object, it dynamically invokes
-/// the [toJson] callback.
-///
-/// ### Example
+/// Example:
 /// ```dart
 /// final payload = LazyJson(() {
-///   // This expensive mapping logic runs only when jsonEncode() is called.
+///   // This mapping logic runs only when jsonEncode() is called.
 ///   return {'timestamp': DateTime.now().toIso8601String(), 'data': 'massive'};
 /// });
 ///
-/// // Evaluation happens here
 /// final jsonString = jsonEncode(payload);
 /// ```
 class LazyJson {
-  /// The deferred computation that returns the actual JSON-serializable structure.
+  /// The deferred callback that returns the JSON-serializable value.
   ///
-  /// This function is automatically invoked by native Dart encoders (such as [jsonEncode])
-  /// or asynchronous encoders (like [jsonEncodeAsync]) because they dynamically look
-  /// for a [toJson] member. The result should be a standard JSON-compatible type
-  /// (e.g., [Map], [List], [String], [int], or another object with a [toJson]).
+  /// Invoked automatically by encoders such as `jsonEncode` or
+  /// `jsonEncodeAsync`.
   final dynamic Function() toJson;
 
-  /// Creates a [LazyJson] that will execute [toJson] when serialized.
+  /// Creates a [LazyJson] that executes [toJson] when serialized.
   const LazyJson(this.toJson);
 }

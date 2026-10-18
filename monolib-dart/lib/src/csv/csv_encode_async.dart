@@ -1,40 +1,31 @@
-/// Asynchronous CSV encoding operations for both streaming and synchronous collections.
-library;
-
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/async_iterator_util.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
-/// Asynchronously encodes a sequence of items into an RFC 4180 CSV format and writes them
-/// to a string sink.
+/// Asynchronously encodes a sequence of [items] into RFC 4180 CSV format and
+/// writes each row to a destination [StringSink].
 ///
-/// This function acts as the foundational CSV encoder within the repository's
-/// data parsing architecture. It unifies the processing of heterogeneous
-/// collections by accepting both `Stream` and `Iterable` inputs through the
-/// [items] parameter, relying on [iterateStreamOrIterable] to handle the
-/// asynchronous traversal.
+/// Accepts both [Iterable] and [Stream] collections via [iterateStreamOrIterable]
+/// and dynamically resolves [Future] values at the row, `toCsv()`, and cell
+/// levels. Each row is formatted as comma-separated cells escaped with
+/// [writeCsvCell] and terminated by `\r\n`.
 ///
-/// The encoder dynamically resolves `Future` values, meaning that the `items`
-/// collection can contain futures resolving to rows, and the individual rows
-/// can contain futures resolving to cell values. Each row element is expected
-/// to either be a `List`, or an object that implements a `toCsv()` method
-/// returning a `List`.
+/// Sink initialization and lifecycle management are delegated to
+/// [withLazyStringSink]. Exactly one of [sink] or [sinkProvider] must be
+/// provided, or an [ArgumentError] is thrown.
 ///
-/// To protect against zero-byte files when a stream yields no data, this
-/// function delegates manual [StringSink] initialization and resource management
-/// to [withLazyStringSink].
-///
-/// You must provide exactly one destination for the output: either an existing
-/// [sink], or a [sinkProvider] function that will be called to create a sink
-/// on the first piece of incoming data. If [sinkProvider] is used, the created
-/// sink will be closed automatically upon completion or error (if it implements
-/// `Sink` or `StreamSink`). If [sink] is provided, it is not automatically closed.
-///
-/// Throws an [ArgumentError] if both [sink] and [sinkProvider] are provided,
-/// or if neither is provided. Throws an [Exception] if an item in the collection
-/// is not a `List` and lacks a valid `toCsv()` method.
+/// - [items]: The [Iterable] or [Stream] of rows to encode. Each item (or
+///   awaited [Future]) must be a [List] of cells or an object implementing a
+///   `toCsv()` method that returns a [List] (or `Future<List>`), otherwise an
+///   [Exception] is thrown.
+/// - [sink]: An active, externally managed [StringSink]. If provided, the
+///   caller retains ownership and is responsible for closing it.
+/// - [sinkProvider]: A factory callback that lazily creates a [StringSink] when
+///   the first row is ready to be written (preventing empty files when [items]
+///   yields no elements). The created sink is closed automatically upon
+///   completion or error if it implements [Sink] or [StreamSink].
 ///
 /// Example:
 /// ```dart
@@ -42,7 +33,7 @@ import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 /// final stream = Stream.fromIterable([
 ///   ['Alice', 30],
 ///   ['Bob', 25],
-///   Future.value(['Charlie', 40]), // dynamically resolves futures
+///   Future.value(['Charlie', 40]),
 /// ]);
 ///
 /// await csvEncodeAsync(
@@ -50,10 +41,7 @@ import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 ///   sink: buffer,
 /// );
 /// print(buffer.toString());
-/// // Outputs:
-/// // Alice,30
-/// // Bob,25
-/// // Charlie,40
+/// // Result: 'Alice,30\r\nBob,25\r\nCharlie,40\r\n'
 /// ```
 Future<void> csvEncodeAsync({
   required Object items,

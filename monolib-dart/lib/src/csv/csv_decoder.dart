@@ -1,21 +1,18 @@
-/// Provides [CsvDecoder], a synchronous converter for parsing RFC 4180
-/// compliant Comma-Separated Values (CSV) strings into lists of rows.
-library;
-
 import 'dart:convert';
 
 import 'package:monolib_dart/src/common/list_accumulator_sink.dart';
 import 'package:monolib_dart/src/csv/csv_chunked_decoder.dart';
 
-/// A synchronous [Converter] that decodes a full RFC 4180 CSV [String] into a
-/// sequence of rows, where each row is a [List] of [String] cells.
+/// A synchronous [Converter] that decodes an RFC 4180 CSV [String] into a
+/// list of rows, where each row is a `List<String>` of cells.
 ///
-/// This class serves as the concrete decoding implementation for [CsvCodec.decoder].
-/// To avoid duplicating the RFC 4180 parsing state machine, it DRYs up the
-/// implementation by delegating the actual structural parsing to [CsvChunkedDecoder].
+/// [CsvDecoder] serves as the synchronous decoder for `CsvCodec.decoder`. It
+/// delegates parsing to [CsvChunkedDecoder] and collects all emitted rows in
+/// memory using a [ListAccumulatorSink].
 ///
-/// It aggregates the synchronous events emitted by the chunked decoder using a
-/// [ListAccumulatorSink], completely buffering the result before returning.
+/// Because it buffers the entire result set in memory before returning, use
+/// the stream-based [CsvChunkedDecoder] instead when processing large files or
+/// streams.
 ///
 /// Example:
 /// ```dart
@@ -24,22 +21,14 @@ import 'package:monolib_dart/src/csv/csv_chunked_decoder.dart';
 /// print(rows); // [['id', 'name'], ['1', 'Alice']]
 /// ```
 class CsvDecoder extends Converter<String, List<List<String>>> {
-  /// Creates a stateless [CsvDecoder].
-  ///
-  /// Since the decoder maintains no internal state between conversions,
-  /// a single `const` instance can be safely reused to parse multiple
-  /// disparate CSV strings.
+  /// Creates a [CsvDecoder].
   const CsvDecoder();
 
-  /// Synchronously transforms a complete CSV string [items] into a
-  /// sequence of parsed rows.
+  /// Synchronously decodes the CSV string [items] into a list of parsed rows.
   ///
-  /// Internally, this sets up a [ListAccumulatorSink] and pipes the entire
-  /// [items] payload through [CsvChunkedDecoder.startChunkedConversion].
-  ///
-  /// If the [items] string is empty, this returns an empty list. If the
-  /// payload contains malformed CSV syntax, any underlying formatting
-  /// exceptions raised by the chunked decoder will bubble up synchronously.
+  /// Feeds [items] through [CsvChunkedDecoder.startChunkedConversion] and
+  /// accumulates the emitted rows in a [ListAccumulatorSink]. Returns an empty
+  /// list if [items] is empty.
   @override
   List<List<String>> convert(String items) {
     final sink = ListAccumulatorSink<List<String>>();

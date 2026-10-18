@@ -1,24 +1,18 @@
-/// Extension on a function that returns a [Future], providing utility methods.
+/// Extension on zero-argument functions returning a [Future] of [T] that
+/// provides retry logic.
 extension OnFutureFunction<T> on Future<T> Function() {
-  /// Invokes the function and retries it upon failure up to [times] times.
+  /// Invokes this function and retries up to [times] total attempts if the
+  /// returned [Future] throws.
   ///
-  /// This method repeatedly awaits the [Future] returned by this function. If it
-  /// succeeds, the result is returned immediately. If it throws an exception,
-  /// it will catch the exception and retry up to [times] total attempts.
-  /// If all attempts fail, it will rethrow the very first exception encountered.
+  /// Returns the result immediately on success. If all [times] attempts throw,
+  /// rethrows the first caught exception.
   ///
-  /// By default, [times] is set to 3. If [times] is less than or equal to 0,
-  /// it throws an [ArgumentError].
+  /// Throws an [ArgumentError] if [times] is less than or equal to `0`.
   ///
   /// Example:
   /// ```dart
-  /// Future<String> fetchData() async {
-  ///   // Simulate a flaky network request
-  ///   throw Exception('Network error');
-  /// }
-  ///
-  /// // Retries `fetchData` up to 5 times before throwing the exception.
-  /// await fetchData.asyncCallWithRetryOnFailure(times: 5);
+  /// Future<int> unstableCall() async => 42;
+  /// final result = await unstableCall.asyncCallWithRetryOnFailure(times: 3);
   /// ```
   Future<T> asyncCallWithRetryOnFailure({int times = 3}) async {
     if (times <= 0) {
@@ -36,24 +30,17 @@ extension OnFutureFunction<T> on Future<T> Function() {
   }
 }
 
-/// Invokes the given [call] function and retries it upon failure.
+/// Invokes [call] and retries up to [times] total attempts if the returned
+/// [Future] throws.
 ///
-/// This is a convenience wrapper around [OnFutureFunction.asyncCallWithRetryOnFailure].
-/// It repeatedly awaits the [Future] returned by [call]. If it succeeds, the
-/// result is returned immediately. If it throws an exception, it retries up to
-/// [times] total attempts (defaulting to 3). If all attempts fail, the first
-/// exception caught is rethrown.
+/// Convenience wrapper around [OnFutureFunction.asyncCallWithRetryOnFailure].
 ///
-/// If [times] is less than or equal to 0, it throws an [ArgumentError].
+/// Throws an [ArgumentError] if [times] is less than or equal to `0`.
 ///
 /// Example:
 /// ```dart
-/// Future<int> getNumber() async {
-///   // Some flaky operation
-///   return 42;
-/// }
-///
-/// final result = await asyncRetryOnFailure(getNumber, times: 3);
+/// Future<int> unstableCall() async => 42;
+/// final result = await asyncRetryOnFailure(unstableCall, times: 3);
 /// ```
 Future<T> asyncRetryOnFailure<T>(Future<T> Function() call, {int times = 3}) {
   return call.asyncCallWithRetryOnFailure(times: times);

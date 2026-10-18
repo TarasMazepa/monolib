@@ -1,17 +1,10 @@
-/// Extension on [Iterable] of [num] providing mathematical operations.
-///
-/// This extension provides additional methods that can be applied directly to
-/// any collection of numbers, such as Lists or Sets containing [int] or [double].
+/// Extension on [Iterable] of [num] that provides element-wise division.
 extension OnIterableOfNum on Iterable<num> {
-  /// Divides each element in the iterable by the given [divisor].
+  /// Lazily divides each element in this iterable by [divisor].
   ///
-  /// Returns a new [Iterable] containing the results as [double] values.
-  /// This operation evaluates lazily, meaning the division is only
-  /// performed when the resulting iterable is iterated.
-  ///
-  /// Note: if [divisor] is zero, dividing a non-zero number by zero will result in
-  /// [double.infinity] or [double.negativeInfinity], and dividing zero by zero
-  /// will result in [double.nan], according to standard Dart floating-point rules.
+  /// Returns a new [Iterable] of [double] values. If [divisor] is `0`, standard
+  /// IEEE 754 floating-point rules apply ([double.infinity],
+  /// [double.negativeInfinity], or [double.nan]).
   ///
   /// Example:
   /// ```dart

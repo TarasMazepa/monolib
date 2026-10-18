@@ -1,39 +1,27 @@
-/// Utilities that introduce Kotlin-style scoping functions to all Dart objects.
+/// Extension on any object [T] that provides Kotlin-style scoping and casting
+/// methods.
 ///
-/// The [OnObject] extension provides functional programming constructs that
-/// allow developers to execute blocks of code within the context of an object,
-/// facilitating fluent method chaining, side-effect execution without breaking
-/// expression pipelines, and localized variable scoping. This minimizes the
-/// need for intermediate local variables and reduces boilerplate when configuring
-/// objects or performing inline transformations.
-library;
-
-/// Extensions providing functional scoping operations on any object.
+/// Enables fluent method chaining, inline transformations, and side-effect
+/// execution without introducing intermediate local variables.
 extension OnObject<T> on T {
-  /// Executes the given [call] closure with this object as its argument, then
-  /// returns this original object.
+  /// Invokes [call] with `this` as its argument and returns `this`.
   ///
-  /// This is particularly useful for performing side effects (like logging,
-  /// triggering callbacks, or mutating properties) during a fluent builder chain
-  /// without breaking the chain's return value.
+  /// Useful for performing side effects (such as logging or configuring an
+  /// object) in a call chain without changing the chain's return value.
   ///
   /// Example:
   /// ```dart
-  /// final sink = StreamController<int>()
-  ///   .also((c) => c.add(1))
-  ///   .also((c) => print('Initialized controller'));
+  /// final list = <int>[].also((l) => l.add(1));
   /// ```
   T also(void Function(T x) call) {
     call(this);
     return this;
   }
 
-  /// Transforms this object into a new value of type [R] by passing it to the
-  /// [call] closure.
+  /// Transforms `this` into a value of type [R] by passing it to [call].
   ///
-  /// This method is ideal for mapping a value from one type to another inline,
-  /// or for scoping an intermediate computation so its variable doesn't leak
-  /// into the broader method scope.
+  /// Useful for inline transformations or scoping an intermediate value to a
+  /// single expression.
   ///
   /// Example:
   /// ```dart
@@ -41,31 +29,26 @@ extension OnObject<T> on T {
   /// ```
   R let<R>(R Function(T x) call) => call(this);
 
-  /// Conditionally transforms this object if [call] is provided, otherwise
-  /// returns the original object unchanged.
-  ///
-  /// This is useful for conditionally applying a transformation or configuration
-  /// step in a functional pipeline without writing an external `if` statement.
+  /// Transforms `this` using [call] if [call] is non-null, or returns `this`
+  /// unchanged otherwise.
   ///
   /// Example:
   /// ```dart
-  /// final config = defaultConfig
-  ///   .maybeLet(shouldOverride ? (c) => applyOverride(c) : null);
+  /// final value = 10.maybeLet(shouldDouble ? (x) => x * 2 : null);
   /// ```
   T maybeLet(T Function(T x)? call) {
     if (call == null) return this;
     return call(this);
   }
 
-  /// Casts this object to the generic type [R].
+  /// Casts `this` to [R].
   ///
-  /// This provides a functional alternative to the standard `as` operator,
-  /// enabling type casting at the end of a fluent call chain without needing
-  /// to wrap the entire expression in parentheses.
+  /// Provides a fluent alternative to the `as` operator at the end of a call
+  /// chain without wrapping the expression in parentheses.
   ///
   /// Example:
   /// ```dart
-  /// final widget = buildWidget().castTo<Container>();
+  /// final number = (42 as Object).castTo<int>();
   /// ```
   R castTo<R>() => this as R;
 }

@@ -1,34 +1,21 @@
-/// Provides the [AsyncJsonWritable] interface for enabling inversion-of-control
-/// during asynchronous JSON encoding.
+/// A callback passed into [AsyncJsonWritable.writeJsonAsync] that allows an
+/// object to recursively serialize nested values back into the active
+/// `jsonEncodeAsync` context.
 ///
-/// This library is a core piece of the [jsonEncodeAsync] architecture, allowing
-/// custom objects to dictate their own chunked, unbuffered serialization logic
-/// rather than relying on synchronous, in-memory [toJson]() maps.
-library;
-
-/// A callback passed into [AsyncJsonWritable.writeJsonAsync] that allows the
-/// implementing object to recursively serialize its nested children back into
-/// the parent `jsonEncodeAsync` context.
-///
-/// When called with an [object], this function will encode it using the same
-/// asynchronous rules and formatting as the root [jsonEncodeAsync] process,
-/// appending the resulting string chunks to the active [StringSink].
+/// When called with an [object], this function encodes it using the same
+/// asynchronous rules and formatting as the root `jsonEncodeAsync` invocation,
+/// appending the resulting JSON chunks to the active [StringSink].
 typedef JsonEncoderCallback = Future<void> Function(Object? object);
 
-/// An interface providing inversion-of-control for objects serialized via
-/// [jsonEncodeAsync].
+/// A contract for objects that write their JSON representation directly to a
+/// [StringSink] during `jsonEncodeAsync`.
 ///
-/// By implementing [AsyncJsonWritable], an object bypasses standard [toJson]()
-/// serialization, gaining direct access to the underlying JSON [StringSink].
-/// This architectural pattern enables massive, dynamic, or chunk-based
-/// data sets (like streaming large strings or reading from file systems) to be
-/// written out asynchronously without buffering the entire representation in
-/// memory.
+/// Implementing [AsyncJsonWritable] bypasses standard `toJson()` serialization
+/// and grants direct access to the target [StringSink]. This allows large or
+/// streaming payloads (such as `StreamingJsonString`) to be written
+/// progressively without buffering the entire structure in memory.
 ///
-/// Real-world usage typically involves streaming classes like
-/// [StreamingJsonString], which writes [Stream<String>] chunks progressively
-/// to the sink.
-///
+/// Example:
 /// ```dart
 /// class MyLazyArray implements AsyncJsonWritable {
 ///   final Stream<int> _numbers;
@@ -47,13 +34,11 @@ typedef JsonEncoderCallback = Future<void> Function(Object? object);
 ///   }
 /// }
 /// ```
-abstract interface class AsyncJsonWritable {
-  /// Writes the raw JSON string representation of this object directly into
-  /// the [sink].
+abstract class AsyncJsonWritable {
+  /// Writes the raw JSON representation of this object directly to [sink].
   ///
-  /// Implementers are entirely responsible for writing valid JSON syntax (e.g.,
-  /// wrapping text in double quotes or formatting arrays/objects). If this
-  /// object contains nested values, use the provided [encode] callback to
-  /// safely and recursively serialize them into the active sink.
+  /// Implementers are responsible for emitting valid JSON syntax (such as
+  /// surrounding quotes for strings or brackets for arrays and objects). Nested
+  /// values can be serialized recursively into [sink] using [encode].
   Future<void> writeJsonAsync(StringSink sink, JsonEncoderCallback encode);
 }

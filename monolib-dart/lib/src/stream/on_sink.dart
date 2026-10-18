@@ -1,56 +1,30 @@
-/// A utility library that enhances [Sink] instances with safe event emission
-/// capabilities, ensuring robust event handling in reactive architectures.
-library;
-
 import 'dart:async';
 
-/// A resilient boundary proxy that shields upstream event producers from asynchronous
-/// sink teardown failures.
-///
-/// In complex, highly concurrent systems, an upstream event producer often lacks
-/// perfectly synchronized knowledge of a downstream [Sink]'s exact lifecycle state.
-/// For example, if a background task attempts to push data to an `IOSink` or
-/// [StreamController] that a different subsystem concurrently closed due to user
-/// cancellation or network timeout, standard Dart streams will throw an aggressive,
-/// unhandled [StateError] that crashes the entire isolate.
-///
-/// This extension resolves this by establishing a defensive emission boundary.
-/// It introduces a "try-add" paradigm, absorbing expected lifecycle exceptions
-/// (like adding to a closed sink) to maintain pipeline stability without
-/// requiring defensive `isClosed` checks everywhere in the codebase.
+/// Extension on [Sink] that provides [tryAdd] for safely adding events without
+/// throwing a [StateError] when the sink is closed.
 extension OnSink<T> on Sink<T> {
-  /// Attempts to safely broadcast an [event] to this sink without throwing
-  /// a [StateError] if the sink has already been closed.
+  /// Adds [event] to this sink if it is still open, ignoring any [StateError]
+  /// caused by a closed sink.
   ///
-  /// This method provides specialized, performant fast-paths for [StreamController]
-  /// instances by evaluating their [StreamController.isClosed] property directly.
-  /// For other [Sink] implementations that do not expose such state, it
-  /// attempts to add the event and gracefully catches and ignores any resulting
-  /// [StateError].
+  /// For a [StreamController], this checks [StreamController.isClosed] before
+  /// calling [StreamController.add]. For other [Sink] implementations, it calls
+  /// [Sink.add] inside a `try`/`catch` block and ignores any [StateError].
   ///
-  /// The [event] parameter represents the primary payload to be dispatched to
-  /// downstream listeners or underlying resources.
+  /// If [ignoreError] is `true`, any other exception thrown while adding
+  /// [event] is also caught and suppressed; otherwise, non-[StateError]
+  /// exceptions are rethrown.
   ///
-  /// If [ignoreError] is `true`, any non-[StateError] exceptions encountered
-  /// during the internal process of adding the [event] to the sink will be silently
-  /// caught, preventing unexpected crashes during cleanup or teardown phases. If `false`
-  /// (the default), such exceptions are rethrown.
+  /// If [onError] is provided, it is invoked with any non-[StateError]
+  /// exception and stack trace caught while adding [event].
   ///
-  /// The [onError] callback provides a mechanism to monitor or log any internal
-  /// exceptions (along with their [StackTrace]) that arise specifically from the act
-  /// of dispatching the original [event] into the sink. This is especially useful when
-  /// [ignoreError] is `true`, allowing these swallowed exceptions to still be tracked
-  /// and recorded without crashing the active zone.
-  ///
+  /// Example:
   /// ```dart
   /// final sink = StreamController<List<int>>();
   ///
-  /// // Safely emit a chunk of data. This avoids crashes even if the sink
-  /// // was concurrently closed in a different part of the system.
   /// sink.tryAdd(
   ///   [1, 2, 3],
   ///   ignoreError: true,
-  ///   onError: (internalErr, st) => print('Failed to broadcast event: $internalErr'),
+  ///   onError: (err, st) => print('Failed to add event: $err'),
   /// );
   /// ```
   void tryAdd(

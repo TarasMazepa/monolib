@@ -1,37 +1,25 @@
-/// Domain-specific [FluentJson] extensions for OpenRouter API responses.
-///
-/// This library provides validation utilities to verify that raw OpenRouter
-/// (or OpenAI-compatible) JSON payloads do not contain architectural-level
-/// failures (such as rate limits or authentication errors) before the consumer
-/// attempts to parse standard expected fields (like `choices`).
-library;
-
 import 'dart:convert';
 
 import 'package:monolib_dart/fluent_json.dart';
 
-/// Adapts the generic [FluentJson] utility for OpenRouter API semantics.
+/// Extension on [FluentJson] that validates OpenRouter API responses for
+/// top-level error payloads.
 ///
-/// While [FluentJson] handles safe, dynamic traversal of JSON trees, OpenRouter
-/// HTTP APIs often return a 200 OK status code alongside a payload containing a
-/// top-level `"error"` object when a request fails (e.g., due to strict routing
-/// failures or provider issues).
-///
-/// This extension allows consumers to eagerly validate the structural integrity
-/// of the response, safely throwing an exception if an error is present, or
-/// continuing down a fluent chain if the payload is healthy.
+/// OpenRouter HTTP APIs may return a `200 OK` status code with a top-level
+/// `"error"` object when a request fails (for example, due to provider routing
+/// errors or rate limits). This extension checks for such errors before
+/// extracting fields in a fluent chain.
 extension OnFluentJson on FluentJson {
   /// Asserts that the JSON payload does not contain a top-level `"error"` node.
   ///
-  /// The OpenRouter API (and OpenAI specification) wraps failures in a root-level
-  /// `"error"` object (e.g., `{"error": {"message": "Rate limited", ...}}`).
-  /// This method proactively checks for that node using [elementAt].
+  /// Checks for a root-level `"error"` entry (e.g.,
+  /// `{"error": {"message": "Rate limited", ...}}`) using [elementAt].
   ///
-  /// If the `"error"` node is found, this throws an [Exception] containing the
-  /// stringified JSON of the error payload. If the node is absent, it returns
-  /// `this` [FluentJson] instance, allowing for seamless method chaining during
-  /// data extraction.
+  /// Throws an [Exception] containing the JSON-encoded error payload if the
+  /// `"error"` node is present; otherwise returns `this` [FluentJson] instance
+  /// for method chaining.
   ///
+  /// Example:
   /// ```dart
   /// final responseBody = '{"error": {"message": "Invalid API key"}}';
   /// final json = FluentJson.decode(responseBody);

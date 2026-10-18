@@ -6,12 +6,12 @@
 /// an active session), which would create a memory leak or stale state.
 ///
 /// In practice, you declare scopes hierarchically. When an instance is
-/// registered via [Pillar.register] with a specific scope, the framework tracks it.
+/// registered via `Pillar.register` with a specific scope, the framework tracks it.
 /// If a lower-scoped instance (e.g., `userScope`) is requested by a higher-scoped
 /// instance (e.g., `globalScope`), a scope enforcement exception is thrown.
 ///
-/// Scopes also act as boundaries for invalidation. Calling [Pillar.discard] or
-/// [Pillar.replace] with a [PillarScope] clears or replaces all cached instances
+/// Scopes also act as boundaries for invalidation. Calling `Pillar.discard` or
+/// `Pillar.replace` with a [PillarScope] clears or replaces all cached instances
 /// associated with that scope and its children, allowing developers to reset
 /// states cleanly (e.g., upon user logout).
 ///

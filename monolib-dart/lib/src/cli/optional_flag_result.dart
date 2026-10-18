@@ -1,19 +1,13 @@
-library;
-
 import 'package:monolib_dart/src/cli/flag.dart';
 
-/// An architectural result type that resolves the ambiguity between a CLI flag
-/// being completely omitted from the arguments list versus being present but
-/// without an accompanying value.
+/// The result of extracting an optional value for a [Flag] from an argument
+/// list.
 ///
-/// In the repository's destructive parsing architecture, arguments are actively
-/// removed from the raw list as they are evaluated. The standard [Flag.getFlagValue]
-/// throws an exception if a value is expected but missing. [OptionalFlagResult]
-/// acts as a safe, explicit wrapper for optional arguments, enabling consumers
-/// to gracefully distinguish between a user skipping a flag, or providing it
-/// as a standalone toggle.
+/// Returned by [Flag.getOptionalFlagValue] to distinguish between a flag being
+/// absent ([FlagNotPresent]) and a flag being present with or without an
+/// accompanying value ([FlagPresent]).
 ///
-/// Typical usage pairs this with [Flag.getOptionalFlagValue]:
+/// Example:
 /// ```dart
 /// final outputFlag = Flag(short: '-o', long: '--output', description: 'Output file');
 /// final result = outputFlag.getOptionalFlagValue(args);
@@ -29,27 +23,19 @@ import 'package:monolib_dart/src/cli/flag.dart';
 /// ```
 sealed class OptionalFlagResult {}
 
-/// Indicates that the target [Flag] was not found within the raw CLI argument list.
-///
-/// When this result is returned by [Flag.getOptionalFlagValue], the underlying
-/// argument list remains unmutated because no matching tokens were destructively consumed.
+/// Indicates that the target [Flag] was not present in the argument list.
 class FlagNotPresent extends OptionalFlagResult {}
 
-/// Indicates that the target [Flag] was successfully matched and destructively
-/// removed from the CLI argument list, optionally containing an extracted [value].
-///
-/// Depending on the parsing context, [value] may be captured from the sequentially
-/// subsequent token.
+/// Indicates that the target [Flag] was matched and removed from the argument
+/// list, optionally with an extracted [value].
 class FlagPresent extends OptionalFlagResult {
-  /// The optional string value that immediately followed the matched flag in the
-  /// argument list.
+  /// The argument value that immediately followed the matched flag, or `null`
+  /// if no value was provided.
   ///
-  /// This will be `null` if the flag was provided as a standalone toggle at the
-  /// end of the argument list, or if it was part of a short-combined flag group
-  /// (e.g., `-xvf` where `-x` is the matched flag).
+  /// This is `null` when the flag appeared at the end of the argument list or
+  /// as part of a combined short-flag group (e.g., `-xvf`).
   final String? value;
 
-  /// Constructs a result indicating the flag was found, optionally wrapping its
-  /// accompanying [value].
+  /// Creates a [FlagPresent] result with the optional [value].
   FlagPresent(this.value);
 }

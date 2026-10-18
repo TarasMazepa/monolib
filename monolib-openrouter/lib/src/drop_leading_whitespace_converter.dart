@@ -2,17 +2,15 @@ import 'dart:convert';
 
 import 'package:monolib_dart/stream.dart';
 
-/// An architectural byte-stream transformer extending [Converter] that filters out leading ASCII whitespace bytes (0x20, 0x0A, 0x0D, 0x09)
-/// from a byte stream before passing data downstream.
+/// A [Converter] that strips leading ASCII whitespace bytes (`0x20`, `0x0A`,
+/// `0x0D`, `0x09`) from a byte stream before forwarding data downstream.
 ///
-/// Architecturally, this class prevents JSON parse errors when handling streaming
-/// responses from LLM APIs (such as OpenRouter) that may eagerly send keep-alive
-/// pings (e.g., `\r\n`) or other padding bytes prior to transmitting the actual
-/// JSON body. By actively filtering these out, it guarantees that downstream
-/// decoders receive a clean starting token.
+/// Prevents JSON parse errors when consuming streaming responses from LLM APIs
+/// (such as OpenRouter) that emit keep-alive pings (e.g., `\r\n`) or padding
+/// bytes before the JSON body begins.
 ///
-/// This is typically used in front of [Utf8Codec.decoder] (`utf8.decoder`) and [JsonDecoder] within
-/// an HTTP response stream pipeline.
+/// Typically placed ahead of [Utf8Codec.decoder] (`utf8.decoder`) and
+/// [JsonDecoder] in an HTTP response stream pipeline.
 ///
 /// Example:
 /// ```dart
@@ -25,26 +23,24 @@ import 'package:monolib_dart/stream.dart';
 class DropLeadingWhitespaceConverter extends Converter<List<int>, List<int>> {
   /// Called when adding a chunk to the downstream sink fails.
   ///
-  /// Such errors are naturally ignored by the [OnSink.tryAdd] extension. Without an [onError] callback provided, they are silently dropped.
+  /// Errors are caught via [OnSink.tryAdd]; if [onError] is omitted, they are
+  /// silently ignored.
   final void Function(Object error, StackTrace stackTrace)? onError;
 
-  /// Creates a [DropLeadingWhitespaceConverter] that optionally reports downstream
-  /// sink transmission errors to the provided [onError] handler.
+  /// Creates a [DropLeadingWhitespaceConverter] that optionally reports
+  /// downstream sink errors to [onError].
   const DropLeadingWhitespaceConverter({this.onError});
 
-  /// Synchronously processes the entire [input] byte array, returning a new slice
-  /// starting from the first non-whitespace byte.
-  ///
-  /// If the [input] consists entirely of whitespace, it returns an empty list.
+  /// Returns a slice of [input] starting from the first non-whitespace byte,
+  /// or an empty list if [input] contains only whitespace.
   @override
   List<int> convert(List<int> input) {
     final index = input.indexWhere(_isNotWhitespace);
     return index == -1 ? const [] : input.sublist(index);
   }
 
-  /// Instantiates and returns a [_DropLeadingWhitespaceConverterSink] for processing
-  /// asynchronous streams in a chunked manner, pushing processed data to the
-  /// downstream [sink].
+  /// Starts a chunked conversion that strips leading whitespace bytes before
+  /// forwarding remaining chunks to [sink].
   @override
   Sink<List<int>> startChunkedConversion(Sink<List<int>> sink) {
     return _DropLeadingWhitespaceConverterSink(sink, onError: onError);

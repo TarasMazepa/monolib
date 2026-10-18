@@ -1,45 +1,30 @@
-/// Provides [encodeBatchAsync], a shared architectural utility for asynchronously encoding streamed data batches.
-library;
-
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/async_iterator_util.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 
-/// A generic architectural foundation for asynchronous chunk-based data encoders.
+/// Asynchronously encodes a stream of [batches] into a [StringSink] using
+/// [encodeAsync].
 ///
-/// This function unifies the core workflow of streaming encoders (such as
-/// [csvEncodeBatchAsync] and [jsonlEncodeBatchAsync]) by abstracting two common
-/// infrastructural needs:
+/// This helper backs batch encoders such as `csvEncodeBatchAsync` and
+/// `jsonlEncodeBatchAsync`. It uses [withLazyStringSink] so that [sinkProvider]
+/// is only invoked when the first batch arrives, and iterates over [batches]
+/// sequentially with [iterateStreamOrIterable].
 ///
-/// 1. **Resource Lifecycle Management:** It delegates manual sink validation,
-///    initialization, and safe tear-down logic to [withLazyStringSink]. This ensures
-///    that a file or buffer is only lazily initialized when data actually arrives,
-///    preventing empty outputs for zero-element streams.
-/// 2. **Iteration and Dispatch:** It processes the inbound [batches] stream using
-///    [iterateStreamOrIterable], sequentially passing each aggregated chunk to the
-///    domain-specific [encodeAsync] callback.
+/// - [batches]: The stream of item batches to encode sequentially.
+/// - [encodeAsync]: Callback invoked for each batch to write formatted data
+///   into the target sink.
+/// - [sink]: An existing caller-managed [StringSink]. If provided, the caller
+///   remains responsible for closing it.
+/// - [sinkProvider]: A factory that lazily creates the target [StringSink] when
+///   the first batch arrives. If provided, the created sink is automatically
+///   closed when encoding completes.
 ///
-/// The consumer API expects either an existing [sink] to append data to, or a
-/// [sinkProvider] factory. The target sink is lazily initialized and passed to
-/// [encodeAsync] alongside each chunk.
-///
-/// - [batches]: A stream of data chunks (typically `List<T>`) representing aggregated
-///   input to be sequentially processed.
-/// - [encodeAsync]: A domain-specific callback (e.g., CSV or JSONL encoding logic)
-///   invoked for each batch, responsible for writing the formatted string data into
-///   the `sink`.
-/// - [sink]: An already instantiated and caller-managed target sink. If provided,
-///   the caller is responsible for eventually closing it.
-/// - [sinkProvider]: A factory function that lazily instantiates the target sink.
-///   If provided, this function takes ownership and ensures the sink is closed
-///   upon completion.
-///
-/// **Note:** Exactly one of [sink] or [sinkProvider] must be provided.
+/// Exactly one of [sink] or [sinkProvider] must be provided; otherwise, an
+/// [ArgumentError] is thrown.
 ///
 /// Example:
 /// ```dart
-/// // Internal usage demonstrating how domain encoders leverage this foundation:
 /// Future<void> myCustomFormatEncodeBatchAsync<T>({
 ///   required Stream<List<T>> batches,
 ///   StringSink? sink,

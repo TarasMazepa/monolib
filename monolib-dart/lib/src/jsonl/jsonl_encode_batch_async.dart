@@ -1,47 +1,40 @@
-/// High-throughput JSON Lines (JSONL) serialization for batched streams.
-///
-/// This library provides [jsonlEncodeBatchAsync], which acts as a bridge
-/// between asynchronous batch processors (e.g., paginated database queries
-/// or chunked stream consumers) and the underlying lazy JSONL encoding engine.
-library;
-
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/encode_batch_async.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_encode_async.dart';
 
-/// Asynchronously encodes a continuous stream of [batches] into JSON Lines (JSONL).
+/// Asynchronously encodes a stream of [batches] into JSON Lines (JSONL) format
+/// and writes each line to a destination [StringSink].
 ///
-/// Acts as an architectural bridge between batched stream processors (like paginated
-/// queries) and the lazy JSON Lines encoding engine ([encodeBatchAsync] and
-/// [jsonlEncodeAsync]). It enables efficient serialization of chunked data to
-/// disk or network without flattening the stream into memory, preserving
-/// batch-level backpressure.
+/// Delegates batch traversal and lazy sink management to [encodeBatchAsync],
+/// encoding each non-empty batch with [jsonlEncodeAsync]. Exactly one of [sink]
+/// or [sinkProvider] must be provided, or an [ArgumentError] is thrown.
 ///
-/// It provides universal support for deeply nested [Future], [Stream],
-/// [Iterable], standard `toJson()` serialization, and the custom
-/// `AsyncJsonWritable` interface.
-///
-/// Either [sink] or [sinkProvider] MUST be provided, but not both.
-///
-/// - [batches]: The asynchronous stream of grouped items to serialize.
-/// - [sink]: An active, externally managed [StringSink]. If provided, the caller
-///   retains ownership and MUST handle closing the resource.
-/// - [sinkProvider]: A lazily evaluated factory callback that creates a [StringSink].
-///   If provided, this function assumes ownership and will automatically close
-///   the sink (awaiting if necessary) when processing completes or an error occurs.
-///   It defers sink creation until the first batch arrives, providing zero-byte
-///   stream protection.
+/// - [batches]: The [Stream] of item batches (`List<T>`) to encode. Each item
+///   of type [T] is serialized via `jsonEncodeAsync`, which supports nested
+///   [Future], [Stream], and [Iterable] values, `toJson()` methods, and
+///   `AsyncJsonWritable` objects.
+/// - [sink]: An active, externally managed [StringSink]. If provided, the
+///   caller retains ownership and is responsible for closing it.
+/// - [sinkProvider]: A factory callback that lazily creates a [StringSink] when
+///   the first non-empty batch arrives (preventing empty files when [batches]
+///   yields no items). The created sink is closed automatically upon completion
+///   or error if it implements [Sink] or [StreamSink].
 ///
 /// Example:
 /// ```dart
-/// // Fetching users in batches of 100 to prevent out-of-memory errors.
-/// final batchedUserStream = database.fetchUsersInBatches(pageSize: 100);
+/// final batchesStream = Stream.fromIterable([
+///   [{'name': 'Alice', 'age': 30}],
+///   [{'name': 'Bob', 'age': 25}],
+/// ]);
+/// final buffer = StringBuffer();
 ///
 /// await jsonlEncodeBatchAsync(
-///   batches: batchedUserStream,
-///   sinkProvider: () => File('users_export.jsonl').openWrite(mode: FileMode.write),
+///   batches: batchesStream,
+///   sink: buffer,
 /// );
+/// print(buffer.toString());
+/// // Result: '{"name":"Alice","age":30}\n{"name":"Bob","age":25}\n'
 /// ```
 Future<void> jsonlEncodeBatchAsync<T>({
   required Stream<List<T>> batches,
