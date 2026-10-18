@@ -1,39 +1,27 @@
-/// A wrapper class for overriding alignment behavior in tabular string generation.
-library;
-
-/// A structural wrapper that forces a table cell to be left-aligned when rendered.
+/// A cell wrapper that forces left alignment when formatted by `formatTable`.
 ///
-/// In the tabular string generation architecture provided by [OnListOfLists.formatTable],
-/// `num` values (integers, doubles) are automatically right-aligned by default.
-/// Wrapping a numerical value or any other object in [TableCellAlignLeft] overrides
-/// this behavior, instructing the formatter to pad the generated string on the right,
-/// resulting in left-aligned output within the calculated column width.
+/// By default, `formatTable` right-aligns [num] values and left-aligns all
+/// other values. Wrapping a value (such as a [num]) in [TableCellAlignLeft]
+/// overrides this behavior so the cell is padded on the right.
 ///
+/// Example:
 /// ```dart
 /// final table = [
 ///   ['ID', 'Value'],
-///   [1, 100], // 100 will be right-aligned
-///   [2, TableCellAlignLeft(200)], // 200 will be left-aligned
+///   [1, 100],
+///   [2, TableCellAlignLeft(200)],
 /// ];
-/// final sink = StringBuffer();
-/// table.formatTable(sink);
+/// final buffer = StringBuffer();
+/// table.formatTable(buffer);
 /// ```
 class TableCellAlignLeft {
-  /// The underlying value to be formatted and rendered in the table cell.
-  ///
-  /// This [value] can be of any type, though typically it wraps a `num`
-  /// to override its default right-alignment. It will be converted to a
-  /// string representation by [OnListOfLists.formatTable] during formatting.
+  /// The underlying cell value to format as a left-aligned string.
   final dynamic value;
 
-  /// Creates a [TableCellAlignLeft] to force left-alignment of the provided [value].
+  /// Creates a [TableCellAlignLeft] wrapper around [value].
   TableCellAlignLeft(this.value);
 
-  /// Returns the string representation of the underlying [value].
-  ///
-  /// This ensures that the cell's textual content remains identical to
-  /// what it would have been if the [value] had not been wrapped, while
-  /// transparently applying the structural alignment override.
+  /// Returns the string representation of [value].
   @override
   String toString() {
     return '$value';
