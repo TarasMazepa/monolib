@@ -1,34 +1,15 @@
-/// Fault-tolerant broadcasting utilities for collections of [StreamController]s.
-///
-/// This library provides extension methods to safely dispatch data and error
-/// events to multiple controllers simultaneously, allowing customization of
-/// exception handling strategies via [ExceptionStrategy].
-library;
-
 import 'dart:async';
 import 'package:monolib_dart/src/stream/composite_event_sink/exception_strategy.dart';
 
-/// A resilient broadcast multiplexer for manually managed subscriber pools.
-///
-/// Within custom reactive architectures (like dynamic event buses, publisher-subscriber
-/// patterns, or list-backed state observers), developers frequently maintain an
-/// `Iterable<StreamController>` representing connected clients. Directly iterating
-/// and invoking `add()` on these controllers is brittle: if any single downstream
-/// consumer has concurrently closed their connection, standard Dart streams throw
-/// an unhandled [StateError], immediately crashing the entire broadcast loop and
-/// leaving subsequent clients unnotified.
-///
-/// This extension resolves this architectural fragility by providing safe,
-/// transactional fan-out methods. It abstracts away manual state inspection
-/// (`!controller.isClosed`) and delegates error handling to an [ExceptionStrategy],
-/// ensuring guaranteed delivery topologies even across mixed-state subscriber pools.
+/// Extension on [Iterable] of [StreamController] that broadcasts data and error
+/// events across all controllers using a configurable [ExceptionStrategy].
 extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
-  /// Safely dispatches the given data [event] to all stream controllers in this collection.
+  /// Dispatches [event] to every [StreamController] in this iterable.
   ///
-  /// Iterates through the collection and invokes [StreamController.add] on each element.
-  /// The [strategy] controls how exceptions thrown by a controller are handled
-  /// (defaults to [ExceptionStrategy.swallow]).
+  /// Calls [StreamController.add] on each controller, handling any synchronous
+  /// exceptions with [strategy] (defaults to [ExceptionStrategy.swallow]).
   ///
+  /// Example:
   /// ```dart
   /// final subscribers = <StreamController<String>>[
   ///   StreamController<String>(),
@@ -36,8 +17,8 @@ extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
   ///   StreamController<String>(),
   /// ];
   ///
-  /// // Successfully dispatches 'Update' to the first and third controllers.
-  /// // The StateError from the second (closed) controller is swallowed.
+  /// // Dispatches 'Update' to the open controllers while swallowing the
+  /// // StateError from the closed controller.
   /// subscribers.onEachAdd('Update');
   /// ```
   void onEachAdd(
@@ -47,13 +28,14 @@ extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
     strategy.dispatch(this, (sink) => sink.add(event));
   }
 
-  /// Safely dispatches an [error] and an optional [stackTrace] to all stream controllers
-  /// in this collection.
+  /// Dispatches [error] and optional [stackTrace] to every [StreamController]
+  /// in this iterable.
   ///
-  /// Iterates through the collection and invokes [StreamController.addError] on each element.
-  /// The [strategy] controls how exceptions thrown by a controller are handled
-  /// (defaults to [ExceptionStrategy.swallow]).
+  /// Calls [StreamController.addError] on each controller, handling any
+  /// synchronous exceptions with [strategy] (defaults to
+  /// [ExceptionStrategy.swallow]).
   ///
+  /// Example:
   /// ```dart
   /// final subscribers = <StreamController<int>>[
   ///   StreamController<int>(),
@@ -62,7 +44,6 @@ extension OnIterableOfStreamControllers<T> on Iterable<StreamController<T>> {
   /// try {
   ///   throw FormatException('Invalid data format');
   /// } catch (e, st) {
-  ///   // Safely forwards the exception and stack trace to all active subscribers.
   ///   subscribers.onEachAddError(e, st);
   /// }
   /// ```
