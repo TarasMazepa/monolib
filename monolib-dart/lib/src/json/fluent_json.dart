@@ -1,28 +1,12 @@
-/// A highly robust, path-tracked wrapper for traversing dynamic JSON structures.
-///
-/// In the repository's data-parsing architecture, `FluentJson` acts as a safe
-/// wrapper over deeply nested dynamic structures natively parsed by [dart:convert].
-///
-/// It aims to eliminate verbose runtime type-checking and manual unboxing logic
-/// at individual call sites. A core feature is maintaining a `breadCrumbs` trail,
-/// meaning if an access error occurs (such as an incorrect type or unexpected null),
-/// the exact hierarchy traversal paths from the JSON root are fully preserved and
-/// reported inside exception traces.
-///
-/// Extensions like `OnFluentJson` in the codebase can subsequently supplement
-/// the fundamental access and unboxing tools herein by bridging base JSON types to
-/// domain-specific data structures.
-library;
-
 import 'dart:convert';
 
-/// A safe, path-tracked wrapper for dynamic JSON structures.
+/// A safe, path-tracked wrapper for traversing dynamic JSON structures.
 ///
-/// Designed to streamline JSON traversal, this class prevents unboxing boilerplate
-/// and cryptic runtime mapping errors when iterating nested structures. By persisting
-/// its navigation [breadCrumbs], it guarantees that any failures encountered when
-/// expecting specific schemas generate precise architectural exception paths (e.g.,
-/// `Hierarchy from root json: $[users][0][id]`).
+/// [FluentJson] wraps decoded JSON values (such as those produced by
+/// `dart:convert`) to simplify nested access and type-checked unboxing. It
+/// maintains a [breadCrumbs] trail from the root node so that missing keys,
+/// unexpected nulls, or type mismatches report the exact JSON path in the
+/// thrown exception (for example, `Hierarchy from root json: $[users][0][id]`).
 class FluentJson {
   /// The dynamic, untyped JSON payload wrapped at this hierarchy level.
   final dynamic json;
@@ -101,8 +85,9 @@ $e''');
   ///
   /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
+  /// Example:
   /// ```dart
-  /// final OptionalNode? node = json.elementAt('optional_node');
+  /// final FluentJson? node = json.elementAt('optional_node');
   /// ```
   FluentJson? elementAt(dynamic accessor) {
     return switch (_elementAt(accessor, couldBeNull: true)) {
@@ -119,11 +104,12 @@ $e''');
   ///
   /// If the node is missing or evaluates to `null`, this operator throws an explicit
   /// exception detailing the traversal error and breadcrumbs. If an integer index
-  /// [accessor] is out-of-bounds (`>= length`), it will throw a `RangeError` wrapped
+  /// [accessor] is out-of-bounds (`>= length`), it will throw a [RangeError] wrapped
   /// in the path exception.
   ///
   /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
+  /// Example:
   /// ```dart
   /// final String name = json['user']['name'].unbox();
   /// ```
@@ -143,6 +129,7 @@ ${_describeForException()}'''),
   ///
   /// Throws an exception via [operator []] if any intermediate level is null.
   ///
+  /// Example:
   /// ```dart
   /// final result = json.cascading(['users', 0, 'id']);
   /// ```
@@ -154,6 +141,7 @@ ${_describeForException()}'''),
   /// If [T] is not nullable and the underlying value is null, or if the runtime type
   /// mismatches [T], it surfaces an explicit path exception.
   ///
+  /// Example:
   /// ```dart
   /// final int age = json['age'].unbox<int>();
   /// ```
@@ -184,6 +172,7 @@ ${_describeForException()}''',
   ///
   /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
+  /// Example:
   /// ```dart
   /// final String name = json.unboxed<String>('name');
   /// ```
@@ -196,6 +185,7 @@ ${_describeForException()}''',
   ///
   /// Throws an [ArgumentError] if [accessor] is a negative integer.
   ///
+  /// Example:
   /// ```dart
   /// final int? id = json.unboxedElementAt<int>('id');
   /// ```
@@ -206,6 +196,7 @@ ${_describeForException()}''',
   /// Yields individually path-tracked [FluentJson] instances for every item, indexing
   /// breadcrumbs so errors inside the loop clearly state their array index.
   ///
+  /// Example:
   /// ```dart
   /// for (final item in json['users'].unboxIterable()) {
   ///   print(item['name'].unbox<String>());
@@ -221,6 +212,7 @@ ${_describeForException()}''',
   ///
   /// Applies the [mapper] to every path-tracked [FluentJson] node yielded by [unboxIterable].
   ///
+  /// Example:
   /// ```dart
   /// final List<User> users = json['users'].unboxMappedList(User.fromJson);
   /// ```
