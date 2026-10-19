@@ -3,8 +3,8 @@
 /// This provides a pure-Dart notification contract (analogous to Flutter's
 /// `Listenable`) without requiring a dependency on Flutter.
 ///
-/// Callers typically encounter this as the return type of [Pillar.changeNotifierFor],
-/// and implementations can use [PillarChangeNotifier] rather than implementing
+/// Callers typically encounter this as the return type of `Pillar.changeNotifierFor`,
+/// and implementations can use `PillarChangeNotifier` rather than implementing
 /// this interface directly. In Flutter applications, instances can be adapted
 /// using the `.asListenable` extension from `package:monolib_flutter`.
 ///

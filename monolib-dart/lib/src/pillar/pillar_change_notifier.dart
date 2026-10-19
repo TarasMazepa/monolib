@@ -1,19 +1,13 @@
 import 'package:monolib_dart/src/pillar/pillar_listenable.dart';
 
-/// The default, pure-Dart implementation of [PillarListenable] that powers reactive
-/// state notifications within the Pillar dependency injection framework.
+/// A pure-Dart implementation of [PillarListenable] that dispatches synchronous
+/// notifications when a `PillarScope` is updated.
 ///
-/// Architecturally, this class acts as a synchronous event multiplexer. It maintains a
-/// registry of observer callbacks and dispatches notifications when changes occur
-/// within a specific `PillarScope`. It serves as the foundation for cross-package
-/// reactivity: while it exists in `monolib-dart` to remain decoupled from the UI,
-/// Flutter applications dynamically bind it to the widget tree using `PillarListenableAdapter`
-/// (typically via the `.asListenable()` extension).
-///
-/// Within the Pillar DI system, instances of this class are mapped 1:1 with a
-/// dependency scope. Consumers rarely instantiate this class directly; instead,
-/// they retrieve an active notifier using `Pillar.changeNotifierFor` to observe
-/// when a scope's injected services are updated.
+/// Each notifier maintains a list of listener callbacks and is typically
+/// obtained via `Pillar.changeNotifierFor` to observe when dependencies in a
+/// scope are replaced. In Flutter applications, it can be adapted to a Flutter
+/// `Listenable` using `PillarListenableAdapter` (via the `.asListenable`
+/// extension getter).
 ///
 /// Example:
 /// ```dart
@@ -26,55 +20,40 @@ import 'package:monolib_dart/src/pillar/pillar_listenable.dart';
 /// scopeNotifier.addListener(onDependenciesUpdated);
 /// ```
 class PillarChangeNotifier implements PillarListenable {
-  /// The internal registry of active callback functions bound to this notifier.
+  /// The registered listener callbacks.
   final List<void Function()> _listeners = [];
 
-  /// Binds a reactive [listener] to this notifier's execution lifecycle.
+  /// Registers [listener] to be called synchronously whenever [notifyListeners]
+  /// is invoked.
   ///
-  /// Whenever the underlying scope publishes an update via [notifyListeners],
-  /// the provided [listener] callback is invoked synchronously. This mechanism enables
-  /// UI components to automatically react when their injected dependencies change.
-  ///
-  /// If the identical [listener] closure is added multiple times, it will be invoked
-  /// exactly that many times during a notification phase.
+  /// If the same [listener] is added multiple times, it will be called once for
+  /// each registration during a notification pass.
   @override
   void addListener(void Function() listener) {
     _listeners.add(listener);
   }
 
-  /// Unbinds a previously registered [listener] from this notifier.
+  /// Removes a previously registered [listener] from this notifier.
   ///
-  /// Architecturally, this is crucial for preventing memory leaks when ephemeral UI
-  /// components or transient controllers are destroyed. It removes the exact [listener]
-  /// reference from the internal dispatch queue.
-  ///
-  /// If the [listener] was registered multiple times, this method only removes the
-  /// first encountered instance. If the [listener] is absent from the registry, this
-  /// method silently ignores the request.
+  /// If [listener] was registered multiple times, only the first matching
+  /// entry is removed. Does nothing if [listener] is not registered.
   @override
   void removeListener(void Function() listener) {
     _listeners.remove(listener);
   }
 
-  /// Synchronously broadcasts an update event to all registered listeners.
+  /// Synchronously invokes all registered listeners.
   ///
-  /// This method iterates through the current dispatch queue and invokes every active
-  /// callback without arguments. It safely utilizes a defensive shallow copy
-  /// (`[..._listeners]`) before iteration. This prevents `ConcurrentModificationError`
-  /// crashes if a listener dynamically calls [addListener] or [removeListener]
-  /// during the active dispatch cycle.
+  /// Iterates over a shallow copy of the listener list so that listeners may
+  /// safely call [addListener] or [removeListener] during dispatch without
+  /// causing a [ConcurrentModificationError].
   void notifyListeners() {
     for (final void Function() listener in [..._listeners]) {
       listener();
     }
   }
 
-  /// Permanently tears down this notifier's active subscriptions.
-  ///
-  /// Architecturally, this method is invoked when the associated scope is destroyed
-  /// or invalidated. It aggressively purges the underlying callback registry, instantly
-  /// severing references to dependent elements and ensuring that memory leaks do not
-  /// accumulate over the application's lifecycle.
+  /// Clears all registered listeners from this notifier.
   void dispose() {
     _listeners.clear();
   }
