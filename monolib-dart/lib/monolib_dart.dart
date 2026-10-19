@@ -21,6 +21,8 @@ export 'src/general/on_list.dart';
 export 'src/general/on_list_of_lists.dart';
 export 'src/general/on_nullable_comparable.dart';
 export 'src/general/on_nullable_object.dart';
+export 'src/general/on_nullable_iterable.dart';
+export 'src/general/on_nullable_map.dart';
 export 'src/general/on_nullable_string.dart';
 export 'src/general/on_object.dart';
 export 'src/general/once.dart';
