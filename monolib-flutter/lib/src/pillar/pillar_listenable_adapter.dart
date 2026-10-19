@@ -22,31 +22,27 @@ import 'package:monolib_dart/pillar.dart';
 /// );
 /// ```
 class PillarListenableAdapter implements Listenable {
-  /// The underlying [PillarListenable] notification source.
-  ///
-  /// Calls to [addListener] and [removeListener] on this adapter are forwarded
-  /// to this instance.
-  final PillarListenable pillarListenable;
+  final PillarListenable _pillarListenable;
 
   /// Creates a [PillarListenableAdapter] that wraps [pillarListenable].
   ///
   /// Prefer using the `.asListenable` extension getter on [PillarListenable]
   /// instead of calling this constructor directly.
-  const PillarListenableAdapter(this.pillarListenable);
+  const PillarListenableAdapter(PillarListenable pillarListenable)
+      : _pillarListenable = pillarListenable;
 
-  /// Registers [listener] with the underlying [pillarListenable].
+  /// Registers [listener] with the underlying [PillarListenable].
   ///
-  /// The [listener] is invoked whenever [pillarListenable] notifies its
-  /// subscribers.
+  /// The [listener] is invoked whenever the listenable notifies its subscribers.
   @override
   void addListener(VoidCallback listener) {
-    pillarListenable.addListener(listener);
+    _pillarListenable.addListener(listener);
   }
 
   /// Removes a previously registered [listener] from the underlying
-  /// [pillarListenable].
+  /// [PillarListenable].
   @override
   void removeListener(VoidCallback listener) {
-    pillarListenable.removeListener(listener);
+    _pillarListenable.removeListener(listener);
   }
 }

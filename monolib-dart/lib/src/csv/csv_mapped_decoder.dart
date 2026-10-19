@@ -54,11 +54,12 @@ class _CsvMappedDecoderSink<T> extends CsvBaseChunkSink<T> {
   final T? Function(List<String> row) _mapper;
 
   /// An optional callback invoked when the sink is closed.
-  final void Function()? onDone;
+  final void Function()? _onDone;
 
   /// Creates a sink that maps parsed CSV rows with [_mapper] and forwards
   /// non-null results to [outSink].
-  _CsvMappedDecoderSink(super.outSink, this._mapper, {this.onDone});
+  _CsvMappedDecoderSink(super.outSink, this._mapper, {void Function()? onDone})
+      : _onDone = onDone;
 
   /// Maps [row] using [_mapper] and emits the result to [outSink] if non-null.
   @override
@@ -70,10 +71,10 @@ class _CsvMappedDecoderSink<T> extends CsvBaseChunkSink<T> {
   }
 
   /// Flushes any remaining buffered data, closes [outSink], and invokes
-  /// [onDone] if provided.
+  /// [_onDone] if provided.
   @override
   void close() {
     super.close();
-    onDone?.call();
+    _onDone?.call();
   }
 }

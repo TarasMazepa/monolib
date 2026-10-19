@@ -81,48 +81,50 @@ class _JsonlMappedDecoderSink<T> extends JsonlBaseChunkSink<T> {
   final T? Function(dynamic) _fromJson;
 
   /// The codec used to decode individual JSON lines.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Whether to suppress decoding and mapping exceptions.
-  final bool ignoreExceptions;
+  final bool _ignoreExceptions;
 
   /// An optional callback invoked when the sink is closed.
-  final void Function()? onDone;
+  final void Function()? _onDone;
 
-  /// Creates a sink that decodes JSONL lines with [jsonCodec], maps them with
+  /// Creates a sink that decodes JSONL lines with [_jsonCodec], maps them with
   /// [_fromJson], and forwards non-null results to [outSink].
   _JsonlMappedDecoderSink(
     super.outSink,
     this._fromJson,
-    this.jsonCodec, {
-    this.ignoreExceptions = false,
-    this.onDone,
-  });
+    Codec<Object?, String> jsonCodec, {
+    bool ignoreExceptions = false,
+    void Function()? onDone,
+  })  : _jsonCodec = jsonCodec,
+        _ignoreExceptions = ignoreExceptions,
+        _onDone = onDone;
 
-  /// Decodes [line] using [jsonCodec], maps the result with [_fromJson], and
+  /// Decodes [line] using [_jsonCodec], maps the result with [_fromJson], and
   /// emits it to [outSink] if non-null.
   ///
-  /// Rethrows any exception unless [ignoreExceptions] is `true`.
+  /// Rethrows any exception unless [_ignoreExceptions] is `true`.
   @override
   void processLine(String line) {
     try {
-      final json = jsonCodec.decode(line);
+      final json = _jsonCodec.decode(line);
       final mapped = _fromJson(json);
       if (mapped != null) {
         outSink.add(mapped);
       }
     } catch (e) {
-      if (!ignoreExceptions) {
+      if (!_ignoreExceptions) {
         rethrow;
       }
     }
   }
 
   /// Flushes any remaining buffered data, closes [outSink], and invokes
-  /// [onDone] if provided.
+  /// [_onDone] if provided.
   @override
   void close() {
     super.close();
-    onDone?.call();
+    _onDone?.call();
   }
 }

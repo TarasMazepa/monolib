@@ -21,15 +21,13 @@ import 'package:monolib_dart/stream.dart';
 /// );
 /// ```
 class DropLeadingWhitespaceConverter extends Converter<List<int>, List<int>> {
-  /// Called when adding a chunk to the downstream sink fails.
-  ///
-  /// Errors are caught via [OnSink.tryAdd]; if [onError] is omitted, they are
-  /// silently ignored.
-  final void Function(Object error, StackTrace stackTrace)? onError;
+  final void Function(Object error, StackTrace stackTrace)? _onError;
 
   /// Creates a [DropLeadingWhitespaceConverter] that optionally reports
   /// downstream sink errors to [onError].
-  const DropLeadingWhitespaceConverter({this.onError});
+  const DropLeadingWhitespaceConverter({
+    void Function(Object error, StackTrace stackTrace)? onError,
+  }) : _onError = onError;
 
   /// Returns a slice of [input] starting from the first non-whitespace byte,
   /// or an empty list if [input] contains only whitespace.
@@ -43,7 +41,7 @@ class DropLeadingWhitespaceConverter extends Converter<List<int>, List<int>> {
   /// forwarding remaining chunks to [sink].
   @override
   Sink<List<int>> startChunkedConversion(Sink<List<int>> sink) {
-    return _DropLeadingWhitespaceConverterSink(sink, onError: onError);
+    return _DropLeadingWhitespaceConverterSink(sink, onError: _onError);
   }
 }
 
