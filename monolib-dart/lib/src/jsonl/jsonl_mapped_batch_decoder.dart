@@ -1,67 +1,66 @@
-/// Provides high-throughput, memory-efficient decoding of JSON Lines (JSONL) data
-/// into batched collections of strongly-typed domain objects.
-library;
-
 import 'dart:convert';
 
 import 'package:monolib_dart/src/common/batching_sink_mixin.dart';
 import 'package:monolib_dart/src/common/chunked_only_converter.dart';
 import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 
-/// A stream transformer for batched mapping of JSON Lines (JSONL) data.
+/// A streaming converter that parses chunked JSON Lines (JSONL) string data,
+/// maps each decoded JSON object into a domain object of type [T], and emits
+/// mapped items in per-chunk batches (`List<T>`).
 ///
-/// Within the repository's data-parsing architecture, [JsonlMappedBatchDecoder]
-/// is a stream transformer extending [ChunkedOnlyConverter]. It mitigates event
-/// loop overhead during high-throughput JSONL ingestion by leveraging
-/// [JsonlBaseChunkSink] to parse chunks, mapping rows to domain objects, and
-/// emitting them in grouped lists via [BatchingSinkMixin] rather than as
-/// individual events.
+/// [JsonlMappedBatchDecoder] extends [ChunkedOnlyConverter] and combines
+/// [JsonlBaseChunkSink] with [BatchingSinkMixin]. Each parsed line is decoded
+/// with [jsonCodec] and passed to [fromJson]; non-null results are accumulated
+/// and flushed as a single `List<T>` batch at the end of each input chunk,
+/// reducing stream event overhead on high-volume JSONL streams.
+///
+/// For one-by-one emission of mapped items, see [JsonlMappedDecoder].
 ///
 /// Example:
 /// ```dart
-/// final stream = Stream.fromIterable([
-///   '{"id": 1}\n{"id": 2}',
-///   '\n{"id": 3}'
-/// ]);
+/// final fileStream = File('large_data.jsonl').openRead().transform(utf8.decoder);
 ///
-/// final batchedStream = stream.transform(
-///   JsonlMappedBatchDecoder((json) => MyDomainObject.fromJson(json)),
+/// final batchStream = fileStream.transform(
+///   JsonlMappedBatchDecoder<MyModel>(
+///     (json) => MyModel.fromJson(json as Map<String, dynamic>),
+///     ignoreExceptions: true,
+///   ),
 /// );
 ///
-/// // Emits:
-/// // [MyDomainObject(1), MyDomainObject(2)]
-/// // [MyDomainObject(3)]
+/// await for (final batch in batchStream) {
+///   await insertModelsToDatabase(batch);
+/// }
 /// ```
 class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
-  /// The factory callback used to transform parsed dynamic JSON objects into the domain type [T].
+  /// The callback invoked to convert a decoded JSON value into an instance of [T].
   ///
-  /// If this callback returns `null`, the specific item is filtered out and will not be included
-  /// in the emitted batch, enabling on-the-fly data validation and sanitization.
+  /// Returning `null` skips the line and excludes it from the current batch.
   final T? Function(dynamic) fromJson;
 
-  /// The underlying codec utilized to parse individual JSON string lines.
+  /// The underlying [Codec] used to decode individual JSON lines.
   ///
-  /// Defaults to standard [JsonCodec] but allows injecting custom or optimized JSON decoders.
+  /// Defaults to [JsonCodec].
   final Codec<Object?, String> jsonCodec;
 
-  /// Dictates the error handling policy during JSON decoding and object mapping.
+  /// Whether to suppress exceptions thrown during JSON decoding or [fromJson] mapping.
   ///
-  /// When `true`, any exceptions thrown by [jsonCodec] or [fromJson] are swallowed, discarding
-  /// the malformed line and allowing processing to continue. When `false` (the default), such
-  /// errors are immediately rethrown, terminating the stream transformation.
+  /// When `true`, lines that fail to decode or map are silently skipped. When
+  /// `false` (the default), exceptions propagate to the stream.
   final bool ignoreExceptions;
 
-  /// An optional lifecycle hook invoked synchronously with the accumulated batch just before it is
-  /// forwarded to the underlying stream sink.
-  ///
-  /// This enables side-effects (e.g., logging or metrics gathering) directly on the grouped data.
+  /// An optional callback invoked with each non-empty `batch` just before it is
+  /// emitted downstream.
   final void Function(List<T> batch)? onBatch;
 
-  /// An optional callback executed once the final chunk has been processed and the stream is fully closed.
+  /// An optional callback invoked once when the input stream closes.
   final void Function()? onDone;
 
-  /// Instantiates a new [JsonlMappedBatchDecoder] to process incoming JSONL strings into batches
-  /// of [T].
+  /// Creates a [JsonlMappedBatchDecoder] that maps decoded JSON lines using
+  /// [fromJson] and emits them in batches.
+  ///
+  /// Optionally configures a custom [jsonCodec], suppresses errors when
+  /// [ignoreExceptions] is `true`, invokes [onBatch] before each batch is
+  /// emitted, and invokes [onDone] when the input stream completes.
   const JsonlMappedBatchDecoder(
     this.fromJson, {
     this.ignoreExceptions = false,
@@ -70,10 +69,8 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
     this.onDone,
   });
 
-  /// Initiates the stateful chunked conversion pipeline.
-  ///
-  /// Returns a specialized [_JsonlMappedBatchDecoderSink] that manages partial line state,
-  /// maps JSON payloads, and batches them before delegating to the target [sink].
+  /// Starts a chunked conversion that parses incoming JSONL string chunks, maps
+  /// each line using [fromJson], and emits non-empty `List<T>` batches to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
     return _JsonlMappedBatchDecoderSink<T>(
@@ -87,29 +84,26 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   }
 }
 
-/// The internal stateful sink driving the logic for [JsonlMappedBatchDecoder].
-///
-/// It combines [JsonlBaseChunkSink] to correctly identify individual JSON lines across arbitrary
-/// string chunk boundaries, and [BatchingSinkMixin] to buffer the successfully mapped instances of [T]
-/// until the end of the current chunk is reached.
+/// Internal [JsonlBaseChunkSink] implementation for [JsonlMappedBatchDecoder].
 class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
     with BatchingSinkMixin<T> {
-  /// Maps raw JSON to the generic type [T], silently dropping `null` returns.
+  /// The callback applied to every decoded JSON value.
   final T? Function(dynamic) _fromJson;
 
-  /// The codec used to parse complete JSON string lines.
+  /// The codec used to decode individual JSON lines.
   final Codec<Object?, String> jsonCodec;
 
-  /// Whether to suppress mapping and parsing exceptions.
+  /// Whether to suppress decoding and mapping exceptions.
   final bool ignoreExceptions;
 
-  /// Callback fired when a populated batch is flushed.
+  /// An optional callback invoked when a non-empty `batch` is flushed.
   final void Function(List<T> batch)? onBatch;
 
-  /// Callback fired when the sink completes its lifecycle.
+  /// An optional callback invoked when the sink is closed.
   final void Function()? onDone;
 
-  /// Constructs the stateful mapping and batching sink, routing final batches into [outSink].
+  /// Creates a sink that decodes JSONL lines with [jsonCodec], maps them with
+  /// [_fromJson], batches non-null results, and forwards each batch to [outSink].
   _JsonlMappedBatchDecoderSink(
     super.outSink,
     this._fromJson,
@@ -119,11 +113,10 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
     this.onDone,
   });
 
-  /// Decodes and maps a single, complete line of JSONL data.
+  /// Decodes [line] using [jsonCodec], maps the result with [_fromJson], and
+  /// adds it to the current batch via [addToBatch] if non-null.
   ///
-  /// Successful conversions are buffered using [BatchingSinkMixin.addToBatch]. Malformed data or
-  /// exceptions within [_fromJson] will either be swallowed (if [ignoreExceptions] is `true`) or
-  /// propagated upwards.
+  /// Rethrows any exception unless [ignoreExceptions] is `true`.
   @override
   void processLine(String line) {
     try {
@@ -139,16 +132,15 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
     }
   }
 
-  /// Triggered natively by [JsonlBaseChunkSink] when an incoming string chunk has been fully processed.
-  ///
-  /// Flushes any accumulated items using [BatchingSinkMixin.flushBatchOnChunkEnd], dispatching
-  /// the single batched event downstream.
+  /// Flushes any accumulated items in the current batch to [outSink] via
+  /// [flushBatchOnChunkEnd], invoking [onBatch] if provided.
   @override
   void onChunkEnd() {
     flushBatchOnChunkEnd(onBatch: onBatch);
   }
 
-  /// Finalizes the sink, flushing remaining data and triggering [onDone] if provided.
+  /// Flushes any remaining buffered data, closes [outSink], and invokes
+  /// [onDone] if provided.
   @override
   void close() {
     super.close();

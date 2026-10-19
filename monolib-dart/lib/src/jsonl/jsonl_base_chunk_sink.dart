@@ -1,50 +1,50 @@
 import 'dart:convert';
 
-/// Acts as the architectural base class for chunked JSON Lines (JSONL) ingestion.
+/// A base [ChunkedConversionSink] for chunked JSON Lines (JSONL) string decoding.
 ///
-/// [JsonlBaseChunkSink] implements the [ChunkedConversionSink] interface to
-/// process raw, fragmented [String] chunks directly from a stream. It serves
-/// as a state machine that bypasses Dart's `LineSplitter` overhead by manually
-/// buffering incomplete string chunks across stream events. It abstracts line
-/// boundary scanning and sanitization, delegating actual JSON mapping to
-/// subclasses via the [processLine] and [onChunkEnd] hooks.
+/// [JsonlBaseChunkSink] ingests raw [String] chunks and splits them into
+/// individual JSON lines along newline boundaries (`\n` or `\r\n`), buffering
+/// incomplete trailing chunks across multiple [add] calls and skipping empty
+/// lines.
 ///
-/// Example architecture usage by a subclass:
+/// Concrete decoders (such as [JsonlChunkedDecoder], [JsonlMappedDecoder], and
+/// [JsonlMappedBatchDecoder]) extend this class to delegate line boundary
+/// scanning while implementing their own decoding and emission logic via
+/// [processLine] and [onChunkEnd].
+///
+/// Example:
 /// ```dart
 /// class MyDecoderSink extends JsonlBaseChunkSink<Map<String, dynamic>> {
 ///   MyDecoderSink(super.outSink);
 ///
 ///   @override
 ///   void processLine(String line) {
-///     final json = jsonDecode(line);
+///     final json = jsonDecode(line) as Map<String, dynamic>;
 ///     outSink.add(json);
 ///   }
 /// }
 /// ```
 abstract class JsonlBaseChunkSink<TOut>
     implements ChunkedConversionSink<String> {
-  /// The downstream destination sink that receives the fully processed output
-  /// instances of type [TOut] (such as parsed domain objects or lists).
+  /// The downstream sink that receives the processed outputs of type [TOut].
   final Sink<TOut> outSink;
   String _carry = '';
 
-  /// Constructs a [JsonlBaseChunkSink] that pipes final, mapped outputs
-  /// into the provided [outSink].
+  /// Creates a [JsonlBaseChunkSink] that forwards processed outputs to [outSink].
   JsonlBaseChunkSink(this.outSink);
 
-  /// An abstract hook invoked by the structural parser whenever a complete,
-  /// sanitized JSON line string is successfully extracted from the stream chunk.
+  /// Invoked whenever a complete, non-empty JSON [line] is extracted from the input stream.
   ///
-  /// Subclasses must implement this method to handle the actual JSON decoding
-  /// and mapping for the [line], eventually dispatching results to the [outSink].
+  /// Subclasses must implement this method to decode and emit the parsed [line]
+  /// (for example, by forwarding the decoded JSON or mapping it into a domain
+  /// object) to [outSink].
   void processLine(String line);
 
-  /// An optional lifecycle hook invoked immediately after a discrete stream chunk
-  /// has been fully parsed into lines.
+  /// A lifecycle hook invoked at the end of both [add] and [close].
   ///
-  /// This is leveraged by batch-oriented subclasses (like
-  /// `_JsonlMappedBatchDecoderSink`) to flush intermediate states or buffered
-  /// elements once a chunk boundary is reached, optimizing asynchronous batching.
+  /// Batch-oriented subclasses (such as [JsonlMappedBatchDecoder]) can override
+  /// this method to flush buffered elements after a chunk of string data has
+  /// been fully processed. By default, this method does nothing.
   void onChunkEnd() {}
 
   void _handleRawLine(String line) {
@@ -56,13 +56,12 @@ abstract class JsonlBaseChunkSink<TOut>
     }
   }
 
-  /// Consumes a raw string [chunk] from the upstream source.
+  /// Ingests a raw [chunk] of JSONL string data and advances the parser state.
   ///
-  /// This method iterates through the [chunk], isolating individual lines by
-  /// newline boundaries (`\n`). If a previous chunk ended prematurely, its
-  /// incomplete trailing string is seamlessly prepended to the first line. Any
-  /// trailing incomplete string in the current chunk is buffered in memory for
-  /// the subsequent chunk. Complete lines are dispatched to [processLine].
+  /// Scans through [chunk] to isolate lines separated by `\n`. Incomplete
+  /// trailing data is buffered internally and prepended to the next chunk on a
+  /// subsequent call to [add]. Complete non-empty lines are dispatched to
+  /// [processLine], followed by [onChunkEnd] once the chunk is processed.
   @override
   void add(String chunk) {
     int start = 0;
@@ -84,11 +83,11 @@ abstract class JsonlBaseChunkSink<TOut>
     onChunkEnd();
   }
 
-  /// Finalizes the stream ingestion process.
+  /// Finalizes parsing, flushes any remaining buffered data, and closes [outSink].
   ///
-  /// Flushes any unsent, incomplete string data buffered from previous chunks
-  /// (simulating a final newline), triggers a final [onChunkEnd] lifecycle
-  /// event, and gracefully shuts down the downstream [outSink].
+  /// Ensures that any trailing line without a final newline is processed via
+  /// [processLine], invokes [onChunkEnd] one final time, and closes the
+  /// downstream [outSink].
   @override
   void close() {
     if (_carry.isNotEmpty) {

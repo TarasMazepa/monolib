@@ -1,67 +1,35 @@
-/// Provides the [JsonlEncoder] class for serializing Dart object lists into JSON Lines format.
-///
-/// This library acts as the encoding counterpart to the JSON Lines (JSONL)
-/// utilities within `monolib_dart`, converting in-memory sequences of objects
-/// into newline-delimited strings suitable for logging, data-exchange, or
-/// file storage.
-library;
-
 import 'dart:convert';
 
-/// A synchronous converter that transforms a list of JSON-serializable objects
-/// into a single JSON Lines (JSONL) formatted string.
+/// A synchronous [Converter] that encodes a list of JSON-serializable objects
+/// into a JSON Lines (JSONL) [String].
 ///
-/// Architecturally, [JsonlEncoder] acts as the synchronous serialization engine
-/// for [JsonlCodec], extending `Converter<List<dynamic>, String>`. It iterates
-/// through a list of objects, encoding each into a compact JSON string using an
-/// underlying [Codec] (like [JsonCodec]), and appends a trailing newline to
-/// generate a batched JSON Lines (JSONL) formatted string.
+/// [JsonlEncoder] serves as the synchronous encoder for `JsonlCodec.encoder`.
+/// It serializes each element in a [List] into a single-line JSON string using
+/// [jsonCodec] and appends a trailing newline (`\n`).
 ///
-/// It strictly outputs a single batched [String] containing multiple lines,
-/// which makes it primarily useful for in-memory batch conversions. For true
-/// asynchronous, chunk-based streaming of large datasets without blocking
-/// or excessive memory buffering, consider the repository's streaming
-/// alternatives like [jsonlEncodeAsync].
+/// Because it buffers the entire output string in memory, use
+/// `jsonlEncodeAsync` instead when streaming large datasets.
 ///
-/// **Real-world example:**
+/// Example:
 /// ```dart
-/// // Typically accessed via JsonlCodec rather than instantiated directly.
-/// final codec = JsonlCodec();
-///
-/// final objects = [
+/// const encoder = JsonlEncoder(JsonCodec());
+/// final jsonlData = encoder.convert([
 ///   {'id': 'alpha', 'value': 100},
 ///   {'id': 'beta', 'value': 200},
-/// ];
-///
-/// // The codec's encoder (an instance of JsonlEncoder) writes each map
-/// // to a separate line separated by `\n`.
-/// final jsonlString = codec.encode(objects);
+/// ]);
+/// // Result: '{"id":"alpha","value":100}\n{"id":"beta","value":200}\n'
 /// ```
 class JsonlEncoder extends Converter<List<dynamic>, String> {
-  /// The underlying [Codec] used to serialize individual elements into JSON strings.
-  ///
-  /// This field delegates the actual string generation to Dart's standard
-  /// JSON machinery. It typically defaults to `JsonCodec` when instantiated by
-  /// `JsonlCodec`, but can be substituted with custom implementations to enforce
-  /// specific formatting rules (e.g., `toEncodable` fallbacks for custom
-  /// domain objects).
+  /// The underlying [Codec] used to encode individual elements into JSON strings.
   final Codec<Object?, String> jsonCodec;
 
-  /// Creates a new [JsonlEncoder] initialized with the specified [jsonCodec].
-  ///
-  /// The [jsonCodec] parameter dictates how each individual object is translated
-  /// into a string before the newline delimiter is appended.
+  /// Creates a [JsonlEncoder] configured with [jsonCodec].
   const JsonlEncoder(this.jsonCodec);
 
-  /// Transforms the given sequence of [items] into a monolithic JSONL string.
+  /// Synchronously encodes [items] into a JSONL [String].
   ///
-  /// This method iterates sequentially through [items]. For each element, it
-  /// invokes the `encode` method on the injected [jsonCodec] and appends the
-  /// serialized output along with a newline (`\n`) to an internal [StringBuffer].
-  ///
-  /// Returns a completed [String] containing all elements. Note that this
-  /// fully buffers the output in memory, so it is generally unsuited for
-  /// massive lists that exceed available RAM.
+  /// Encodes each element in [items] using [jsonCodec] and writes it followed
+  /// by a newline (`\n`) to a [StringBuffer].
   @override
   String convert(List<dynamic> items) {
     final result = StringBuffer();
