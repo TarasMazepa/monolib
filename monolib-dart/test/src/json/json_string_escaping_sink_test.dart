@@ -1,4 +1,4 @@
-import 'package:monolib_dart/json_encode_async.dart';
+import 'package:monolib_dart/src/json/json_string_escaping_sink.dart';
 import 'package:test/test.dart';
 
 void main() {

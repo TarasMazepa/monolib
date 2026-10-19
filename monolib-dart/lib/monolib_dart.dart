@@ -9,8 +9,6 @@ export 'src/general/on_bool.dart';
 export 'src/general/on_comparable.dart';
 export 'src/general/on_date_time.dart';
 export 'src/general/on_double.dart';
-export 'src/general/on_empty_iterable.dart';
-export 'src/general/on_empty_iterator.dart';
 export 'src/general/on_function_with_no_arguments.dart';
 export 'src/general/on_future_function.dart';
 export 'src/general/on_int.dart';
