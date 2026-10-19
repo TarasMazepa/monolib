@@ -1,28 +1,15 @@
-/// Provides an architectural decoupling layer for writing high-frequency data
-/// to JSON Lines (JSONL) files efficiently.
-///
-/// This library centralizes the bridging of in-memory buffering and
-/// asynchronous file I/O to minimize disk wear and latency during bursty
-/// operations, such as analytics tracking or request logging.
-library;
-
 import 'dart:io';
 
 import 'package:monolib_dart/jsonl.dart';
 import 'package:monolib_dart/monolib_dart.dart';
 
-/// An architectural utility that combines a [Batcher] and an [IOSink] to efficiently
-/// write high-frequency data to a JSON Lines (JSONL) file in batches.
+/// A buffered writer that combines a [Batcher] and an [IOSink] to write items
+/// to a JSON Lines (JSONL) file in batches.
 ///
-/// In real-world applications (such as analytics tracking, request logging, or event sourcing),
-/// emitting individual events synchronously to disk can introduce significant I/O latency and
-/// disk wear. [JsonlBatchWriter] solves this by acting as a decoupling layer: it accepts
-/// items synchronously via [add], buffers them in memory using a [Batcher], and periodically
-/// flushes them as batched JSON Lines (JSONL) to the underlying file via asynchronous chunks.
-///
-/// Under the hood, this delegates serialization to [jsonlEncodeAsync] and automatically
-/// manages the lifecycle of the internal [IOSink], lazily opening it only upon the first
-/// flush operation.
+/// [JsonlBatchWriter] accepts items synchronously via [add], buffers them in
+/// memory using a [Batcher], and periodically flushes them as JSONL lines to
+/// the target [File] using [jsonlEncodeAsync]. The underlying [IOSink] is
+/// opened lazily on the first flush.
 ///
 /// Example:
 /// ```dart
@@ -32,11 +19,9 @@ import 'package:monolib_dart/monolib_dart.dart';
 ///   maxDuration: const Duration(seconds: 1),
 /// );
 ///
-/// // This is fast and synchronous.
 /// writer.add({'event': 'app_start', 'timestamp': DateTime.now().toIso8601String()});
 /// writer.add({'event': 'login', 'userId': 123});
 ///
-/// // Shut down the writer gracefully, ensuring pending items are written to disk.
 /// await writer.dispose();
 /// ```
 class JsonlBatchWriter<T> {
