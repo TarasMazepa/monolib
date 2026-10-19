@@ -1,15 +1,7 @@
-/// Provides architectural extensions on [BuildContext] for streamlined tree traversal.
-library;
-
 import 'package:flutter/material.dart';
 
-/// Provides a clean, fluent API for accessing deeply nested inherited widgets,
-/// reducing boilerplate when traversing the widget tree.
-///
-/// Architecturally, this extension centralizes the retrieval of cross-cutting concerns
-/// (such as theme configurations) directly from the element tree context, making widget
-/// `build` methods more concise and readable by eliminating repetitive `Theme.of(context)`
-/// calls.
+/// Extension on [BuildContext] that provides convenient access to the nearest
+/// [ThemeData] in the widget tree.
 ///
 /// Example:
 /// ```dart

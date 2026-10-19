@@ -1,11 +1,8 @@
-/// Provides utilities for programmatic scrolling behaviors in Flutter.
-library;
-
 import 'package:flutter/widgets.dart';
 
-/// Provides convenient scrolling behaviors that are commonly
-/// required in user interfaces, such as auto-scrolling to the bottom of
-/// dynamic lists, chat interfaces, or log viewers.
+/// Extension on [ScrollController] that provides programmatic scrolling
+/// utilities, such as auto-scrolling to the bottom of dynamic lists, chat
+/// interfaces, or log viewers.
 extension OnScrollController on ScrollController {
   /// Repeatedly animates the scroll position to the bottom until the end is reached.
   ///
@@ -16,9 +13,10 @@ extension OnScrollController on ScrollController {
   /// or extents are revealed or calculated as the user scrolls.
   ///
   /// It completes when:
-  /// - The scroll controller is detached (i.e., [hasClients] is false).
+  /// - The scroll controller is detached (i.e., [hasClients] is `false`).
   /// - The bottom is reached (i.e., [ScrollPosition.extentAfter] is `0.0`).
   ///
+  /// Example:
   /// ```dart
   /// final controller = ScrollController();
   ///
