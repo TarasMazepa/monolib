@@ -1,25 +1,17 @@
-/// Provides domain-specific extensions on the native [bool] type to facilitate
-/// multi-field sorting operations.
-library;
-
-/// Extensions for the native [bool] type that aid in building complex,
-/// multi-field comparator chains.
+/// Extension on [bool] that supports multi-field comparator chains.
 ///
-/// Since [bool] does not natively implement [Comparable] in Dart, this extension
-/// provides a standardized way to evaluate boolean sorting precedence.
+/// Since [bool] does not implement [Comparable] in Dart, this extension
+/// provides a way to chain boolean comparisons with fallback comparators.
 extension OnBool on bool {
-  /// Compares this boolean against [other] for sorting, returning `null` if they
-  /// are equal. This allows for graceful chaining of fallback comparators using
-  /// the `??` operator.
+  /// Compares this boolean with [other], returning `null` when they are equal.
   ///
-  /// This method is designed to be used in multi-field `sort` functions where
-  /// boolean fields dictate primary or secondary sorting criteria. By returning
-  /// `null` instead of `0` on equality, it avoids terminating the comparison
-  /// chain prematurely.
+  /// Returning `null` instead of `0` on equality allows chaining fallback
+  /// comparisons with the `??` operator in multi-field `sort` callbacks.
   ///
-  /// When the values differ, `true` is considered greater than `false` (meaning
-  /// `false` appears before `true` in ascending sorts).
+  /// When the values differ, `true` is considered greater than `false` (so
+  /// `false` appears before `true` in ascending order).
   ///
+  /// Example:
   /// ```dart
   /// items.sort((a, b) {
   ///   return a.isPinned.compareChain(b.isPinned) ??

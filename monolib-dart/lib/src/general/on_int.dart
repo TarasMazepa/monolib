@@ -1,52 +1,34 @@
-/// Core extensions for the Dart `int` type.
-library;
-
-/// An architectural extension on the core [int] type that provides
-/// domain-specific utilities, such as type-safe index conversion and
-/// extended base-encoding for URL-safe identifiers.
+/// Extension on [int] that provides nullable index conversion and extended
+/// radix formatting.
 extension OnInt on int {
-  /// Converts a standard `-1` "not found" index into a type-safe `null`.
+  /// Returns `null` if this integer is `-1`, or this integer otherwise.
   ///
-  /// In Dart, many native `List` or `String` search methods (like `indexOf`
-  /// or `indexWhere`) return `-1` to indicate a missing element. This getter
-  /// transforms that sentinel value into an idiomatic `null`, allowing consumers
-  /// to safely chain null-aware operators (`?.`, `??`) instead of writing manual
-  /// imperative branch checks (`if (index != -1)`).
+  /// Converts the `-1` sentinel returned by search methods such as
+  /// [List.indexOf] or [String.indexOf] into `null` for use with null-aware
+  /// operators (`?.`, `??`).
   ///
-  /// For example, in the repository's CLI parsing architecture, this is used
-  /// within `Flag.findAndRemoveFlag` to safely process argument list indices.
-  ///
+  /// Example:
   /// ```dart
   /// final args = ['run', '--verbose'];
   /// final index = args.indexOf('--missing').asNullableIndex;
-  ///
-  /// // Safely handle the missing index without an explicit -1 check
   /// final value = index != null ? args[index] : null;
   /// ```
   int? get asNullableIndex => this == -1 ? null : this;
 
   /// Converts this integer to a string representation in the given [radix].
   ///
-  /// This serves as an architectural enhancement over the native [int.toRadixString]
-  /// method. While the native method is artificially limited to base-36 (0-9, a-z),
-  /// [toExtendedRadixString] supports up to base-62 encoding (0-9, a-z, A-Z), which
-  /// is critical for generating compact, URL-safe alphanumeric identifiers without
-  /// relying on external cryptographic dependencies.
+  /// Extends [int.toRadixString] to support radixes from `2` through `62`:
+  /// - Radixes `2` to `36` use digits `0`-`9` and lowercase letters `a`-`z`.
+  /// - Radixes `37` to `62` additionally use uppercase letters `A`-`Z` for
+  ///   digit values `36` through `61`.
   ///
-  /// The [radix] must be an integer between 2 and 62, inclusive. If [radix] falls
-  /// outside this range, a [RangeError] is explicitly thrown.
+  /// Throws a [RangeError] if [radix] is outside the inclusive range
+  /// `[2, 62]`.
   ///
-  /// For radixes between 2 and 36, it directly delegates to [int.toRadixString] to
-  /// ensure identical behavior, using lowercase letters `a`-`z` for digits 10
-  /// through 35. For radixes between 37 and 62, it incorporates uppercase letters
-  /// `A`-`Z` for digits 36 through 61.
-  ///
+  /// Example:
   /// ```dart
-  /// // Standard base-16 (hexadecimal) encoding
   /// final hex = 255.toExtendedRadixString(16); // 'ff'
-  ///
-  /// // Extended base-62 encoding for compact IDs
-  /// final id = 123456789.toExtendedRadixString(62); // '8M0kX'
+  /// final base62 = 123456789.toExtendedRadixString(62); // '8M0kX'
   /// ```
   String toExtendedRadixString(int radix) {
     if (radix < 2 || radix > 62) {

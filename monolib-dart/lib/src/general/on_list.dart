@@ -1,28 +1,17 @@
-/// Provides architectural utility methods and mutation patterns for [List] collections.
-///
-/// This extension centralizes common operations such as destructive read access
-/// ([drain], [drainMap]), memory-optimized transformations ([toMappedList]), and
-/// binary search mutations ([insertSorted]). These utilities prevent scattered
-/// list manipulation logic across the domain and provide optimized alternatives
-/// to native iterable operations, especially for performance-sensitive iterations.
-library;
-
-/// Supplements the core [List] type with domain-specific collection utilities.
-///
-/// [OnList] exposes destructive extraction methods, optimized mapping functions
-/// that skip intermediate iterables, and specialized element positioning tools.
+/// Extension on [List] that provides draining, eager mapping, binary-search
+/// insertion, and formatting utilities.
 extension OnList<T> on List<T> {
-  /// Destructively consumes the list by repeatedly removing and yielding its last element.
+  /// Lazily removes and yields elements from the end of this list until it is
+  /// empty.
   ///
-  /// This provides an efficient way to clear a collection while sequentially processing
-  /// its contents, acting as an active pipeline rather than a passive iterator.
-  /// Because elements are removed from the end, it avoids the memory shifting overhead
-  /// associated with removing elements from the start of a [List].
+  /// Removes elements using [removeLast] to avoid the shifting overhead of
+  /// removing from the front of a [List].
   ///
+  /// Example:
   /// ```dart
   /// final queue = [1, 2, 3];
   /// for (final item in queue.drain()) {
-  ///   print(item); // Prints 3, 2, 1
+  ///   print(item); // 3, 2, 1
   /// }
   /// print(queue.isEmpty); // true
   /// ```
@@ -32,15 +21,17 @@ extension OnList<T> on List<T> {
     }
   }
 
-  /// Destructively consumes the list and immediately applies a [mapper] to each element.
+  /// Lazily removes elements from the end of this list and yields the result of
+  /// applying [mapper] to each removed element.
   ///
-  /// Similar to [drain], this removes elements from the end of the list but
-  /// seamlessly converts them to a new type [R] during extraction. It prevents
-  /// creating a separate mapping operation over a drained iterable.
+  /// Because the returned [Iterable] is lazy, elements are only removed from
+  /// this list as the returned sequence is iterated.
   ///
+  /// Example:
   /// ```dart
-  /// final pendingSubscriptions = [sub1, sub2];
-  /// final unsubscriptions = pendingSubscriptions.drainMap((s) => s.cancel());
+  /// final queue = [1, 2, 3];
+  /// final doubled = queue.drainMap((x) => x * 2).toList(); // [6, 4, 2]
+  /// print(queue.isEmpty); // true
   /// ```
   Iterable<R> drainMap<R>(R Function(T) mapper) sync* {
     while (isNotEmpty) {
@@ -48,31 +39,33 @@ extension OnList<T> on List<T> {
     }
   }
 
-  /// Eagerly converts the list to a new mapped [List] using [List.generate].
+  /// Eagerly maps each element of this list using [mapper] and returns a new
+  /// [List].
   ///
-  /// Unlike standard `map().toList()`, which involves intermediate lazy iterables
-  /// and potentially unoptimized list growing, [toMappedList] allocates the correct
-  /// capacity immediately by using the current list's length.
+  /// Pre-allocates the result list to [length] via [List.generate]. Whether the
+  /// returned list is growable is controlled by [growable].
   ///
-  /// The [growable] parameter dictates whether the newly created list can change length.
-  ///
+  /// Example:
   /// ```dart
-  /// final stringIds = [1, 2, 3].toMappedList((id) => id.toString(), growable: false);
+  /// final stringIds = [1, 2, 3].toMappedList(
+  ///   (id) => id.toString(),
+  ///   growable: false,
+  /// );
   /// ```
   List<E> toMappedList<E>(E Function(T) mapper, {bool growable = true}) =>
       List.generate(length, (i) => mapper(this[i]), growable: growable);
 
-  /// Eagerly converts the list to a new mapped [List], providing the current index to the [mapper].
+  /// Eagerly maps each element and its index using [mapper] and returns a new
+  /// [List].
   ///
-  /// Avoids the overhead of `asMap().entries.map(...)` by directly utilizing a
-  /// [List.generate] loop. Useful for index-aware transformations.
+  /// Pre-allocates the result list to [length] via [List.generate]. Whether the
+  /// returned list is growable is controlled by [growable].
   ///
-  /// The [growable] parameter dictates whether the newly created list can change length.
-  ///
+  /// Example:
   /// ```dart
-  /// final widgets = items.toIndexedMappedList((item, index) {
-  ///   return buildItem(item, isFirst: index == 0);
-  /// });
+  /// final labels = ['a', 'b'].toIndexedMappedList(
+  ///   (item, index) => '$index: $item',
+  /// ); // ['0: a', '1: b']
   /// ```
   List<E> toIndexedMappedList<E>(
     E Function(T, int index) mapper, {
@@ -80,17 +73,16 @@ extension OnList<T> on List<T> {
   }) =>
       List.generate(length, (i) => mapper(this[i], i), growable: growable);
 
-  /// Inserts the [element] into a naturally sorted list, maintaining its sorted order.
+  /// Inserts [element] into this sorted list while preserving its sorted order,
+  /// and returns the insertion index.
   ///
-  /// Uses a binary search algorithm to quickly find the correct insertion point
-  /// (`O(log n)` time), significantly outperforming linear insertions on large lists.
+  /// Uses binary search (`O(log n)`) to find the insertion index. If [compare]
+  /// is omitted, elements must implement [Comparable].
   ///
-  /// If [compare] is not provided, elements must implement [Comparable]. Returns
-  /// the index where the [element] was inserted.
-  ///
+  /// Example:
   /// ```dart
   /// final times = [10, 30, 50];
-  /// times.insertSorted(20); // times becomes [10, 20, 30, 50]
+  /// times.insertSorted(20); // times is [10, 20, 30, 50]
   /// ```
   int insertSorted(T element, {int Function(T a, T b)? compare}) {
     final comparator = compare ?? (a, b) => (a as Comparable).compareTo(b);
@@ -112,18 +104,13 @@ extension OnList<T> on List<T> {
     return min;
   }
 
-  /// Locates the [element] by expanding outwards from the specified starting [index].
+  /// Searches outward in both directions from [index] and returns the index of
+  /// the nearest occurrence of [element], or `null` if not found.
   ///
-  /// Instead of a sequential scan from the beginning, this method searches bidirectionally.
-  /// It is highly optimized for scenarios where an element is expected to be near
-  /// a known vicinity (e.g., matching a localized cluster in a visual list).
-  ///
-  /// Returns the index of the [element], or `null` if it is not found in the list.
-  ///
+  /// Example:
   /// ```dart
   /// final values = ['A', 'B', 'C', 'B', 'A'];
-  /// // Searches outward starting from index 2 ('C').
-  /// final matchIndex = values.closestIndexOfTo('B', 2); // returns 1 or 3
+  /// final matchIndex = values.closestIndexOfTo('B', 2); // 1
   /// ```
   int? closestIndexOfTo(T element, int index) {
     if (this[index] == element) return index;
@@ -146,16 +133,13 @@ extension OnList<T> on List<T> {
     return null;
   }
 
-  /// Performs a structural equality check against [other].
+  /// Returns `true` if this list and [other] have the same length and equal
+  /// elements at every index.
   ///
-  /// Unlike standard [List] equality which checks identity, [deepEquals] iterates
-  /// through all items to verify both lists contain identically ordered elements.
-  /// It employs early exit checks for identity and length to optimize performance.
-  ///
+  /// Example:
   /// ```dart
   /// final listA = [1, 2];
   /// final listB = [1, 2];
-  /// print(listA == listB); // false
   /// print(listA.deepEquals(listB)); // true
   /// ```
   bool deepEquals(List<T> other) {
@@ -167,21 +151,20 @@ extension OnList<T> on List<T> {
     return true;
   }
 
-  /// Stringifies and joins list elements into a fully constructed string representation.
+  /// Joins the elements of this list into a string separated by [delimiter] and
+  /// enclosed by [prefix] and [suffix].
   ///
-  /// Acts as a cohesive formatter that surrounds the joined elements with a [prefix]
-  /// and [suffix]. It optionally maps elements using [map] before joining them
-  /// with a [delimiter].
+  /// If [map] is provided, each element is converted with [map] before joining.
+  /// If this list is empty and [ifEmpty] is provided, returns the result of
+  /// calling [ifEmpty] without [prefix] or [suffix].
   ///
-  /// If the list is empty and an [ifEmpty] fallback is provided, it returns the
-  /// result of [ifEmpty], ignoring the prefix and suffix.
-  ///
+  /// Example:
   /// ```dart
-  /// final arrayStr = [1, 2].joinWith(
+  /// final result = [1, 2].joinWith(
   ///   prefix: '[',
   ///   delimiter: ', ',
   ///   suffix: ']',
-  /// ); // Returns '[1, 2]'
+  /// ); // '[1, 2]'
   /// ```
   String joinWith({
     String prefix = '',
