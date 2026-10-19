@@ -1,41 +1,31 @@
-/// Provides [jsonEncodeAsync], an architectural foundation for streaming and
-/// asynchronous JSON serialization.
-///
-/// This library exists to bypass the memory constraints and blocking nature
-/// of standard [jsonEncode]. By progressively writing chunks to a [StringSink],
-/// it enables the serialization of massive datasets, raw streams, or lazily
-/// evaluated futures without retaining the full JSON tree in memory.
-library;
-
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/json/async_json_writable.dart';
 
-/// Asynchronously encodes an [object] into JSON and writes it to a sink in chunks.
+/// Asynchronously encodes an [object] into JSON and writes it to a [StringSink]
+/// in chunks.
 ///
-/// Unlike standard [jsonEncode], this function is fully stream and future-aware.
-/// It seamlessly resolves nested [Future]s and progressively consumes [Stream]s,
-/// writing array items or object values as they arrive. This unbuffered approach
-/// prevents blocking the event loop and significantly reduces memory overhead when
-/// serializing massive or delayed structures (e.g. streaming API responses or
-/// chunked file reads).
+/// Unlike standard [jsonEncode], this function resolves nested [Future]s and
+/// progressively consumes [Stream]s, writing array items or object values as
+/// they arrive without buffering the full JSON tree in memory.
 ///
-/// You must provide either an active [sink] or a lazy [sinkProvider], but not both.
-/// See [withLazyStringSink] for detailed sink lifecycle management semantics.
+/// Sink initialization and lifecycle management are delegated to
+/// [withLazyStringSink]. Exactly one of [sink] or [sinkProvider] must be
+/// provided, or an [ArgumentError] is thrown.
 ///
-/// - [object]: The root object to serialize. It supports standard primitives, maps,
-///   iterables, natively awaited [Future]s, incrementally consumed [Stream]s, and
-///   custom objects implementing [toJson]() or the streaming [AsyncJsonWritable] interface.
-/// - [sink]: An already active, externally managed sink. The caller retains ownership
-///   and is responsible for closing it.
-/// - [sinkProvider]: A factory that lazily opens a sink (e.g. a file) only when the
-///   first bytes are ready to be written. This utility takes ownership and will safely
-///   close the sink upon completion or failure.
+/// - [object]: The root object to serialize. Supports primitives, [Map]s,
+///   [Iterable]s, awaited [Future]s, streamed [Stream]s, objects implementing
+///   `toJson()`, and [AsyncJsonWritable] instances.
+/// - [sink]: An active, externally managed [StringSink]. If provided, the
+///   caller retains ownership and is responsible for closing it.
+/// - [sinkProvider]: A factory callback that lazily creates a [StringSink] when
+///   the first output is ready to be written. The created sink is closed
+///   automatically upon completion or error if it implements [Sink] or
+///   [StreamSink].
 ///
-/// ### Example
-///
+/// Example:
 /// ```dart
 /// final stream = Stream.fromIterable([1, 2, 3]);
 /// final lazyData = {

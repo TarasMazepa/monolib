@@ -1,48 +1,40 @@
-/// Provides [withLazyStringSink], an architectural utility for lazy resource allocation during asynchronous encoding.
-library;
-
 import 'dart:async';
 
-/// A utility function that manages the lifecycle, lazy initialization, and resource
-/// ownership of a [StringSink] for asynchronous encoding operations.
+/// Manages the lazy initialization and lifecycle of a [StringSink] for
+/// asynchronous encoding operations.
 ///
-/// This function serves as the architectural foundation for asynchronous chunked
-/// encoders (such as `jsonEncodeAsync`, `csvEncodeAsync`, and `jsonlEncodeAsync`)
-/// by abstracting away manual sink validation and tear-down logic. It enforces
-/// an inversion-of-control pattern: if the caller provides an already instantiated
-/// [sink], the caller retains ownership and must close it. However, if the caller
-/// provides a [sinkProvider], this function takes ownership, initializes the sink
-/// only when requested, and automatically closes it upon completion or failure.
+/// If an existing [sink] is provided, the caller retains ownership and this
+/// function does not close it. If [sinkProvider] is provided instead, this
+/// function creates the sink lazily when `getSink()` is first called inside
+/// [action] and automatically closes it (awaiting `close()` if it is a
+/// [StreamSink] or `IOSink`, or calling [Sink.close] if it is a [Sink]) in a
+/// `finally` block once [action] completes.
 ///
-/// Lazy initialization protects against generating zero-byte or empty files when
-/// an asynchronous operation yields no data to write. By deferring the execution
-/// of [sinkProvider] until `getSink()` is explicitly invoked by the inner [action],
-/// I/O resources are only allocated when necessary.
+/// Deferring [sinkProvider] until `getSink()` is called avoids creating empty
+/// files or buffers when an input stream yields no items.
 ///
-/// Either [sink] or [sinkProvider] MUST be provided, but not both. Throws an
-/// [ArgumentError] if both are provided, or if neither are provided.
+/// Exactly one of [sink] or [sinkProvider] must be provided; otherwise, an
+/// [ArgumentError] is thrown.
 ///
-/// - [sink]: An active, externally managed [StringSink]. When provided, this utility
-///   will NOT automatically close the sink after execution.
-/// - [sinkProvider]: A factory callback that instantiates and returns a [StringSink].
-///   When provided, this utility assumes ownership of the returned sink and will
-///   safely invoke `.close()` (awaiting if it is a [StreamSink] or `dart:io` [IOSink])
-///   in a `finally` block once [action] completes.
-/// - [action]: The core asynchronous encoding logic. It receives a `getSink` callback,
-///   which it must invoke to access the underlying [StringSink]. The `getSink` callback
-///   caches and returns the active sink instance, triggering [sinkProvider] on its
-///   first invocation if applicable.
+/// - [sink]: An existing, caller-managed [StringSink] that will not be closed
+///   by this function.
+/// - [sinkProvider]: A factory callback that creates a [StringSink] on first
+///   use, which this function will close when [action] finishes.
+/// - [action]: The asynchronous operation that receives a `getSink` callback
+///   returning the active [StringSink].
 ///
 /// Example:
 /// ```dart
-/// Future<void> customEncodeAsync(Stream<String> data, {StringSink Function()? sinkProvider}) {
+/// Future<void> customEncodeAsync(
+///   Stream<String> data, {
+///   StringSink Function()? sinkProvider,
+/// }) {
 ///   return withLazyStringSink(
 ///     sinkProvider: sinkProvider,
 ///     action: (getSink) async {
-///       // Using late final prevents initialization overhead until the stream yields data.
 ///       late final activeSink = getSink();
 ///       await for (final chunk in data) {
-///         activeSink.write(chunk); // sinkProvider is invoked here on the first iteration.
+///         activeSink.write(chunk);
 ///       }
 ///     },
 ///   );
