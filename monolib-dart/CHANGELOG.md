@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Exports `JsonStringEscapingSink` to the public API.
+
 ## 0.1.0
 
 - Comprehensive documentation harmonization across all modules, standardizing on concise Dartdoc summaries and compilable `Example:` blocks.
