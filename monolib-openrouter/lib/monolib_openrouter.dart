@@ -1,4 +1,4 @@
-/// OpenRouter client for dart projects.
+/// Streaming, JSON, and timeout utilities for OpenRouter clients in Dart projects.
 library;
 
 export 'src/drop_leading_whitespace_converter.dart';

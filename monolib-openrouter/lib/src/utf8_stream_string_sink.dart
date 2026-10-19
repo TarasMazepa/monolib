@@ -3,14 +3,11 @@ import 'dart:convert';
 
 import 'package:monolib_dart/stream.dart';
 
-/// An architectural string processing endpoint that implements [StringSink], eagerly UTF-8 encoding textual input and delegating the resulting bytes to an underlying [EventSink].
+/// A [StringSink] that UTF-8 encodes written strings and forwards the resulting
+/// byte chunks to an underlying [EventSink].
 ///
-/// Architecturally, [Utf8StreamStringSink] acts as a non-buffering bridge
-/// between high-throughput string generators (like `jsonEncodeAsync`) and
-/// byte-based networking or file writing endpoints. It immediately translates
-/// textual output into UTF-8 chunks without ever accumulating the entire string
-/// in memory, which is critical for handling massive JSON responses or streaming
-/// LLM outputs directly into an HTTP request body.
+/// Bridges string-producing APIs (such as `jsonEncodeAsync`) directly to
+/// byte-based sinks without buffering the entire string in memory.
 ///
 /// Example:
 /// ```dart
@@ -18,7 +15,7 @@ import 'package:monolib_dart/stream.dart';
 /// final stringSink = Utf8StreamStringSink(controller.sink);
 ///
 /// // Encodes iteratively to bytes and adds them directly to the StreamController.
-/// await jsonEncodeAsync({'large': 'payload...'}, stringSink);
+/// await jsonEncodeAsync(object: {'large': 'payload...'}, sink: stringSink);
 /// ```
 class Utf8StreamStringSink implements StringSink {
   /// The target endpoint for UTF-8 encoded bytes.
@@ -27,25 +24,25 @@ class Utf8StreamStringSink implements StringSink {
   /// An optional callback invoked if the underlying sink throws an exception.
   final void Function(Object error, StackTrace stackTrace)? _onError;
 
-  /// Creates a [Utf8StreamStringSink] that wraps the underlying byte [_sink].
+  /// Creates a [Utf8StreamStringSink] that forwards UTF-8 encoded bytes to the
+  /// underlying sink.
   ///
-  /// The [_sink] is typically the endpoint for the encoded data (e.g. an
-  /// `IOSink` or the `sink` of a `StreamController<List<int>>`).
+  /// The underlying sink is typically an `IOSink` or the `sink` of an internal
+  /// [StreamController].
   ///
-  /// The [onError] callback is invoked if adding encoded bytes to [_sink] throws
-  /// an exception (handled safely via [OnSink.tryAdd]). Such errors are caught
-  /// internally to prevent pipeline crashes; if [onError] is omitted, they are
-  /// silently dropped.
+  /// The [onError] callback is invoked if adding encoded bytes to the
+  /// underlying sink throws an error (handled via [OnSink.tryAdd]). If
+  /// [onError] is omitted, such errors are silently ignored.
   const Utf8StreamStringSink(
     this._sink, {
     void Function(Object error, StackTrace stackTrace)? onError,
   }) : _onError = onError;
 
-  /// Converts the given [object] to its string representation and immediately
-  /// UTF-8 encodes it, emitting the raw bytes to the underlying sink.
+  /// Converts [object] to a string, UTF-8 encodes it, and emits the resulting
+  /// bytes to the underlying sink.
   ///
-  /// Uses [OnSink.tryAdd] to safely dispatch the bytes, ensuring the process
-  /// does not crash if the target sink is closed or throws a `StateError`.
+  /// Uses [OnSink.tryAdd] so writing does not throw if the target sink is
+  /// closed or throws a [StateError].
   @override
   void write(Object? object) {
     _sink.tryAdd(utf8.encode('$object'), ignoreError: true, onError: _onError);
