@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-/// Internal proxy [StringSink] that intercepts writes, escapes them for JSON
-/// string literals, and forwards the escaped characters to an underlying sink.
+/// A proxy [StringSink] that intercepts writes, escapes them for JSON string
+/// literals, and forwards the escaped characters to an underlying sink.
 class JsonStringEscapingSink implements StringSink {
   static const _encoder = JsonEncoder();
 
