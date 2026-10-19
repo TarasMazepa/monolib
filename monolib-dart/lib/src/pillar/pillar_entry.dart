@@ -73,7 +73,7 @@ class PillarEntry {
   /// Retrieves the dependency instance of type [T].
   ///
   /// If [instanceScope] is `null`, this acts as a transient factory, returning a fresh
-  /// instance via [_create] on every call. If [instanceScope] is provided, it lazily
+  /// instance on every call. If [instanceScope] is provided, it lazily
   /// caches and returns the singleton instance tied to that scope.
   T get<T>() {
     return switch (instanceScope) {
