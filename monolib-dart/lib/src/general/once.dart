@@ -10,11 +10,13 @@
 /// cleanup.attempt(() => print('Cleaning up...')); // Ignored
 /// ```
 class Once {
+  bool _executed = false;
+
   /// Whether an action has already been executed by this [Once] instance.
   ///
   /// Set to `true` synchronously on the first call to [attempt] or a function
   /// returned by [wrap].
-  bool executed = false;
+  bool get executed => _executed;
 
   /// Executes [call] if this [Once] instance has not yet been triggered.
   ///
@@ -28,8 +30,8 @@ class Once {
   /// cleanup.attempt(() => print('Cleaning up resources...')); // Ignored
   /// ```
   void attempt(void Function() call) {
-    if (executed) return;
-    executed = true;
+    if (_executed) return;
+    _executed = true;
     call();
   }
 

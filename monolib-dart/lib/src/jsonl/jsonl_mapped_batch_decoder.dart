@@ -91,59 +91,62 @@ class _JsonlMappedBatchDecoderSink<T> extends JsonlBaseChunkSink<List<T>>
   final T? Function(dynamic) _fromJson;
 
   /// The codec used to decode individual JSON lines.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Whether to suppress decoding and mapping exceptions.
-  final bool ignoreExceptions;
+  final bool _ignoreExceptions;
 
   /// An optional callback invoked when a non-empty `batch` is flushed.
-  final void Function(List<T> batch)? onBatch;
+  final void Function(List<T> batch)? _onBatch;
 
   /// An optional callback invoked when the sink is closed.
-  final void Function()? onDone;
+  final void Function()? _onDone;
 
-  /// Creates a sink that decodes JSONL lines with [jsonCodec], maps them with
+  /// Creates a sink that decodes JSONL lines with [_jsonCodec], maps them with
   /// [_fromJson], batches non-null results, and forwards each batch to [outSink].
   _JsonlMappedBatchDecoderSink(
     super.outSink,
     this._fromJson,
-    this.jsonCodec, {
-    this.ignoreExceptions = false,
-    this.onBatch,
-    this.onDone,
-  });
+    Codec<Object?, String> jsonCodec, {
+    bool ignoreExceptions = false,
+    void Function(List<T> batch)? onBatch,
+    void Function()? onDone,
+  })  : _jsonCodec = jsonCodec,
+        _ignoreExceptions = ignoreExceptions,
+        _onBatch = onBatch,
+        _onDone = onDone;
 
-  /// Decodes [line] using [jsonCodec], maps the result with [_fromJson], and
+  /// Decodes [line] using [_jsonCodec], maps the result with [_fromJson], and
   /// adds it to the current batch via [addToBatch] if non-null.
   ///
-  /// Rethrows any exception unless [ignoreExceptions] is `true`.
+  /// Rethrows any exception unless [_ignoreExceptions] is `true`.
   @override
   void processLine(String line) {
     try {
-      final json = jsonCodec.decode(line);
+      final json = _jsonCodec.decode(line);
       final mapped = _fromJson(json);
       if (mapped != null) {
         addToBatch(mapped);
       }
     } catch (e) {
-      if (!ignoreExceptions) {
+      if (!_ignoreExceptions) {
         rethrow;
       }
     }
   }
 
   /// Flushes any accumulated items in the current batch to [outSink] via
-  /// [flushBatchOnChunkEnd], invoking [onBatch] if provided.
+  /// [flushBatchOnChunkEnd], invoking [_onBatch] if provided.
   @override
   void onChunkEnd() {
-    flushBatchOnChunkEnd(onBatch: onBatch);
+    flushBatchOnChunkEnd(onBatch: _onBatch);
   }
 
   /// Flushes any remaining buffered data, closes [outSink], and invokes
-  /// [onDone] if provided.
+  /// [_onDone] if provided.
   @override
   void close() {
     super.close();
-    onDone?.call();
+    _onDone?.call();
   }
 }

@@ -10,7 +10,6 @@ const _decodableRight = 0x300 + _encodableRight - _encodableLeft;
 ///
 /// See also:
 /// * [isZalgoDecodableCodeUnit], which checks the reverse mapping.
-/// * [assertZalgoEncodableCodeUnit], which throws when this returns `false`.
 /// * [zalgoEncode], which encodes a string using this range.
 bool isZalgoEncodableCodeUnit(int codeUnit) {
   return _encodableLeft <= codeUnit && codeUnit <= _encodableRight;
@@ -24,33 +23,21 @@ bool isZalgoEncodableCodeUnit(int codeUnit) {
 ///
 /// See also:
 /// * [isZalgoEncodableCodeUnit], which checks the forward mapping.
-/// * [assertZalgoDecodableCodeUnit], which throws when this returns `false`.
 /// * [zalgoDecodeSingle], which decodes a Zalgo grapheme cluster.
 bool isZalgoDecodableCodeUnit(int codeUnit) {
   return _decodableLeft <= codeUnit && codeUnit <= _decodableRight;
 }
 
-/// Validates that [codeUnit] can be Zalgo-encoded and returns it unchanged.
-///
-/// Returns [codeUnit] if [isZalgoEncodableCodeUnit] is `true`.
-///
-/// Throws an [Exception] if [codeUnit] is outside the printable ASCII range
-/// `[32, 126]`.
-int assertZalgoEncodableCodeUnit(int codeUnit) {
+/// Asserts that [codeUnit] can be Zalgo-encoded and returns it.
+int _assertZalgoEncodableCodeUnit(int codeUnit) {
   if (isZalgoEncodableCodeUnit(codeUnit)) return codeUnit;
   throw Exception(
     "Can't encode '${String.fromCharCode(codeUnit)}' ($codeUnit) as it is outside of [$_encodableLeft, $_encodableRight] range.",
   );
 }
 
-/// Validates that [codeUnit] is a Zalgo combining modifier and returns it
-/// unchanged.
-///
-/// Returns [codeUnit] if [isZalgoDecodableCodeUnit] is `true`.
-///
-/// Throws an [Exception] if [codeUnit] is outside the Zalgo combining mark
-/// range `[0x300, 0x35E]`.
-int assertZalgoDecodableCodeUnit(int codeUnit) {
+/// Asserts that [codeUnit] is a Zalgo combining modifier and returns it.
+int _assertZalgoDecodableCodeUnit(int codeUnit) {
   if (isZalgoDecodableCodeUnit(codeUnit)) return codeUnit;
   throw Exception(
     "Can't decode '${String.fromCharCode(codeUnit)}' ($codeUnit) as it is outside of [$_decodableLeft, $_decodableRight] range.",
@@ -64,9 +51,9 @@ int assertZalgoDecodableCodeUnit(int codeUnit) {
 /// zero or more Zalgo combining modifiers. Each combining modifier is shifted
 /// back to its original ASCII code unit.
 ///
-/// Throws an [Exception] if [input] is empty, if the base character fails
-/// [assertZalgoEncodableCodeUnit], or if any subsequent code unit fails
-/// [assertZalgoDecodableCodeUnit].
+/// Throws an [Exception] if [input] is empty, if the base character is not
+/// printable ASCII, or if any subsequent code unit is not a valid Zalgo
+/// combining modifier.
 ///
 /// Example:
 /// ```dart
@@ -80,10 +67,10 @@ String zalgoDecodeSingle(String input) {
     throw Exception("Can't zalgo decode empty string.");
   }
   final result = StringBuffer()
-    ..writeCharCode(assertZalgoEncodableCodeUnit(iterator.current));
+    ..writeCharCode(_assertZalgoEncodableCodeUnit(iterator.current));
   while (iterator.moveNext()) {
     result.writeCharCode(
-      assertZalgoDecodableCodeUnit(iterator.current) -
+      _assertZalgoDecodableCodeUnit(iterator.current) -
           _decodableLeft +
           _encodableLeft,
     );
@@ -98,7 +85,7 @@ String zalgoDecodeSingle(String input) {
 /// `U+0300`.
 ///
 /// Throws an [Exception] if [input] is empty or if any character in [input]
-/// fails [assertZalgoEncodableCodeUnit].
+/// is outside the printable ASCII range.
 ///
 /// Example:
 /// ```dart
@@ -110,7 +97,7 @@ String zalgoEncode(String input) {
   if (!iterator.moveNext()) {
     throw Exception("Can't zalgo encode empty string.");
   }
-  int getCodeUnit() => assertZalgoEncodableCodeUnit(iterator.current);
+  int getCodeUnit() => _assertZalgoEncodableCodeUnit(iterator.current);
   final result = StringBuffer()..writeCharCode(getCodeUnit());
   while (iterator.moveNext()) {
     result.writeCharCode(getCodeUnit() - _encodableLeft + _decodableLeft);

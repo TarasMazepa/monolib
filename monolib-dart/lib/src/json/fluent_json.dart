@@ -4,20 +4,18 @@ import 'dart:convert';
 ///
 /// [FluentJson] wraps decoded JSON values (such as those produced by
 /// `dart:convert`) to simplify nested access and type-checked unboxing. It
-/// maintains a [breadCrumbs] trail from the root node so that missing keys,
+/// maintains a path trail from the root node so that missing keys,
 /// unexpected nulls, or type mismatches report the exact JSON path in the
 /// thrown exception (for example, `Hierarchy from root json: $[users][0][id]`).
 class FluentJson {
   /// The dynamic, untyped JSON payload wrapped at this hierarchy level.
   final dynamic json;
 
-  /// The traversal history from the JSON root to this [json] element.
-  final List<dynamic> breadCrumbs;
+  final List<dynamic> _breadCrumbs;
 
-  /// Creates a new [FluentJson] with raw [json] and an optional trail of [breadCrumbs].
-  ///
-  /// This base constructor is usually called internally during tree traversals.
-  const FluentJson({required this.json, this.breadCrumbs = const []});
+  /// Creates a [FluentJson] wrapping [json] with an optional path trail.
+  const FluentJson({required this.json, List<dynamic> breadCrumbs = const []})
+      : _breadCrumbs = breadCrumbs;
 
   /// Instantiates a [FluentJson] root object by natively decoding the string payload.
   FluentJson.decode(String json) : this(json: jsonDecode(json));
@@ -26,7 +24,7 @@ class FluentJson {
   const FluentJson.empty() : this(json: null);
 
   /// Instantiates a [FluentJson] root from existing mapped [json], starting the path trail.
-  FluentJson.root(this.json) : breadCrumbs = const [];
+  FluentJson.root(this.json) : _breadCrumbs = const [];
 
   Iterable<dynamic> _flattenBreadCrumbs(dynamic crumbs) sync* {
     if (crumbs is List) {
@@ -40,7 +38,7 @@ class FluentJson {
 
   String _describeForException() => '''Hierarchy from root json: ${[
         '\$'
-      ].followedBy(_flattenBreadCrumbs(breadCrumbs).map((x) => "[$x]")).join()}
+      ].followedBy(_flattenBreadCrumbs(_breadCrumbs).map((x) => "[$x]")).join()}
 
 ${jsonEncode(json)}''';
 
@@ -94,7 +92,7 @@ $e''');
       null => null,
       final json => FluentJson(
           json: json,
-          breadCrumbs: [breadCrumbs, accessor],
+          breadCrumbs: [_breadCrumbs, accessor],
         ),
     };
   }
@@ -119,7 +117,7 @@ $e''');
 ${_describeForException()}'''),
       final json => FluentJson(
           json: json,
-          breadCrumbs: [breadCrumbs, accessor],
+          breadCrumbs: [_breadCrumbs, accessor],
         ),
     };
   }
@@ -204,7 +202,7 @@ ${_describeForException()}''',
   /// ```
   Iterable<FluentJson> unboxIterable() sync* {
     for (final (index, item) in unbox<List>().indexed) {
-      yield FluentJson(json: item, breadCrumbs: [breadCrumbs, index]);
+      yield FluentJson(json: item, breadCrumbs: [_breadCrumbs, index]);
     }
   }
 

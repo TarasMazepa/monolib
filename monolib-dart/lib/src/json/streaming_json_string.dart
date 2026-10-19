@@ -23,16 +23,15 @@ import 'package:monolib_dart/src/json/async_json_writable.dart';
 /// await jsonEncodeAsync(object: jsonObject, sink: stdout);
 /// ```
 class StreamingJsonString implements AsyncJsonWritable {
-  /// A factory callback that provides the stream of unescaped string chunks to
-  /// write to the JSON sink.
-  final Stream<String> Function() streamProvider;
+  final Stream<String> Function() _streamProvider;
 
   /// Creates a [StreamingJsonString] that incrementally encodes and writes
   /// chunks from the stream returned by [streamProvider].
-  const StreamingJsonString(this.streamProvider);
+  const StreamingJsonString(Stream<String> Function() streamProvider)
+      : _streamProvider = streamProvider;
 
-  /// Asynchronously reads chunks from [streamProvider], escapes them for JSON,
-  /// and writes them as a single quoted JSON string to [sink].
+  /// Asynchronously reads chunks from the underlying stream provider, escapes
+  /// them for JSON, and writes them as a single quoted JSON string to [sink].
   ///
   /// Writes an opening double quote, appends the inner escaped content of each
   /// chunk (using [jsonEncode] with its surrounding quotes stripped), and
@@ -43,7 +42,7 @@ class StreamingJsonString implements AsyncJsonWritable {
     JsonEncoderCallback encode,
   ) async {
     sink.write('"');
-    await for (final chunk in streamProvider()) {
+    await for (final chunk in _streamProvider()) {
       // jsonEncode escapes the chunk and adds surrounding quotes (e.g., "chunk\ntext").
       final escaped = jsonEncode(chunk);
       if (escaped.length >= 2) {

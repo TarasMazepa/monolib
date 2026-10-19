@@ -69,19 +69,20 @@ class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>>
   final T? Function(List<String> row) _mapper;
 
   /// An optional callback invoked when a non-empty `batch` is flushed.
-  final void Function(List<T> batch)? onBatch;
+  final void Function(List<T> batch)? _onBatch;
 
   /// An optional callback invoked when the sink is closed.
-  final void Function()? onDone;
+  final void Function()? _onDone;
 
   /// Creates a sink that maps parsed CSV rows with [_mapper], batches non-null
   /// results, and forwards each batch to [outSink].
   _CsvMappedBatchDecoderSink(
     super.outSink,
     this._mapper, {
-    this.onBatch,
-    this.onDone,
-  });
+    void Function(List<T> batch)? onBatch,
+    void Function()? onDone,
+  })  : _onBatch = onBatch,
+        _onDone = onDone;
 
   /// Maps [row] using [_mapper] and adds the result to the current batch via
   /// [addToBatch] if non-null.
@@ -94,17 +95,17 @@ class _CsvMappedBatchDecoderSink<T> extends CsvBaseChunkSink<List<T>>
   }
 
   /// Flushes any accumulated items in the current batch to [outSink] via
-  /// [flushBatchOnChunkEnd], invoking [onBatch] if provided.
+  /// [flushBatchOnChunkEnd], invoking [_onBatch] if provided.
   @override
   void onChunkEnd() {
-    flushBatchOnChunkEnd(onBatch: onBatch);
+    flushBatchOnChunkEnd(onBatch: _onBatch);
   }
 
   /// Flushes any remaining buffered data, closes [outSink], and invokes
-  /// [onDone] if provided.
+  /// [_onDone] if provided.
   @override
   void close() {
     super.close();
-    onDone?.call();
+    _onDone?.call();
   }
 }
