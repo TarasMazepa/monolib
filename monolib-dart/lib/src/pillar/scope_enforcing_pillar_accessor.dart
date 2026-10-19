@@ -5,22 +5,21 @@ import 'package:monolib_dart/src/pillar/scope_tracking_pillar_accessor.dart';
 /// Internal [ScopeTrackingPillarAccessor] that validates [PillarScope] boundaries
 /// when resolving dependencies.
 class ScopeEnforcingPillarAccessor extends ScopeTrackingPillarAccessor {
-  /// The dependency entry currently being instantiated.
-  final PillarEntry requestingEntry;
+  final PillarEntry _requestingEntry;
 
-  /// Creates a [ScopeEnforcingPillarAccessor] for [requestingEntry].
-  ScopeEnforcingPillarAccessor(this.requestingEntry, super.entryGetter);
+  /// Creates a [ScopeEnforcingPillarAccessor] for [_requestingEntry].
+  ScopeEnforcingPillarAccessor(this._requestingEntry, super.entryGetter);
 
-  /// Validates that [requestedEntry] can be consumed by [requestingEntry].
+  /// Validates that [requestedEntry] can be consumed by [_requestingEntry].
   @override
   void validateEntry(PillarEntry requestedEntry) {
     final PillarScope? requestedEntryScope =
         requestedEntry.effectiveScopeIncludingDependencies;
     if (requestedEntryScope == null) return;
-    final PillarScope requestingEntryScope = requestingEntry.instanceScope!;
+    final PillarScope requestingEntryScope = _requestingEntry.instanceScope!;
     if (!requestingEntryScope.isOrChildOf(requestedEntryScope)) {
       throw Exception(
-        '${requestingEntry.key} with $requestingEntryScope requesting for ${requestedEntry.key} with $requestedEntryScope, which is not accessible as $requestingEntryScope is not child scope of $requestedEntryScope',
+        '${_requestingEntry.key} with $requestingEntryScope requesting for ${requestedEntry.key} with $requestedEntryScope, which is not accessible as $requestingEntryScope is not child scope of $requestedEntryScope',
       );
     }
   }

@@ -10,8 +10,7 @@ class PillarEntry {
   /// The cached instance of the dependency, if instantiated and retained.
   Object? value;
 
-  /// The factory responsible for instantiating the dependency.
-  final PillarFactoryWithScopeTracking factory;
+  final PillarFactoryWithScopeTracking _factory;
 
   /// The declared lifecycle boundary for this dependency, or `null` for transients.
   final PillarScope? instanceScope;
@@ -25,14 +24,15 @@ class PillarEntry {
   /// Creates a [PillarEntry].
   PillarEntry({
     required this.key,
-    required this.factory,
+    required PillarFactoryWithScopeTracking factory,
     this.value,
     this.instanceScope,
-  })  : isInstance = value != null,
+  })  : _factory = factory,
+        isInstance = value != null,
         effectiveScopeIncludingDependencies = instanceScope;
 
   T _create<T>() {
-    final (:value, :scope) = factory();
+    final (:value, :scope) = _factory();
     effectiveScopeIncludingDependencies = PillarScope.chooseLowest(
       left: scope,
       right: effectiveScopeIncludingDependencies,

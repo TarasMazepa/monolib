@@ -20,21 +20,20 @@ import 'dart:convert';
 /// // Result: '{"id":"alpha","value":100}\n{"id":"beta","value":200}\n'
 /// ```
 class JsonlEncoder extends Converter<List<dynamic>, String> {
-  /// The underlying [Codec] used to encode individual elements into JSON strings.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Creates a [JsonlEncoder] configured with [jsonCodec].
-  const JsonlEncoder(this.jsonCodec);
+  const JsonlEncoder(Codec<Object?, String> jsonCodec) : _jsonCodec = jsonCodec;
 
   /// Synchronously encodes [items] into a JSONL [String].
   ///
-  /// Encodes each element in [items] using [jsonCodec] and writes it followed
+  /// Encodes each element in [items] using [_jsonCodec] and writes it followed
   /// by a newline (`\n`) to a [StringBuffer].
   @override
   String convert(List<dynamic> items) {
     final result = StringBuffer();
     for (final item in items) {
-      result.writeln(jsonCodec.encode(item));
+      result.writeln(_jsonCodec.encode(item));
     }
     return result.toString();
   }

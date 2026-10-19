@@ -21,11 +21,10 @@ import 'package:monolib_dart/src/jsonl/jsonl_chunked_decoder.dart';
 /// print(objects); // [{'name': 'Alice'}, {'name': 'Bob'}]
 /// ```
 class JsonlDecoder extends Converter<String, List<dynamic>> {
-  /// The underlying [Codec] used to decode individual JSON lines.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Creates a [JsonlDecoder] configured with [jsonCodec].
-  const JsonlDecoder(this.jsonCodec);
+  const JsonlDecoder(Codec<Object?, String> jsonCodec) : _jsonCodec = jsonCodec;
 
   /// Synchronously decodes the JSONL string [items] into a list of parsed JSON objects.
   ///
@@ -38,7 +37,7 @@ class JsonlDecoder extends Converter<String, List<dynamic>> {
   @override
   List<dynamic> convert(String items) {
     final sink = ListAccumulatorSink<dynamic>();
-    JsonlChunkedDecoder(jsonCodec: jsonCodec).startChunkedConversion(sink)
+    JsonlChunkedDecoder(jsonCodec: _jsonCodec).startChunkedConversion(sink)
       ..add(items)
       ..close();
     return sink.results;
