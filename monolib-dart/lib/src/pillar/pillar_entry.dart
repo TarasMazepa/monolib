@@ -1,8 +1,21 @@
-import 'package:monolib_dart/src/pillar/pillar.dart';
 import 'package:monolib_dart/src/pillar/pillar_key.dart';
 import 'package:monolib_dart/src/pillar/pillar_scope.dart';
 
-/// Internal container representing a registered dependency within [Pillar].
+/// Internal factory signature that constructs a dependency and returns the
+/// lowest [PillarScope] encountered during its resolution.
+typedef PillarFactoryWithScopeTracking<T> = ({T value, PillarScope? scope})
+    Function();
+
+/// Determines the more restrictive (lower-level/child) scope between [left] and [right].
+PillarScope? chooseLowestScope({PillarScope? left, PillarScope? right}) {
+  if (left == null) return right;
+  if (right == null) return left;
+  if (left.isOrChildOf(right)) return left;
+  if (right.isOrChildOf(left)) return right;
+  throw Exception("Two disconnected scopes can't be combined: $left, $right");
+}
+
+/// Internal container representing a registered dependency within `Pillar`.
 class PillarEntry {
   /// The unique key for this dependency.
   final PillarKey key;
@@ -33,7 +46,7 @@ class PillarEntry {
 
   T _create<T>() {
     final (:value, :scope) = _factory();
-    effectiveScopeIncludingDependencies = PillarScope.chooseLowest(
+    effectiveScopeIncludingDependencies = chooseLowestScope(
       left: scope,
       right: effectiveScopeIncludingDependencies,
     );

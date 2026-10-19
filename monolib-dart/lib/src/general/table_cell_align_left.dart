@@ -19,7 +19,7 @@ class TableCellAlignLeft {
   final dynamic value;
 
   /// Creates a [TableCellAlignLeft] wrapper around [value].
-  TableCellAlignLeft(this.value);
+  const TableCellAlignLeft(this.value);
 
   /// Returns the string representation of [value].
   @override

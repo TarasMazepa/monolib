@@ -21,7 +21,7 @@ class ScopeTrackingPillarAccessor implements PillarAccessor {
     final PillarEntry requestedEntry = _entryGetter<T>(key: key, token: token);
     final T result = requestedEntry.get<T>();
     validateEntry(requestedEntry);
-    _trackedDependenciesScope = PillarScope.chooseLowest(
+    _trackedDependenciesScope = chooseLowestScope(
       left: _trackedDependenciesScope,
       right: requestedEntry.effectiveScopeIncludingDependencies,
     );

@@ -17,11 +17,10 @@ import 'dart:async';
 /// stream.listen(print); // Prints: Hello, World!
 /// ```
 class SingleValueCachingStream<T> extends Stream<T> {
-  /// The cached value emitted to every subscriber of this stream.
-  final T value;
+  final T _value;
 
   /// Creates a broadcast stream that emits [value] to each listener.
-  const SingleValueCachingStream(this.value);
+  const SingleValueCachingStream(T value) : _value = value;
 
   /// Whether this stream is a broadcast stream (always `true`).
   @override
@@ -36,7 +35,7 @@ class SingleValueCachingStream<T> extends Stream<T> {
     void Function()? onDone,
     bool? cancelOnError,
   }) =>
-      Stream.value(value).listen(
+      Stream.value(_value).listen(
         onData,
         onError: onError,
         onDone: onDone,
