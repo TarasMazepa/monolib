@@ -1,3 +1,9 @@
+## 0.1.0
+
+- Updates `monolib_dart` dependency constraint to `^0.1.0`.
+- Comprehensive documentation harmonization across streaming, JSON, and timeout utilities with zero analyzer or Dartdoc warnings.
+- Privatizes internal state and error handling in `DropLeadingWhitespaceConverter` and `Utf8StreamStringSink`.
+
 ## 0.0.2
 
 - Adds `OnFuture` extension with `timeoutAsStream` to turn a future into a stream that closes without emitting on timeout.
