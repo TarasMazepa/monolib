@@ -1,29 +1,18 @@
 import 'dart:async';
 
-/// A self-managing lifecycle bridge for list-backed subscriber architectures.
-///
-/// In systems implementing manual pub-sub or multiplexing patterns (where listeners
-/// are stored dynamically in a `List<StreamController>`), managing resource teardown
-/// is traditionally error-prone. Failing to evict a [StreamController] from the list
-/// when the downstream client cancels their subscription leads to memory leaks and
-/// zombie connections.
-///
-/// This extension resolves this by establishing an automatic lifecycle linkage.
-/// It intercepts the `onCancel` event of an incoming controller, guaranteeing it
-/// is safely and immediately purged from the active registry without requiring manual
-/// garbage collection sweeps by the host class.
+/// Extension on [List] of [StreamController] that automatically removes
+/// controllers when their subscriptions are cancelled.
 extension OnListOfStreamControllers<T> on List<StreamController<T>> {
-  /// Adds the provided [listener] to this list and configures its [StreamController.onCancel] handler.
+  /// Adds [listener] to this list and configures its
+  /// [StreamController.onCancel] callback to remove it when cancelled.
   ///
-  /// When the [listener] is canceled, it will be automatically removed from this list.
-  /// If the list becomes empty as a result of the removal, the optional [onEmpty]
-  /// callback will be invoked.
+  /// If removing [listener] leaves this list empty, the optional [onEmpty]
+  /// callback is invoked.
   ///
-  /// If removing the [listener] from this list throws an error, the optional
-  /// [onRemoveError] callback will be invoked. It can be provided as a function
-  /// taking either one argument (the error) or two arguments (the error and stack trace).
-  ///
-  /// Errors thrown by the [onEmpty] callback are not caught, allowing them to propagate.
+  /// If removing [listener] from this list throws an error, the optional
+  /// [onRemoveError] callback is invoked with `(error)` or
+  /// `(error, stackTrace)` depending on its signature. Errors thrown by
+  /// [onEmpty] are not caught.
   ///
   /// Example:
   /// ```dart
