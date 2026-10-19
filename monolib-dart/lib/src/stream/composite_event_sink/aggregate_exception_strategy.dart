@@ -1,31 +1,24 @@
 part of 'exception_strategy.dart';
 
-/// A fault-tolerant [ExceptionStrategy] that defers synchronous exception propagation
-/// to ensure a broadcasting operation completes entirely before reporting failures.
+/// An [ExceptionStrategy] that dispatches to every sink before reporting any
+/// synchronous exceptions.
 ///
-/// In multiplexing stream architectures like [CompositeEventSink], a single event or lifecycle
-/// signal (e.g., [EventSink.add] or [EventSink.close]) must be reliably fanned out to multiple
-/// downstream sinks. If an eager strategy (like [ExceptionStrategy.failFast]) is used, an exception
-/// in one child sink abruptly halts the iteration, leaving subsequent sinks unnotified and creating
-/// unpredictable partial-state architectures.
+/// Each sink's dispatch invocation is wrapped in a `try`/`catch` block so that
+/// an error in one sink does not prevent remaining sinks in a
+/// `CompositeEventSink` from receiving the event. After all sinks have been
+/// processed:
+/// - If no errors occurred, [dispatch] returns normally.
+/// - If a single error occurred, that original error is rethrown directly.
+/// - If multiple errors occurred, they are thrown together in a
+///   [CompositeSinkException].
 ///
-/// `_AggregateExceptionStrategy` solves this by wrapping each sink's dispatch invocation in an
-/// individual `try/catch` block. It silently accumulates any thrown exceptions while forcing the
-/// loop to continue. Once all sinks have been processed, it evaluates the caught errors:
-/// * If no errors occurred, it returns normally.
-/// * If exactly **one** error occurred, it transparently unwraps and rethrows that original error,
-///   preventing unnecessary exception-wrapping overhead.
-/// * If **multiple** errors occurred, it packages them into a single [CompositeSinkException],
-///   allowing the caller to inspect the full breadth of the failure.
+/// Exposed via [ExceptionStrategy.aggregate].
 ///
-/// This strategy is typically accessed via the [ExceptionStrategy.aggregate] constant and
-/// injected into a [CompositeEventSink] constructor.
-///
-/// ### Example
+/// Example:
 /// ```dart
-/// final sinkA = StreamController<int>()..close(); // Closed early, throws StateError on add
-/// final sinkB = StreamController<int>();          // Will succeed
-/// final sinkC = StreamController<int>()..close(); // Closed early, throws StateError on add
+/// final sinkA = StreamController<int>()..close();
+/// final sinkB = StreamController<int>();
+/// final sinkC = StreamController<int>()..close();
 ///
 /// final composite = CompositeEventSink(
 ///   [sinkA.sink, sinkB.sink, sinkC.sink],
@@ -33,32 +26,20 @@ part of 'exception_strategy.dart';
 /// );
 ///
 /// try {
-///   // The loop will not crash on sinkA.
-///   // sinkB will successfully receive 42.
-///   // sinkC will throw, and its error will also be caught.
 ///   composite.add(42);
 /// } on CompositeSinkException catch (e) {
 ///   print('Errors caught: ${e.errors.length}'); // Prints 2
 /// }
 /// ```
 class _AggregateExceptionStrategy implements ExceptionStrategy {
-  /// Instantiates the deferred execution exception strategy.
-  ///
-  /// This constructor is typically only invoked once internally to define the
-  /// singleton [ExceptionStrategy.aggregate] constant.
+  /// Creates an aggregating exception strategy.
   const _AggregateExceptionStrategy();
 
-  /// Dispatches the given [action] across all provided [sinks], accumulating any
-  /// synchronous exceptions thrown along the way.
+  /// Invokes [action] on each sink in [sinks], collecting any synchronous
+  /// exceptions thrown during iteration.
   ///
-  /// This method iterates sequentially over the `Iterable` of [sinks]. For each [sink],
-  /// it invokes [action]. If [action] throws, the exception is caught and appended to
-  /// an internal list, and iteration continues to the next sink.
-  ///
-  /// After iteration completes, it analyzes the list of caught errors:
-  /// - 0 errors: Returns silently.
-  /// - 1 error: Throws the original exception directly.
-  /// - 2+ errors: Throws a [CompositeSinkException] containing all accumulated errors.
+  /// Rethrows the single error if only one sink failed, or throws a
+  /// [CompositeSinkException] if two or more sinks failed.
   @override
   void dispatch<T>(
     Iterable<EventSink<T>> sinks,
