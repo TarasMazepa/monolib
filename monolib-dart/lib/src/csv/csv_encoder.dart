@@ -1,23 +1,17 @@
-/// Provides [CsvEncoder], a synchronous converter for formatting Dart objects
-/// into RFC 4180 compliant CSV strings.
-library;
-
 import 'dart:convert';
 
 import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
-/// A [Converter] that formats a sequence of Dart objects into a single RFC 4180
-/// compliant CSV (Comma-Separated Values) string.
+/// A synchronous [Converter] that encodes a list of rows into an RFC 4180
+/// Comma-Separated Values (CSV) [String].
 ///
-/// Architecturally, this class powers the encoding phase of [CsvCodec]. It
-/// processes a top-level list of rows, converting each row into comma-separated
-/// cells terminated by a `\r\n` sequence.
+/// [CsvEncoder] serves as the synchronous encoder for `CsvCodec.encoder`. It
+/// formats a list of rows into comma-separated cells terminated by `\r\n`.
+/// Each row element in the input [List] must be either a [List] of cell values
+/// or an object implementing a `toCsv()` method that returns a [List].
 ///
-/// To support seamless interoperability with domain objects, [CsvEncoder] employs
-/// dynamic dispatch: if a row element within the provided [List] is not already
-/// a [List] itself, the encoder dynamically invokes a `toCsv()` method on it.
-/// This allows domain models to directly serialize themselves to CSV without
-/// intermediate mapping steps.
+/// Because it buffers the entire output string in memory, use `csvEncodeAsync`
+/// instead when streaming large datasets.
 ///
 /// Example:
 /// ```dart
@@ -29,33 +23,27 @@ import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 ///   List<dynamic> toCsv() => [id, name];
 /// }
 ///
-/// final encoder = const CsvEncoder();
+/// const encoder = CsvEncoder();
 /// final csvData = encoder.convert([
 ///   ['id', 'name'],
 ///   User(1, 'Alice'),
 ///   User(2, 'Bob, Jr.'),
 /// ]);
-///
-/// print(csvData);
-/// // id,name\r\n1,Alice\r\n2,"Bob, Jr."\r\n
+/// // Result: 'id,name\r\n1,Alice\r\n2,"Bob, Jr."\r\n'
 /// ```
 class CsvEncoder extends Converter<List<dynamic>, String> {
-  /// Constructs a [CsvEncoder] instance.
+  /// Creates a [CsvEncoder].
   const CsvEncoder();
 
-  /// Converts the provided [items] into a standard RFC 4180 CSV [String].
+  /// Synchronously encodes [items] into an RFC 4180 CSV [String].
   ///
-  /// The [items] parameter expects a sequence of rows. Each element in [items]
-  /// is evaluated:
-  /// * If it is already a [List], it is treated as a row of cells.
-  /// * If it is not a [List], this method dynamically invokes `toCsv()` on the
-  ///   object. If `toCsv()` does not return a [List], an [Exception] is thrown.
+  /// Each element in [items] is evaluated as a row:
+  /// - If it is already a [List], its elements are written as cells.
+  /// - Otherwise, `toCsv()` is dynamically invoked on the element. Throws an
+  ///   [Exception] if `toCsv()` does not return a [List].
   ///
-  /// Each cell within the resolved row is then converted to a [String] (via
-  /// string interpolation if necessary) and safely escaped using
-  /// [writeCsvCell] before appending to the final output buffer.
-  ///
-  /// Returns a complete, fully-formatted CSV string where rows are joined by `\r\n`.
+  /// Each cell is converted to a [String], escaped with [writeCsvCell], and
+  /// separated by commas, with each row terminated by `\r\n`.
   @override
   String convert(List<dynamic> items) {
     final result = StringBuffer();

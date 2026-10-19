@@ -1,27 +1,24 @@
-/// Provides asynchronous utilities for encoding batched data streams into RFC 4180 CSV format.
-library;
-
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/encode_batch_async.dart';
 import 'package:monolib_dart/src/csv/csv_encode_async.dart';
 
-/// Asynchronously encodes a stream of batches into an RFC 4180 CSV format and writes it to a sink.
+/// Asynchronously encodes a stream of [batches] into RFC 4180 CSV format and
+/// writes each row to a destination [StringSink].
 ///
-/// This function processes a stream of item [batches], encoding each item as a
-/// row in a CSV output. It is useful for handling large datasets in chunks
-/// to minimize memory usage.
+/// Delegates batch traversal and lazy sink management to [encodeBatchAsync],
+/// encoding each non-empty batch with [csvEncodeAsync]. Exactly one of [sink]
+/// or [sinkProvider] must be provided, or an [ArgumentError] is thrown.
 ///
-/// The [batches] stream provides lists of elements of type `T`. Each element
-/// is expected to be a `List` representing a row, an object that implements
-/// a `toCsv()` method returning a `List`, or a `Future` that resolves to one of
-/// those.
-///
-/// You must provide exactly one destination for the output: either an existing
-/// [sink], or a [sinkProvider] function that will be called to create a sink
-/// when the first data arrives. If [sinkProvider] is used, the created sink
-/// will be closed automatically once all batches are processed (if it implements
-/// `Sink` or `StreamSink`). If [sink] is provided, it is not closed automatically.
+/// - [batches]: The [Stream] of item batches (`List<T>`) to encode. Each item
+///   of type [T] must be a [List] representing a row, an object implementing
+///   `toCsv()` that returns a [List], or a [Future] resolving to one of those.
+/// - [sink]: An active, externally managed [StringSink]. If provided, the
+///   caller retains ownership and is responsible for closing it.
+/// - [sinkProvider]: A factory callback that lazily creates a [StringSink] when
+///   the first non-empty batch arrives (preventing empty files when [batches]
+///   yields no items). The created sink is closed automatically upon completion
+///   or error if it implements [Sink] or [StreamSink].
 ///
 /// Example:
 /// ```dart
@@ -36,10 +33,7 @@ import 'package:monolib_dart/src/csv/csv_encode_async.dart';
 ///   sink: buffer,
 /// );
 /// print(buffer.toString());
-/// // Outputs:
-/// // Name,Age
-/// // Alice,30
-/// // Bob,25
+/// // Result: 'Name,Age\r\nAlice,30\r\nBob,25\r\n'
 /// ```
 Future<void> csvEncodeBatchAsync<T>({
   required Stream<List<T>> batches,

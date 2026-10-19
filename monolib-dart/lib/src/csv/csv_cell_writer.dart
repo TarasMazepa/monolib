@@ -1,17 +1,13 @@
-/// Provides [writeCsvCell], a utility for formatting and escaping individual CSV cells.
-library;
-
-/// Writes a single [cell] of data to a [StringSink] in an RFC 4180-compatible format.
+/// Writes a single [cell] of data to [sink] in an RFC 4180-compatible CSV format.
 ///
-/// This function is used internally by encoders like [CsvEncoder] to evaluate
-/// the contents of [cell] and determine if escaping is necessary. Escaping
-/// is required if the [cell] starts with a quotation
-/// mark (`"`), or if it contains any commas (`,`) or newline characters (`\n`).
-/// Internal quotation marks do not trigger full cell escaping on their own.
+/// Escaping is applied when [cell] starts with a double quote (`"`), or when
+/// it contains a comma (`,`) or a newline character (`\n`). Internal double
+/// quotes do not trigger full-cell escaping unless one of those conditions is
+/// also met.
 ///
-/// When escaping is applied, the entire [cell] is enclosed in double quotes,
-/// and any internal double quotes are duplicated (i.e., `"` becomes `""`).
-/// If the [cell] is empty, nothing is written to the [sink].
+/// When escaped, the entire [cell] is enclosed in double quotes and any
+/// internal double quotes are doubled (`"` becomes `""`). If [cell] is empty,
+/// nothing is written to [sink].
 ///
 /// Example:
 /// ```dart
