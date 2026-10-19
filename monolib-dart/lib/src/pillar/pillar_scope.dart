@@ -68,24 +68,6 @@ class PillarScope {
     return parent?.isOrChildOf(scope) ?? false;
   }
 
-  /// Determines the more restrictive (lower-level/child) scope between [left] and [right].
-  ///
-  /// This is used internally by the framework to compute the effective scope of a
-  /// dependency tree. If an object relies on multiple dependencies from different
-  /// scopes, its effective scope becomes the lowest one encountered, ensuring it
-  /// does not outlive its shortest-lived dependency.
-  ///
-  /// If either [left] or [right] is `null`, the other is returned.
-  /// Throws an [Exception] if [left] and [right] are disconnected branches in
-  /// the hierarchy (i.e., neither is an ancestor of the other).
-  static PillarScope? chooseLowest({PillarScope? left, PillarScope? right}) {
-    if (left == null) return right;
-    if (right == null) return left;
-    if (left.isOrChildOf(right)) return left;
-    if (right.isOrChildOf(left)) return right;
-    throw Exception("Two disconnected scopes can't be combined: $left, $right");
-  }
-
   /// Compares this scope to [other] by comparing their names and parents.
   @override
   bool operator ==(Object other) =>

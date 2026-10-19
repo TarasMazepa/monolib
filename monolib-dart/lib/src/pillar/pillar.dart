@@ -21,14 +21,6 @@ typedef PillarFactory<T> = T Function(PillarAccessor);
 /// created independently of a [PillarAccessor].
 typedef PillarPureFactory<T> = T Function();
 
-/// An internal factory signature that constructs a dependency and returns the
-/// lowest [PillarScope] encountered during its resolution.
-///
-/// This ensures that cached instances do not outlive the shortest lifecycle
-/// boundary of any of their transitive dependencies.
-typedef PillarFactoryWithScopeTracking<T> = ({T value, PillarScope? scope})
-    Function();
-
 /// The dependency injection container and scope lifecycle manager.
 ///
 /// [Pillar] registers, caches, and resolves dependencies mapped by [PillarKey]

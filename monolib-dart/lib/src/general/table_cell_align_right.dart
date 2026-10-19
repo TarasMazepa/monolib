@@ -19,7 +19,7 @@ class TableCellAlignRight {
   final dynamic value;
 
   /// Creates a [TableCellAlignRight] wrapper around [value].
-  TableCellAlignRight(this.value);
+  const TableCellAlignRight(this.value);
 
   /// Returns the string representation of [value].
   @override

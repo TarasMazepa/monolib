@@ -8,8 +8,7 @@ import 'package:monolib_flutter/src/pillar/pillar_listenable_adapter.dart';
 /// [Pillar.changeNotifierFor]) to be consumed directly by Flutter widgets like
 /// `ListenableBuilder` or `AnimatedBuilder`.
 extension OnPillarListenable on PillarListenable {
-  /// Returns a [PillarListenableAdapter] that exposes this [PillarListenable]
-  /// as a Flutter [Listenable].
+  /// Returns this [PillarListenable] as a Flutter [Listenable].
   ///
   /// Example:
   /// ```dart
