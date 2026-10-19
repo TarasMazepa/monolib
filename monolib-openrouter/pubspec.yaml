@@ -1,6 +1,6 @@
 name: monolib_openrouter
 description: OpenRouter client for dart projects
-version: 0.0.2
+version: 0.1.0
 repository: https://github.com/TarasMazepa/monolib
 
 environment:
@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  monolib_dart: ^0.0.63
+  monolib_dart: ^0.1.0
 
 dev_dependencies:
   lints: ^6.0.0

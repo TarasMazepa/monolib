@@ -1,3 +1,13 @@
+## 0.1.0
+
+- Comprehensive documentation harmonization across all modules, standardizing on concise Dartdoc summaries and compilable `Example:` blocks.
+- Cleans up and refines public API surface:
+  - Unexports package-internal classes (`PillarEntry`, `ScopeEnforcingPillarAccessor`, `ScopeTrackingPillarAccessor`, `OnEmptyIterable`, `OnEmptyIterator`, `JsonStringEscapingSink`) from top-level barrel files.
+  - Privatizes internal state, configuration fields, and assertion helpers in `Batcher`, `SingleValueCachingStream`, `CsvMappedDecoder`, `CsvMappedBatchDecoder`, `JsonlCodec`, and `Jsonl*Decoder` classes.
+  - Relocates framework-internal dependency resolution logic (`chooseLowestScope`, `PillarFactoryWithScopeTracking`) out of public `PillarScope` and `Pillar` APIs into internal package helpers.
+  - Changes `AsyncJsonWritable` from `interface class` to `abstract class`.
+  - Removes unused `PillarChangeNotifierInternal`.
+
 ## 0.0.63
 
 - Updates `callWithRetryOnFailure` and `retryOnFailure` to throw `ArgumentError` when `times <= 0`.
