@@ -32,28 +32,11 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// }
 /// ```
 class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
-  /// The callback invoked to convert a decoded JSON value into an instance of [T].
-  ///
-  /// Returning `null` skips the line and excludes it from the current batch.
-  final T? Function(dynamic) fromJson;
-
-  /// The underlying [Codec] used to decode individual JSON lines.
-  ///
-  /// Defaults to [JsonCodec].
-  final Codec<Object?, String> jsonCodec;
-
-  /// Whether to suppress exceptions thrown during JSON decoding or [fromJson] mapping.
-  ///
-  /// When `true`, lines that fail to decode or map are silently skipped. When
-  /// `false` (the default), exceptions propagate to the stream.
-  final bool ignoreExceptions;
-
-  /// An optional callback invoked with each non-empty `batch` just before it is
-  /// emitted downstream.
-  final void Function(List<T> batch)? onBatch;
-
-  /// An optional callback invoked once when the input stream closes.
-  final void Function()? onDone;
+  final T? Function(dynamic) _fromJson;
+  final Codec<Object?, String> _jsonCodec;
+  final bool _ignoreExceptions;
+  final void Function(List<T> batch)? _onBatch;
+  final void Function()? _onDone;
 
   /// Creates a [JsonlMappedBatchDecoder] that maps decoded JSON lines using
   /// [fromJson] and emits them in batches.
@@ -62,24 +45,28 @@ class JsonlMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
   /// [ignoreExceptions] is `true`, invokes [onBatch] before each batch is
   /// emitted, and invokes [onDone] when the input stream completes.
   const JsonlMappedBatchDecoder(
-    this.fromJson, {
-    this.ignoreExceptions = false,
-    this.jsonCodec = const JsonCodec(),
-    this.onBatch,
-    this.onDone,
-  });
+    T? Function(dynamic) fromJson, {
+    bool ignoreExceptions = false,
+    Codec<Object?, String> jsonCodec = const JsonCodec(),
+    void Function(List<T> batch)? onBatch,
+    void Function()? onDone,
+  })  : _fromJson = fromJson,
+        _ignoreExceptions = ignoreExceptions,
+        _jsonCodec = jsonCodec,
+        _onBatch = onBatch,
+        _onDone = onDone;
 
   /// Starts a chunked conversion that parses incoming JSONL string chunks, maps
-  /// each line using [fromJson], and emits non-empty `List<T>` batches to [sink].
+  /// each line using [_fromJson], and emits non-empty `List<T>` batches to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
     return _JsonlMappedBatchDecoderSink<T>(
       sink,
-      fromJson,
-      jsonCodec,
-      ignoreExceptions: ignoreExceptions,
-      onBatch: onBatch,
-      onDone: onDone,
+      _fromJson,
+      _jsonCodec,
+      ignoreExceptions: _ignoreExceptions,
+      onBatch: _onBatch,
+      onDone: _onDone,
     );
   }
 }

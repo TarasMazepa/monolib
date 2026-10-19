@@ -27,24 +27,23 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// }
 /// ```
 class CsvMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
-  /// The callback invoked to convert a parsed CSV `row` into an instance of [T].
-  ///
-  /// Returning `null` skips the row without emitting an event.
-  final T? Function(List<String> row) mapper;
-
-  /// An optional callback invoked once when the input stream closes.
-  final void Function()? onDone;
+  final T? Function(List<String> row) _mapper;
+  final void Function()? _onDone;
 
   /// Creates a [CsvMappedDecoder] that maps parsed CSV rows using [mapper].
   ///
   /// Optionally invokes [onDone] when the input stream completes.
-  const CsvMappedDecoder(this.mapper, {this.onDone});
+  const CsvMappedDecoder(
+    T? Function(List<String> row) mapper, {
+    void Function()? onDone,
+  })  : _mapper = mapper,
+        _onDone = onDone;
 
   /// Starts a chunked conversion that parses incoming CSV string chunks, maps
-  /// each row using [mapper], and emits non-null [T] values to [sink].
+  /// each row using [_mapper], and emits non-null [T] values to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
-    return _CsvMappedDecoderSink<T>(sink, mapper, onDone: onDone);
+    return _CsvMappedDecoderSink<T>(sink, _mapper, onDone: _onDone);
   }
 }
 

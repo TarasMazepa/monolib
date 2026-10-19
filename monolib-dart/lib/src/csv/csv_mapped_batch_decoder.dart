@@ -30,34 +30,32 @@ import 'package:monolib_dart/src/csv/csv_base_chunk_sink.dart';
 /// }
 /// ```
 class CsvMappedBatchDecoder<T> extends ChunkedOnlyConverter<String, List<T>> {
-  /// The callback invoked to convert a parsed CSV `row` into an instance of [T].
-  ///
-  /// Returning `null` skips the row and excludes it from the current batch.
-  final T? Function(List<String> row) mapper;
-
-  /// An optional callback invoked with each non-empty `batch` just before it is
-  /// emitted downstream.
-  final void Function(List<T> batch)? onBatch;
-
-  /// An optional callback invoked once when the input stream closes.
-  final void Function()? onDone;
+  final T? Function(List<String> row) _mapper;
+  final void Function(List<T> batch)? _onBatch;
+  final void Function()? _onDone;
 
   /// Creates a [CsvMappedBatchDecoder] that maps parsed CSV rows using [mapper]
   /// and emits them in batches.
   ///
   /// Optionally invokes [onBatch] before each batch is emitted and [onDone]
   /// when the input stream completes.
-  const CsvMappedBatchDecoder(this.mapper, {this.onBatch, this.onDone});
+  const CsvMappedBatchDecoder(
+    T? Function(List<String> row) mapper, {
+    void Function(List<T> batch)? onBatch,
+    void Function()? onDone,
+  })  : _mapper = mapper,
+        _onBatch = onBatch,
+        _onDone = onDone;
 
   /// Starts a chunked conversion that parses incoming CSV string chunks, maps
-  /// each row using [mapper], and emits non-empty `List<T>` batches to [sink].
+  /// each row using [_mapper], and emits non-empty `List<T>` batches to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<List<T>> sink) {
     return _CsvMappedBatchDecoderSink<T>(
       sink,
-      mapper,
-      onBatch: onBatch,
-      onDone: onDone,
+      _mapper,
+      onBatch: _onBatch,
+      onDone: _onDone,
     );
   }
 }

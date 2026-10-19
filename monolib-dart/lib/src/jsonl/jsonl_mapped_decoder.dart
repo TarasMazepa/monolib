@@ -30,24 +30,10 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// }
 /// ```
 class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
-  /// The callback invoked to convert a decoded JSON value into an instance of [T].
-  ///
-  /// Returning `null` skips the line without emitting an event.
-  final T? Function(dynamic) fromJson;
-
-  /// The underlying [Codec] used to decode individual JSON lines.
-  ///
-  /// Defaults to [JsonCodec].
-  final Codec<Object?, String> jsonCodec;
-
-  /// Whether to suppress exceptions thrown during JSON decoding or [fromJson] mapping.
-  ///
-  /// When `true`, lines that fail to decode or map are silently skipped. When
-  /// `false` (the default), exceptions propagate to the stream.
-  final bool ignoreExceptions;
-
-  /// An optional callback invoked once when the input stream closes.
-  final void Function()? onDone;
+  final T? Function(dynamic) _fromJson;
+  final Codec<Object?, String> _jsonCodec;
+  final bool _ignoreExceptions;
+  final void Function()? _onDone;
 
   /// Creates a [JsonlMappedDecoder] that maps decoded JSON lines using [fromJson].
   ///
@@ -55,22 +41,25 @@ class JsonlMappedDecoder<T> extends ChunkedOnlyConverter<String, T> {
   /// [ignoreExceptions] is `true`, and invokes [onDone] when the input stream
   /// completes.
   const JsonlMappedDecoder(
-    this.fromJson, {
-    this.ignoreExceptions = false,
-    this.jsonCodec = const JsonCodec(),
-    this.onDone,
-  });
+    T? Function(dynamic) fromJson, {
+    bool ignoreExceptions = false,
+    Codec<Object?, String> jsonCodec = const JsonCodec(),
+    void Function()? onDone,
+  })  : _fromJson = fromJson,
+        _ignoreExceptions = ignoreExceptions,
+        _jsonCodec = jsonCodec,
+        _onDone = onDone;
 
   /// Starts a chunked conversion that parses incoming JSONL string chunks, maps
-  /// each line using [fromJson], and emits non-null [T] values to [sink].
+  /// each line using [_fromJson], and emits non-null [T] values to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<T> sink) {
     return _JsonlMappedDecoderSink<T>(
       sink,
-      fromJson,
-      jsonCodec,
-      ignoreExceptions: ignoreExceptions,
-      onDone: onDone,
+      _fromJson,
+      _jsonCodec,
+      ignoreExceptions: _ignoreExceptions,
+      onDone: _onDone,
     );
   }
 }

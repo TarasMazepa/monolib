@@ -29,25 +29,10 @@ import 'dart:async';
 /// await analyticsBatcher.dispose();
 /// ```
 class Batcher<T> {
-  /// The maximum number of buffered items before a batch is immediately
-  /// emitted, or `null` to disable size-based flushing.
-  final int? maxBatchSize;
-
-  /// The maximum duration to wait after the first buffered item before
-  /// emitting a batch, or `null` to disable time-based flushing.
-  final Duration? maxDuration;
-
-  /// Callback invoked sequentially with each flushed batch of items.
-  ///
-  /// A new invocation of [onBatch] will not start until the [Future] returned
-  /// by the previous invocation has completed.
-  final FutureOr<void> Function(List<T>) onBatch;
-
-  /// Whether calling [add] after [dispose] throws a [StateError].
-  ///
-  /// When `true`, calling [add] on a disposed instance throws a [StateError].
-  /// When `false`, items added after disposal are silently ignored.
-  final bool throwOnAddAfterDispose;
+  final int? _maxBatchSize;
+  final Duration? _maxDuration;
+  final FutureOr<void> Function(List<T>) _onBatch;
+  final bool _throwOnAddAfterDispose;
 
   List<T> _buffer = <T>[];
   Timer? _timer;
@@ -59,11 +44,15 @@ class Batcher<T> {
   ///
   /// If provided, [maxBatchSize] must be greater than zero.
   Batcher({
-    this.maxBatchSize,
-    this.maxDuration,
-    required this.onBatch,
-    this.throwOnAddAfterDispose = true,
-  }) : assert(maxBatchSize == null || maxBatchSize > 0);
+    int? maxBatchSize,
+    Duration? maxDuration,
+    required FutureOr<void> Function(List<T>) onBatch,
+    bool throwOnAddAfterDispose = true,
+  })  : assert(maxBatchSize == null || maxBatchSize > 0),
+        _maxBatchSize = maxBatchSize,
+        _maxDuration = maxDuration,
+        _onBatch = onBatch,
+        _throwOnAddAfterDispose = throwOnAddAfterDispose;
 
   /// Adds [item] to the current batch buffer.
   ///
@@ -75,7 +64,7 @@ class Batcher<T> {
   /// [throwOnAddAfterDispose] is `true`.
   void add(T item) {
     if (_isDisposed) {
-      if (throwOnAddAfterDispose) {
+      if (_throwOnAddAfterDispose) {
         throw StateError('Cannot add items to a disposed Batcher.');
       }
       return;
@@ -83,10 +72,10 @@ class Batcher<T> {
 
     _buffer.add(item);
 
-    if (maxBatchSize != null && _buffer.length >= maxBatchSize!) {
+    if (_maxBatchSize != null && _buffer.length >= _maxBatchSize) {
       unawaited(_emit());
-    } else if (maxDuration != null) {
-      _timer ??= Timer(maxDuration!, _emit);
+    } else if (_maxDuration != null) {
+      _timer ??= Timer(_maxDuration, _emit);
     }
   }
 
@@ -108,7 +97,7 @@ class Batcher<T> {
         if (previousTask != null) {
           await previousTask;
         }
-        await onBatch(batch);
+        await _onBatch(batch);
       } finally {
         completer.complete();
       }

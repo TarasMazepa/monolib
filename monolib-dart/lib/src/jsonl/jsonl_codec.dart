@@ -29,25 +29,22 @@ import 'package:monolib_dart/src/jsonl/jsonl_encoder.dart';
 /// // Result: [{'id': 1, 'name': 'Alice'}, {'id': 2, 'name': 'Bob'}]
 /// ```
 class JsonlCodec extends Codec<List<dynamic>, String> {
-  /// The underlying [Codec] used to encode and decode individual JSON lines.
-  ///
-  /// Defaults to [JsonCodec], or can be customized to supply custom reviver or
-  /// `toEncodable` functions.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Creates a [JsonlCodec] for encoding and decoding JSONL strings.
   ///
   /// Uses [jsonCodec] (defaulting to `const JsonCodec()`) to serialize and
   /// deserialize each individual line.
-  const JsonlCodec({this.jsonCodec = const JsonCodec()});
+  const JsonlCodec({Codec<Object?, String> jsonCodec = const JsonCodec()})
+      : _jsonCodec = jsonCodec;
 
-  /// Returns a [JsonlDecoder] configured with [jsonCodec] that parses a JSONL
+  /// Returns a [JsonlDecoder] configured with [_jsonCodec] that parses a JSONL
   /// [String] into a list of decoded JSON objects.
   @override
-  Converter<String, List<dynamic>> get decoder => JsonlDecoder(jsonCodec);
+  Converter<String, List<dynamic>> get decoder => JsonlDecoder(_jsonCodec);
 
-  /// Returns a [JsonlEncoder] configured with [jsonCodec] that converts a list
+  /// Returns a [JsonlEncoder] configured with [_jsonCodec] that converts a list
   /// of JSON-serializable objects into a JSONL [String].
   @override
-  Converter<List<dynamic>, String> get encoder => JsonlEncoder(jsonCodec);
+  Converter<List<dynamic>, String> get encoder => JsonlEncoder(_jsonCodec);
 }

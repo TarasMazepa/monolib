@@ -25,39 +25,37 @@ import 'package:monolib_dart/src/jsonl/jsonl_base_chunk_sink.dart';
 /// }
 /// ```
 class JsonlChunkedDecoder extends ChunkedOnlyConverter<String, dynamic> {
-  /// The underlying [Codec] used to decode individual JSON lines.
-  ///
-  /// Defaults to [JsonCodec], or can be customized to supply a custom decoding
-  /// strategy.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
   /// Creates a [JsonlChunkedDecoder].
   ///
   /// Uses [jsonCodec] (defaulting to `const JsonCodec()`) to decode each line.
-  const JsonlChunkedDecoder({this.jsonCodec = const JsonCodec()});
+  const JsonlChunkedDecoder(
+      {Codec<Object?, String> jsonCodec = const JsonCodec()})
+      : _jsonCodec = jsonCodec;
 
   /// Starts a chunked conversion that parses incoming JSONL string chunks and
   /// emits decoded JSON objects to [sink].
   @override
   Sink<String> startChunkedConversion(Sink<dynamic> sink) {
-    return _JsonlChunkedDecoderSink(sink, jsonCodec);
+    return _JsonlChunkedDecoderSink(sink, _jsonCodec);
   }
 }
 
 /// Internal [JsonlBaseChunkSink] implementation for [JsonlChunkedDecoder].
 class _JsonlChunkedDecoderSink extends JsonlBaseChunkSink<dynamic> {
   /// The underlying codec used to decode individual lines.
-  final Codec<Object?, String> jsonCodec;
+  final Codec<Object?, String> _jsonCodec;
 
-  /// Creates a sink that decodes lines with [jsonCodec] and forwards non-null
+  /// Creates a sink that decodes lines with [_jsonCodec] and forwards non-null
   /// results to [outSink].
-  _JsonlChunkedDecoderSink(super.outSink, this.jsonCodec);
+  _JsonlChunkedDecoderSink(super.outSink, this._jsonCodec);
 
-  /// Decodes [line] using [jsonCodec] and emits the result to [outSink] if
+  /// Decodes [line] using [_jsonCodec] and emits the result to [outSink] if
   /// non-null.
   @override
   void processLine(String line) {
-    final json = jsonCodec.decode(line);
+    final json = _jsonCodec.decode(line);
     if (json != null) {
       outSink.add(json);
     }
