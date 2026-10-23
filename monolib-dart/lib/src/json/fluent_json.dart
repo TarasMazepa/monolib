@@ -153,6 +153,9 @@ ${_describeForException()}'''),
 ${_describeForException()}''',
       );
     }
+    if ((T == double || T == _type<double?>()) && json is num) {
+      return (json as num).toDouble() as T;
+    }
     if (json is! T) {
       throw Exception(
         '''Expected json to be type $T but found ${json.runtimeType}.
@@ -174,8 +177,9 @@ ${_describeForException()}''',
   /// ```dart
   /// final String name = json.unboxed<String>('name');
   /// ```
-  T unboxed<T>(dynamic accessor) =>
-      null is! T ? this[accessor].unbox() : unboxedElementAt(accessor) as T;
+  T unboxed<T>(dynamic accessor) => null is! T
+      ? this[accessor].unbox<T>()
+      : unboxedElementAt<T>(accessor) as T;
 
   /// Safely traverses into an optional child using [accessor] and casts it to [T].
   ///
@@ -187,7 +191,7 @@ ${_describeForException()}''',
   /// ```dart
   /// final int? id = json.unboxedElementAt<int>('id');
   /// ```
-  T? unboxedElementAt<T>(dynamic accessor) => elementAt(accessor)?.unbox();
+  T? unboxedElementAt<T>(dynamic accessor) => elementAt(accessor)?.unbox<T>();
 
   /// Interprets the current structure as a JSON array and iterates over its items.
   ///
@@ -217,3 +221,5 @@ ${_describeForException()}''',
   List<T> unboxMappedList<T>(T Function(FluentJson) mapper) =>
       unboxIterable().map(mapper).toList();
 }
+
+Type _type<T>() => T;

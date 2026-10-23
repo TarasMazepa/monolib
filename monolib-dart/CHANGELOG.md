@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Converts `num` values to `double` automatically when unboxing `double` or `double?` in `FluentJson`.
+
 ## 0.1.1
 
 - Exports `JsonStringEscapingSink` to the public API.

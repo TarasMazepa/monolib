@@ -35,5 +35,24 @@ void main() {
       final json = FluentJson.root(['a', 'b', 'c']);
       expect(json.elementAt(3), isNull);
     });
+
+    test('unbox converts num to double when T is double', () {
+      final json = FluentJson.root({'score': 0, 'fractional': 12.34});
+      expect(json['score'].unbox<double>(), 0.0);
+      expect(json['fractional'].unbox<double>(), 12.34);
+      expect(json.unboxed<double>('score'), 0.0);
+      expect(json.unboxed<double>('fractional'), 12.34);
+      expect(json.unboxedElementAt<double>('score'), 0.0);
+    });
+
+    test('unbox converts num to double when T is double?', () {
+      final json = FluentJson.root({'score': 42, 'missing': null});
+      expect(json['score'].unbox<double?>(), 42.0);
+      expect(FluentJson.root(null).unbox<double?>(), isNull);
+      expect(json.unboxed<double?>('score'), 42.0);
+      expect(json.unboxed<double?>('missing'), isNull);
+      expect(json.unboxedElementAt<double?>('score'), 42.0);
+      expect(json.unboxedElementAt<double?>('missing'), isNull);
+    });
   });
 }
