@@ -16,6 +16,31 @@ class CustomWithAsyncToJson {
   dynamic toJson() => Future.value({'delayed': true});
 }
 
+class _CustomStringSink implements StringSink {
+  final List<String> writes;
+  _CustomStringSink(this.writes);
+
+  @override
+  void write(Object? object) {
+    writes.add('$object');
+  }
+
+  @override
+  void writeAll(Iterable<dynamic> objects, [String separator = '']) {
+    writes.add(objects.join(separator));
+  }
+
+  @override
+  void writeCharCode(int charCode) {
+    writes.add(String.fromCharCode(charCode));
+  }
+
+  @override
+  void writeln([Object? object = '']) {
+    writes.add('$object\n');
+  }
+}
+
 Future<String> encodeToString(dynamic object) async {
   final buffer = StringBuffer();
   await jsonEncodeAsync(object: object, sink: buffer);
@@ -114,5 +139,28 @@ void main() {
         '{"stream":[1,2,3],"nestedMap":{"futureObj":{"custom":true,"nested":"value"}}}',
       );
     });
+
+    test(
+      'flushes prior buffered writes before awaiting nested future',
+      () async {
+        final completer = Completer<int>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+        final complex = {
+          'syncKey': 'syncVal',
+          'asyncKey': completer.future,
+        };
+
+        final future = jsonEncodeAsync(object: complex, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"syncKey":"syncVal","asyncKey":');
+
+        completer.complete(42);
+        await future;
+
+        expect(writes.join(), '{"syncKey":"syncVal","asyncKey":42}');
+      },
+    );
   });
 }

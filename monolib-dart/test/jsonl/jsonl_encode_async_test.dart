@@ -7,6 +7,30 @@ class _FailingItem {
   dynamic toJson() => throw Exception('serialization error');
 }
 
+class _RecordingStringSink implements StringSink {
+  final List<String> writes = [];
+
+  @override
+  void write(Object? object) {
+    writes.add('$object');
+  }
+
+  @override
+  void writeAll(Iterable<dynamic> objects, [String separator = '']) {
+    writes.add(objects.join(separator));
+  }
+
+  @override
+  void writeCharCode(int charCode) {
+    writes.add(String.fromCharCode(charCode));
+  }
+
+  @override
+  void writeln([Object? object = '']) {
+    writes.add('$object\n');
+  }
+}
+
 void main() {
   group('jsonlEncodeAsync', () {
     test('encodes iterable of items with trailing newlines', () async {
@@ -62,5 +86,40 @@ void main() {
         expect(buffer.toString(), '\n');
       },
     );
+
+    test(
+      'flushes prior buffered writes before awaiting delayed item',
+      () async {
+        final completer = Completer<Map<String, dynamic>>();
+        final sink = _RecordingStringSink();
+        final items = [
+          {'id': 1},
+          completer.future,
+        ];
+
+        final future = jsonlEncodeAsync(items: items, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(sink.writes.join(), '{"id":1}\n');
+
+        completer.complete({'id': 2});
+        await future;
+
+        expect(sink.writes.join(), '{"id":1}\n{"id":2}\n');
+      },
+    );
+
+    test('does not invoke sinkProvider when stream yields no items', () async {
+      bool created = false;
+      await jsonlEncodeAsync(
+        items: Stream.empty(),
+        sinkProvider: () {
+          created = true;
+          return _RecordingStringSink();
+        },
+      );
+
+      expect(created, isFalse);
+    });
   });
 }
