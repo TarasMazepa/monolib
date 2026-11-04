@@ -10,7 +10,8 @@ import 'package:monolib_dart/stream.dart';
 /// bytes before the JSON body begins.
 ///
 /// Typically placed ahead of [Utf8Codec.decoder] (`utf8.decoder`) and
-/// [JsonDecoder] in an HTTP response stream pipeline.
+/// [JsonDecoder] in an HTTP response stream pipeline, or used directly via
+/// [openRouterJsonDecoder].
 ///
 /// Example:
 /// ```dart
@@ -19,6 +20,8 @@ import 'package:monolib_dart/stream.dart';
 ///       .fuse(utf8.decoder)
 ///       .fuse(json.decoder),
 /// );
+/// // Or simply:
+/// final pipeline = responseStream.transform(openRouterJsonDecoder);
 /// ```
 class DropLeadingWhitespaceConverter extends Converter<List<int>, List<int>> {
   final void Function(Object error, StackTrace stackTrace)? _onError;
