@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Adds `openRouterJsonDecoder`, fusing `DropLeadingWhitespaceConverter`, `utf8.decoder`, and `json.decoder` for OpenRouter streamed response streams.
+
 ## 0.1.0
 
 - Updates `monolib_dart` dependency constraint to `^0.1.0`.
