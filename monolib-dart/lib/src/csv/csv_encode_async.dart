@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/async_iterator_util.dart';
+import 'package:monolib_dart/src/common/buffered_string_sink.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/csv/csv_cell_writer.dart';
 
@@ -52,47 +53,81 @@ Future<void> csvEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
-      late final activeSink = getSink();
-      Future<void> writeRow(dynamic item_) async {
-        dynamic item = item_;
-        if (item is Future) {
-          item = await item;
-        }
-        if (item is! List) {
-          try {
-            item = (item as dynamic).toCsv();
-            if (item is Future) {
-              item = await item;
-            }
-          } on NoSuchMethodError {
-            // ignore
-          } catch (e) {
-            rethrow;
+      final bufferedSink = BufferedStringSink.lazy(getSink);
+
+      try {
+        FutureOr<void> writeRow(dynamic item_) {
+          dynamic item = item_;
+          if (item is Future) {
+            bufferedSink.flush();
+            return item.then((resolved) => writeRow(resolved));
           }
           if (item is! List) {
-            throw Exception(
-              'Expecting $item to be a List or have toCsv() function that returns List',
-            );
+            try {
+              item = (item as dynamic).toCsv();
+              if (item is Future) {
+                bufferedSink.flush();
+                return item.then((resolved) => writeRow(resolved));
+              }
+            } on NoSuchMethodError {
+              // ignore
+            } catch (e) {
+              rethrow;
+            }
+            if (item is! List) {
+              throw Exception(
+                'Expecting $item to be a List or have toCsv() function that returns List',
+              );
+            }
           }
+          for (int i = 0; i < item.length; i++) {
+            dynamic cell = item[i];
+            if (cell is Future) {
+              bufferedSink.flush();
+              return cell.then((resolvedCell) async {
+                final cellStr =
+                    resolvedCell is String ? resolvedCell : '$resolvedCell';
+                writeCsvCell(cellStr, bufferedSink);
+                if (i == item.length - 1) {
+                  bufferedSink.write('\r\n');
+                } else {
+                  bufferedSink.write(',');
+                }
+                for (int j = i + 1; j < item.length; j++) {
+                  dynamic nextCell = item[j];
+                  if (nextCell is Future) {
+                    bufferedSink.flush();
+                    nextCell = await nextCell;
+                  }
+                  final nextStr = nextCell is String ? nextCell : '$nextCell';
+                  writeCsvCell(nextStr, bufferedSink);
+                  if (j == item.length - 1) {
+                    bufferedSink.write('\r\n');
+                  } else {
+                    bufferedSink.write(',');
+                  }
+                }
+              });
+            }
+            final cellStr = cell is String ? cell : '$cell';
+            writeCsvCell(cellStr, bufferedSink);
+            if (i == item.length - 1) {
+              bufferedSink.write('\r\n');
+            } else {
+              bufferedSink.write(',');
+            }
+          }
+          return null;
         }
-        for (int i = 0; i < item.length; i++) {
-          dynamic cell = item[i];
-          if (cell is Future) {
-            cell = await cell;
-          }
-          if (cell is! String) {
-            cell = '$cell';
-          }
-          writeCsvCell(cell, activeSink);
-          if (i == item.length - 1) {
-            activeSink.write('\r\n');
-          } else {
-            activeSink.write(',');
-          }
-        }
-      }
 
-      await iterateStreamOrIterable(items, writeRow);
+        await iterateStreamOrIterable(
+          items,
+          writeRow,
+          onStreamItemDone: bufferedSink.flush,
+        );
+      } finally {
+        bufferedSink.flush();
+      }
     },
   );
 }

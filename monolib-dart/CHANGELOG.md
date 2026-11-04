@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Optimizes `jsonEncodeAsync`, `jsonlEncodeAsync`, and `csvEncodeAsync` by introducing internal buffered writes via `BufferedStringSink` that automatically batch synchronous elements and flush immediately prior to any asynchronous wait (`Future`, `Stream`, or `AsyncJsonWritable`).
+
 ## 0.1.2
 
 - Converts `num` values to `double` automatically when unboxing `double` or `double?` in `FluentJson`.
