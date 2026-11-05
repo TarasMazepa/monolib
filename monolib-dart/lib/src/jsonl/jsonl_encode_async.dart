@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:monolib_dart/src/common/async_iterator_util.dart';
+import 'package:monolib_dart/src/common/buffered_string_sink.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/json/json_encode_async.dart';
 
@@ -51,14 +52,26 @@ Future<void> jsonlEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
-      late final activeSink = getSink();
-      await iterateStreamOrIterable(items, (item) async {
-        try {
-          await jsonEncodeAsync(object: item, sink: activeSink);
-        } finally {
-          activeSink.writeln();
-        }
-      });
+      final bufferedSink = BufferedStringSink.lazy(getSink);
+
+      try {
+        await iterateStreamOrIterable(
+          items,
+          (item) async {
+            try {
+              if (item is Future) {
+                bufferedSink.flush();
+              }
+              await jsonEncodeAsync(object: item, sink: bufferedSink);
+            } finally {
+              bufferedSink.writeln();
+            }
+          },
+          onStreamItemDone: bufferedSink.flush,
+        );
+      } finally {
+        bufferedSink.flush();
+      }
     },
   );
 }
