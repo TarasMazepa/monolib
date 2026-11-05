@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:monolib_dart/src/common/buffered_string_sink.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/json/async_json_writable.dart';
 
@@ -46,84 +47,114 @@ Future<void> jsonEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
-      late final activeSink = getSink();
+      final activeSink = BufferedStringSink.lazy(getSink);
 
-      Future<void> encode(Object? obj) async {
-        if (obj == null) {
-          activeSink.write('null');
-        } else if (obj is num || obj is bool) {
-          activeSink.write(obj.toString());
-        } else if (obj is String) {
-          activeSink.write(jsonEncode(obj));
-        } else if (obj is Future) {
-          await encode(await obj);
-        } else if (obj is Stream) {
-          bool first = true;
-          await for (final item in obj) {
-            if (first) {
-              activeSink.write('[');
-            } else {
-              activeSink.write(',');
+      try {
+        Future<void> encode(Object? obj) async {
+          if (_writePrimitive(obj, activeSink)) {
+            return;
+          } else if (obj is Future) {
+            activeSink.flush();
+            await encode(await obj);
+          } else if (obj is Stream) {
+            bool first = true;
+            activeSink.flush();
+            await for (final item in obj) {
+              if (first) {
+                activeSink.write('[');
+              } else {
+                activeSink.write(',');
+              }
+              if (!_writePrimitive(item, activeSink)) {
+                await encode(item);
+              }
+              first = false;
+              activeSink.flush();
             }
-            await encode(item);
-            first = false;
-          }
-          if (first) activeSink.write('[');
-          activeSink.write(']');
-        } else if (obj is Iterable) {
-          bool first = true;
-          for (final item in obj) {
-            if (first) {
-              activeSink.write('[');
-            } else {
-              activeSink.write(',');
+            if (first) activeSink.write('[');
+            activeSink.write(']');
+          } else if (obj is Iterable) {
+            bool first = true;
+            for (final item in obj) {
+              if (first) {
+                activeSink.write('[');
+              } else {
+                activeSink.write(',');
+              }
+              first = false;
+              if (!_writePrimitive(item, activeSink)) {
+                await encode(item);
+              }
             }
-            await encode(item);
-            first = false;
-          }
-          if (first) activeSink.write('[');
-          activeSink.write(']');
-        } else if (obj is Map) {
-          bool first = true;
-          for (final entry in obj.entries) {
-            dynamic key = entry.key;
-            if (key is Future) {
-              key = await key;
-            }
+            if (first) activeSink.write('[');
+            activeSink.write(']');
+          } else if (obj is Map) {
+            bool first = true;
+            for (final entry in obj.entries) {
+              dynamic key = entry.key;
+              if (key is Future) {
+                activeSink.flush();
+                key = await key;
+              }
 
-            if (key is! String) {
-              // Force the standard error message for map keys
-              jsonEncode({key: null});
+              if (key is! String) {
+                // Force the standard error message for map keys
+                jsonEncode({key: null});
+              }
+              if (first) {
+                activeSink.write('{');
+              } else {
+                activeSink.write(',');
+              }
+              activeSink.write(jsonEncode(key));
+              activeSink.write(':');
+              first = false;
+
+              final value = entry.value;
+              if (!_writePrimitive(value, activeSink)) {
+                await encode(value);
+              }
             }
-            if (first) {
-              activeSink.write('{');
-            } else {
-              activeSink.write(',');
+            if (first) activeSink.write('{');
+            activeSink.write('}');
+          } else if (obj is AsyncJsonWritable) {
+            activeSink.flush();
+            await obj.writeJsonAsync(activeSink, encode);
+          } else {
+            try {
+              dynamic result = (obj as dynamic).toJson();
+              if (result is Future) {
+                activeSink.flush();
+              }
+              await encode(result);
+            } on NoSuchMethodError {
+              // Let standard jsonEncode throw its normal error
+              activeSink.write(jsonEncode(obj));
+            } catch (e) {
+              // If toJson throws something else, we rethrow it
+              rethrow;
             }
-            activeSink.write(jsonEncode(key));
-            activeSink.write(':');
-            await encode(entry.value);
-            first = false;
-          }
-          if (first) activeSink.write('{');
-          activeSink.write('}');
-        } else if (obj is AsyncJsonWritable) {
-          await obj.writeJsonAsync(activeSink, encode);
-        } else {
-          try {
-            dynamic result = (obj as dynamic).toJson();
-            await encode(result);
-          } on NoSuchMethodError {
-            // Let standard jsonEncode throw its normal error
-            activeSink.write(jsonEncode(obj));
-          } catch (e) {
-            // If toJson throws something else, we rethrow it
-            rethrow;
           }
         }
-      }
 
-      await encode(object);
+        await encode(object);
+      } finally {
+        activeSink.flush();
+      }
     },
   );
+}
+
+bool _writePrimitive(Object? value, StringSink sink) {
+  if (value == null) {
+    sink.write('null');
+    return true;
+  } else if (value is num || value is bool) {
+    sink.write(value.toString());
+    return true;
+  } else if (value is String) {
+    sink.write(jsonEncode(value));
+    return true;
+  }
+  return false;
 }

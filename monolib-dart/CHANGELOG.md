@@ -1,5 +1,6 @@
 ## 0.1.3
 
+- Optimizes `jsonEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous values, streams, or keys.
 - Optimizes `csvEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous rows, cells, or stream events.
 - Optimizes `jsonlEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous items or stream events.
 - Introduces `BufferedStringSink` to buffer writes in memory and flush in chunks or before asynchronous pauses.
