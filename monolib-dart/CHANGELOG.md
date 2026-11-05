@@ -3,7 +3,7 @@
 - Optimizes `csvEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous rows, cells, or stream events.
 - Optimizes `jsonlEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous items or stream events.
 - Introduces `BufferedStringSink` to buffer writes in memory and flush in chunks or before asynchronous pauses.
-- Enhances `iterateStreamOrIterable` to accept `FutureOr<void>` handlers and an optional `onStreamItemDone` callback.
+- Enhances `iterateStreamOrIterable` to return `FutureOr<void>` so synchronous traversals complete without allocating a `Future` or awaiting, accepting `FutureOr<void>` handlers and an optional `onStreamItemDone` callback.
 
 ## 0.1.2
 

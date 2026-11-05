@@ -5,16 +5,38 @@ import 'package:test/test.dart';
 
 void main() {
   group('iterateStreamOrIterable', () {
-    test('iterates Iterable synchronously when handler returns synchronously',
-        () async {
+    test(
+        'iterates Iterable synchronously and returns null when handler returns synchronously',
+        () {
       final processed = <int>[];
       final items = [1, 2, 3];
 
-      await iterateStreamOrIterable(items, (item) {
+      final result = iterateStreamOrIterable(items, (item) {
         processed.add(item as int);
       });
 
+      expect(result, isNull);
       expect(processed, [1, 2, 3]);
+    });
+
+    test(
+        'returns Future and awaits when handler returns Future midway through Iterable',
+        () async {
+      final processed = <int>[];
+      final items = [1, 2, 3, 4];
+
+      final result = iterateStreamOrIterable(items, (item) {
+        if (item == 2) {
+          return Future<void>.delayed(Duration(milliseconds: 1), () {
+            processed.add(item as int);
+          });
+        }
+        processed.add(item as int);
+      });
+
+      expect(result, isA<Future<void>>());
+      await result;
+      expect(processed, [1, 2, 3, 4]);
     });
 
     test('awaits Future when handler returns Future for Iterable', () async {

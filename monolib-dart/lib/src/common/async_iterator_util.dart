@@ -10,43 +10,57 @@ import 'dart:async';
 /// If [items] is a [Stream], this function uses `await for` to lazily process
 /// items as they are yielded, optionally invoking [onStreamItemDone] after each
 /// stream event is processed (e.g., to flush buffered output before awaiting
-/// the next item). If [items] is an [Iterable], it iterates synchronously while
-/// awaiting [processItem] when a [Future] is returned.
+/// the next item). If [items] is an [Iterable], it iterates synchronously and
+/// returns `null` unless [processItem] returns a [Future], in which case it
+/// awaits remaining elements asynchronously.
+///
+/// Returns a [Future] if asynchronous work was awaited (or if [items] is a
+/// [Stream]), or `null` if traversal completed entirely synchronously.
 ///
 /// Throws an [ArgumentError] if [items] is neither a [Stream] nor an [Iterable].
 ///
 /// Example:
 /// ```dart
-/// Future<void> encode(Object items, FutureOr<void> Function(dynamic) write) async {
-///   await iterateStreamOrIterable(items, (item) {
+/// FutureOr<void> encode(Object items, FutureOr<void> Function(dynamic) write) {
+///   return iterateStreamOrIterable(items, (item) {
 ///     write(item);
 ///   });
 /// }
 /// ```
-Future<void> iterateStreamOrIterable(
+FutureOr<void> iterateStreamOrIterable(
   Object items,
   FutureOr<void> Function(dynamic) processItem, {
   void Function()? onStreamItemDone,
-}) async {
+}) {
   switch (items) {
     case Stream stream:
-      await for (final item in stream) {
-        final result = processItem(item);
-        if (result is Future) {
-          await result;
+      return () async {
+        await for (final item in stream) {
+          final result = processItem(item);
+          if (result is Future) {
+            await result;
+          }
+          onStreamItemDone?.call();
         }
-        onStreamItemDone?.call();
-      }
-      break;
+      }();
 
     case Iterable iterable:
-      for (final item in iterable) {
-        final result = processItem(item);
+      final iterator = iterable.iterator;
+      while (iterator.moveNext()) {
+        final result = processItem(iterator.current);
         if (result is Future) {
-          await result;
+          return () async {
+            await result;
+            while (iterator.moveNext()) {
+              final nextResult = processItem(iterator.current);
+              if (nextResult is Future) {
+                await nextResult;
+              }
+            }
+          }();
         }
       }
-      break;
+      return null;
 
     default:
       throw ArgumentError(
