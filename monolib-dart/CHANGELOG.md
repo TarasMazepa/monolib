@@ -1,5 +1,6 @@
 ## 0.1.3
 
+- Optimizes `jsonlEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous items or stream events.
 - Introduces `BufferedStringSink` to buffer writes in memory and flush in chunks or before asynchronous pauses.
 - Enhances `iterateStreamOrIterable` to accept `FutureOr<void>` handlers and an optional `onStreamItemDone` callback.
 
