@@ -50,6 +50,7 @@ void main() {
         throwsArgumentError,
       );
     });
+
     test(
       'throws ArgumentError if both sink and sinkProvider are provided',
       () async {
@@ -94,6 +95,41 @@ void main() {
 
       expect(sink.buffer.toString(), 'a,b,c\r\n1,2,3\r\n');
       expect(sink.isClosed, isFalse);
+    });
+
+    test(
+      'flushes prior buffered writes before awaiting delayed row or cell',
+      () async {
+        final completer = Completer<List<dynamic>>();
+        final sink = _TestSink();
+        final items = [
+          ['sync1', 'sync2'],
+          completer.future,
+        ];
+
+        final future = csvEncodeAsync(items: items, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(sink.buffer.toString(), 'sync1,sync2\r\n');
+
+        completer.complete(['async1', 'async2']);
+        await future;
+
+        expect(sink.buffer.toString(), 'sync1,sync2\r\nasync1,async2\r\n');
+      },
+    );
+
+    test('does not invoke sinkProvider when stream yields no items', () async {
+      bool created = false;
+      await csvEncodeAsync(
+        items: Stream.empty(),
+        sinkProvider: () {
+          created = true;
+          return _TestSink();
+        },
+      );
+
+      expect(created, isFalse);
     });
   });
 }
