@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Enhances `iterateStreamOrIterable` to accept `FutureOr<void>` handlers and an optional `onStreamItemDone` callback.
+
 ## 0.1.2
 
 - Converts `num` values to `double` automatically when unboxing `double` or `double?` in `FluentJson`.
