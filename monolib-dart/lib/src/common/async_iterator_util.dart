@@ -13,44 +13,70 @@ import 'dart:async';
 /// the next item). If [items] is an [Iterable], it iterates synchronously while
 /// awaiting [processItem] when a [Future] is returned.
 ///
+/// Returns `null` if [items] is an [Iterable] whose elements were all processed
+/// synchronously, or a [Future] if asynchronous processing was required.
+///
 /// Throws an [ArgumentError] if [items] is neither a [Stream] nor an [Iterable].
 ///
 /// Example:
 /// ```dart
-/// Future<void> encode(Object items, FutureOr<void> Function(dynamic) write) async {
-///   await iterateStreamOrIterable(items, (item) {
+/// FutureOr<void> encode(Object items, FutureOr<void> Function(dynamic) write) {
+///   final future = iterateStreamOrIterable(items, (item) {
 ///     write(item);
 ///   });
+///   if (future != null) return future;
 /// }
 /// ```
-Future<void> iterateStreamOrIterable(
+Future<void>? iterateStreamOrIterable(
   Object items,
   FutureOr<void> Function(dynamic) processItem, {
   void Function()? onStreamItemDone,
-}) async {
+}) {
   switch (items) {
     case Stream stream:
-      await for (final item in stream) {
-        final result = processItem(item);
-        if (result is Future) {
-          await result;
-        }
-        onStreamItemDone?.call();
-      }
-      break;
+      return _iterateStream(stream, processItem, onStreamItemDone);
 
     case Iterable iterable:
-      for (final item in iterable) {
-        final result = processItem(item);
+      final iterator = iterable.iterator;
+      while (iterator.moveNext()) {
+        final result = processItem(iterator.current);
         if (result is Future) {
-          await result;
+          return _resumeIterable(iterator, result, processItem);
         }
       }
-      break;
+      return null;
 
     default:
       throw ArgumentError(
         'The "items" parameter must be an Iterable or a Stream.',
       );
+  }
+}
+
+Future<void> _iterateStream(
+  Stream stream,
+  FutureOr<void> Function(dynamic) processItem,
+  void Function()? onStreamItemDone,
+) async {
+  await for (final item in stream) {
+    final result = processItem(item);
+    if (result is Future) {
+      await result;
+    }
+    onStreamItemDone?.call();
+  }
+}
+
+Future<void> _resumeIterable(
+  Iterator iterator,
+  Future pendingFuture,
+  FutureOr<void> Function(dynamic) processItem,
+) async {
+  await pendingFuture;
+  while (iterator.moveNext()) {
+    final result = processItem(iterator.current);
+    if (result is Future) {
+      await result;
+    }
   }
 }
