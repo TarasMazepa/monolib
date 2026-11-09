@@ -56,53 +56,77 @@ Future<void> csvEncodeAsync({
       final activeSink = BufferedStringSink.lazy(getSink);
 
       try {
-        Future<void> writeRow(dynamic item_) async {
-          dynamic item = item_;
-          if (item is Future) {
-            activeSink.flush();
-            item = await item;
+        void writeCell(dynamic cell, bool isLast) {
+          final text = cell is String ? cell : '$cell';
+          writeCsvCell(text, activeSink);
+          activeSink.write(isLast ? '\r\n' : ',');
+        }
+
+        Future<void> writeRemainingCellsAsync(List row, int startIndex) async {
+          for (int i = startIndex; i < row.length; i++) {
+            dynamic cell = row[i];
+            if (cell is Future) {
+              activeSink.flush();
+              cell = await cell;
+            }
+            writeCell(cell, i == row.length - 1);
           }
-          if (item is! List) {
+        }
+
+        late final Future<void>? Function(dynamic rawRow) writeRow;
+
+        Future<void> writeRowAsync(dynamic pendingRow) async {
+          final row = await pendingRow;
+          final future = writeRow(row);
+          if (future != null) {
+            await future;
+          }
+        }
+
+        writeRow = (dynamic rawRow) {
+          if (rawRow is Future) {
+            activeSink.flush();
+            return writeRowAsync(rawRow);
+          }
+          dynamic row = rawRow;
+          if (row is! List) {
             try {
-              item = (item as dynamic).toCsv();
-              if (item is Future) {
+              row = (row as dynamic).toCsv();
+              if (row is Future) {
                 activeSink.flush();
-                item = await item;
+                return writeRowAsync(row);
               }
             } on NoSuchMethodError {
               // ignore
             } catch (e) {
               rethrow;
             }
-            if (item is! List) {
+            if (row is! List) {
               throw Exception(
-                'Expecting $item to be a List or have toCsv() function that returns List',
+                'Expecting $rawRow to be a List or have toCsv() function that returns List',
               );
             }
           }
-          for (int i = 0; i < item.length; i++) {
-            dynamic cell = item[i];
+          for (int i = 0; i < row.length; i++) {
+            dynamic cell = row[i];
             if (cell is Future) {
               activeSink.flush();
-              cell = await cell;
+              return writeRemainingCellsAsync(row, i);
             }
-            if (cell is! String) {
-              cell = '$cell';
-            }
-            writeCsvCell(cell, activeSink);
-            if (i == item.length - 1) {
-              activeSink.write('\r\n');
-            } else {
-              activeSink.write(',');
-            }
+            writeCell(cell, i == row.length - 1);
           }
-        }
+          return null;
+        };
 
-        await iterateStreamOrIterable(
+        final future = iterateStreamOrIterable(
           items,
           writeRow,
           onStreamItemDone: activeSink.flush,
         );
+        if (future != null) {
+          activeSink.flush();
+          await future;
+        }
       } finally {
         activeSink.flush();
       }

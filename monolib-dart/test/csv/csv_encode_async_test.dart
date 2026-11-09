@@ -119,6 +119,48 @@ void main() {
       },
     );
 
+    test(
+      'flushes prior buffered writes before awaiting cell future midway through row',
+      () async {
+        final completer = Completer<String>();
+        final sink = _TestSink();
+        final items = [
+          ['a', completer.future, 'c'],
+        ];
+
+        final future = csvEncodeAsync(items: items, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(sink.buffer.toString(), 'a,');
+
+        completer.complete('b');
+        await future;
+
+        expect(sink.buffer.toString(), 'a,b,c\r\n');
+      },
+    );
+
+    test('flushes prior buffered writes between stream events', () async {
+      final controller = StreamController<List<dynamic>>();
+      final sink = _TestSink();
+
+      final future = csvEncodeAsync(items: controller.stream, sink: sink);
+
+      controller.add(['row1_col1', 'row1_col2']);
+      await Future<void>.delayed(Duration.zero);
+      expect(sink.buffer.toString(), 'row1_col1,row1_col2\r\n');
+
+      controller.add(['row2_col1', 'row2_col2']);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        sink.buffer.toString(),
+        'row1_col1,row1_col2\r\nrow2_col1,row2_col2\r\n',
+      );
+
+      controller.close();
+      await future;
+    });
+
     test('does not invoke sinkProvider when stream yields no items', () async {
       bool created = false;
       await csvEncodeAsync(
