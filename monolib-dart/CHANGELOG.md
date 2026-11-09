@@ -1,5 +1,6 @@
 ## 0.1.3
 
+- Enhances `iterateStreamOrIterable` to return a nullable `Future<void>?`, allowing synchronous collections to complete without allocating a `Future` or yielding to the event loop.
 - Optimizes `csvEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous rows, cells, or stream events.
 - Optimizes `jsonlEncodeAsync` by batching writes with `BufferedStringSink` and flushing before awaiting asynchronous items or stream events.
 - Introduces `BufferedStringSink` to buffer writes in memory and flush in chunks or before asynchronous pauses.
