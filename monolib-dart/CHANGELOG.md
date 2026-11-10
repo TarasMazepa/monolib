@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Optimizes `jsonEncodeAsync` to encode synchronous primitives, iterables, and maps without awaiting or allocating Futures, while batching writes with `BufferedStringSink` and flushing before awaiting asynchronous values, streams, keys, or `toJson` results.
+
 ## 0.1.3
 
 - Introduces `JsonMappedConverter` to extract target fields or objects from decoded JSON using `FluentJson` and support stream pipeline fusing.
