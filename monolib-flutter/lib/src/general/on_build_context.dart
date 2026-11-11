@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Extension on [BuildContext] that provides convenient access to the nearest
 /// [ThemeData] in the widget tree.
