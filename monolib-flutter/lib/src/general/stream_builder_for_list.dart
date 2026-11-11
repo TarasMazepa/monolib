@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A [StatelessWidget] that wraps [StreamBuilder] with dedicated builder
 /// callbacks for loading, error, empty, and populated [List] states.
