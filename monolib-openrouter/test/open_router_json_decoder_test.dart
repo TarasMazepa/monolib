@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:monolib_dart/fluent_json.dart';
 import 'package:monolib_openrouter/monolib_openrouter.dart';
 import 'package:test/test.dart';
 
@@ -126,6 +127,27 @@ void main() {
         stream.transform(openRouterJsonDecoder).toList(),
         throwsA(isA<FormatException>()),
       );
+    });
+
+    test('fuses with JsonMappedConverter to extract fields directly', () async {
+      final stream = Stream<List<int>>.fromIterable([
+        utf8.encode(
+            '  \r\n {"choices":[{"message":{"content":"hello from openrouter"}}]}'),
+      ]);
+
+      final pipeline = openRouterJsonDecoder.fuse(
+        JsonMappedConverter<String>(
+          (json) => json
+              .assertNoTopLevelError()['choices']
+              .unboxIterable()
+              .first['message']
+              .unboxed<String>('content'),
+        ),
+      );
+
+      final result = await stream.transform(pipeline).toList();
+
+      expect(result, equals(['hello from openrouter']));
     });
   });
 }

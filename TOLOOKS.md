@@ -1,6 +1,6 @@
 # ToLooks
 
-- [ ] **1. Generic JSON Selector Converter for Streaming Pipelines (`JsonMappedConverter`)**
+- [x] **1. Generic JSON Selector Converter for Streaming Pipelines (`JsonMappedConverter`)**
   - **Idea**: Introduce a generic `Converter<dynamic, T>` (e.g. `JsonMappedConverter<T>` / `FluentJsonMappedConverter<T>`) in `monolib-dart` (`package:monolib_dart/fluent_json.dart`) that extracts a target domain object or field using `FluentJson` and implements chunked conversion so it can be fused directly into streaming pipelines with `.fuse()`.
   - **Context**: In streaming pipelines (e.g. Hivebud's OpenRouter-to-JSONL converter), input byte streams are decoded from JSON and need specific fields extracted (such as `choices[0].message.content`) before being forwarded into downstream chunked decoders (such as `CsvMappedBatchDecoder`). Currently, extracting fields requires breaking the stream into multiple `.transform()` / `.map()` calls or implementing ad-hoc converters (like `OpenRouterContentConverter`). A generic selector converter enables fusing `json.decoder` (or `openRouterJsonDecoder`) directly into downstream chunked decoders.
   - **Investigation**:
@@ -28,3 +28,4 @@
        ```
     3. *Placement & Export*:
        Add to `monolib-dart/lib/src/json/json_mapped_converter.dart` and export via `package:monolib_dart/fluent_json.dart`.
+  - **Resolution**: Implemented `JsonMappedConverter<T>` in `monolib-dart/lib/src/json/json_mapped_converter.dart` and exported it from `package:monolib_dart/fluent_json.dart`. Added chunked conversion support with optional `onDone` callback, enabling seamless `.fuse()` pipelines between JSON decoders (`json.decoder`, `openRouterJsonDecoder`) and downstream decoders (`CsvMappedDecoder`, `CsvMappedBatchDecoder`).
