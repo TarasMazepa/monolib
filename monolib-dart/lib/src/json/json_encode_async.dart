@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:monolib_dart/src/common/buffered_string_sink.dart';
 import 'package:monolib_dart/src/common/with_lazy_string_sink.dart';
 import 'package:monolib_dart/src/json/async_json_writable.dart';
 
@@ -46,84 +47,214 @@ Future<void> jsonEncodeAsync({
     sink: sink,
     sinkProvider: sinkProvider,
     action: (getSink) async {
-      late final activeSink = getSink();
+      final activeSink = BufferedStringSink.lazy(getSink);
 
-      Future<void> encode(Object? obj) async {
-        if (obj == null) {
-          activeSink.write('null');
-        } else if (obj is num || obj is bool) {
-          activeSink.write(obj.toString());
-        } else if (obj is String) {
-          activeSink.write(jsonEncode(obj));
-        } else if (obj is Future) {
-          await encode(await obj);
-        } else if (obj is Stream) {
-          bool first = true;
-          await for (final item in obj) {
-            if (first) {
-              activeSink.write('[');
-            } else {
-              activeSink.write(',');
-            }
-            await encode(item);
-            first = false;
-          }
-          if (first) activeSink.write('[');
-          activeSink.write(']');
-        } else if (obj is Iterable) {
-          bool first = true;
-          for (final item in obj) {
-            if (first) {
-              activeSink.write('[');
-            } else {
-              activeSink.write(',');
-            }
-            await encode(item);
-            first = false;
-          }
-          if (first) activeSink.write('[');
-          activeSink.write(']');
-        } else if (obj is Map) {
-          bool first = true;
-          for (final entry in obj.entries) {
-            dynamic key = entry.key;
-            if (key is Future) {
-              key = await key;
-            }
+      try {
+        late final Future<void>? Function(Object? obj) encode;
 
-            if (key is! String) {
-              // Force the standard error message for map keys
-              jsonEncode({key: null});
-            }
-            if (first) {
-              activeSink.write('{');
-            } else {
-              activeSink.write(',');
-            }
-            activeSink.write(jsonEncode(key));
-            activeSink.write(':');
-            await encode(entry.value);
-            first = false;
-          }
-          if (first) activeSink.write('{');
-          activeSink.write('}');
-        } else if (obj is AsyncJsonWritable) {
-          await obj.writeJsonAsync(activeSink, encode);
-        } else {
-          try {
-            dynamic result = (obj as dynamic).toJson();
-            await encode(result);
-          } on NoSuchMethodError {
-            // Let standard jsonEncode throw its normal error
-            activeSink.write(jsonEncode(obj));
-          } catch (e) {
-            // If toJson throws something else, we rethrow it
-            rethrow;
+        Future<void> encodeFutureAsync(Future pendingFuture) async {
+          final resolved = await pendingFuture;
+          final future = encode(resolved);
+          if (future != null) {
+            activeSink.flush();
+            await future;
           }
         }
-      }
 
-      await encode(object);
+        Future<void> encodeStreamAsync(Stream stream) async {
+          bool first = true;
+          await for (final item in stream) {
+            if (first) {
+              activeSink.write('[');
+              first = false;
+            } else {
+              activeSink.write(',');
+            }
+            if (!_writePrimitive(item, activeSink)) {
+              final future = encode(item);
+              if (future != null) {
+                activeSink.flush();
+                await future;
+              }
+            }
+            activeSink.flush();
+          }
+          if (first) activeSink.write('[');
+          activeSink.write(']');
+        }
+
+        Future<void> resumeIterableAsync(
+          Iterator iterator,
+          Future<void> pendingFuture,
+        ) async {
+          activeSink.flush();
+          await pendingFuture;
+          while (iterator.moveNext()) {
+            activeSink.write(',');
+            final item = iterator.current;
+            if (!_writePrimitive(item, activeSink)) {
+              final future = encode(item);
+              if (future != null) {
+                activeSink.flush();
+                await future;
+              }
+            }
+          }
+          activeSink.write(']');
+        }
+
+        Future<void> resumeMapFromValueAsync(
+          Iterator<MapEntry> iterator, [
+          Future<void>? pendingValueFuture,
+        ]) async {
+          if (pendingValueFuture != null) {
+            activeSink.flush();
+            await pendingValueFuture;
+          }
+          while (iterator.moveNext()) {
+            dynamic key = iterator.current.key;
+            if (key is Future) {
+              activeSink.flush();
+              key = await key;
+            }
+            if (key is! String) {
+              jsonEncode({key: null});
+            }
+            activeSink.write(',');
+            activeSink.write(jsonEncode(key));
+            activeSink.write(':');
+            final value = iterator.current.value;
+            if (!_writePrimitive(value, activeSink)) {
+              final future = encode(value);
+              if (future != null) {
+                activeSink.flush();
+                await future;
+              }
+            }
+          }
+          activeSink.write('}');
+        }
+
+        Future<void> resumeMapFromKeyAsync(
+          Iterator<MapEntry> iterator,
+          Future pendingKey,
+          dynamic value,
+        ) async {
+          dynamic key = await pendingKey;
+          if (key is! String) {
+            jsonEncode({key: null});
+          }
+          activeSink.write(jsonEncode(key));
+          activeSink.write(':');
+          final future = encode(value);
+          await resumeMapFromValueAsync(iterator, future);
+        }
+
+        encode = (Object? obj) {
+          if (_writePrimitive(obj, activeSink)) {
+            return null;
+          } else if (obj is Future) {
+            activeSink.flush();
+            return encodeFutureAsync(obj);
+          } else if (obj is Stream) {
+            activeSink.flush();
+            return encodeStreamAsync(obj);
+          } else if (obj is Iterable) {
+            bool first = true;
+            final iterator = obj.iterator;
+            while (iterator.moveNext()) {
+              activeSink.write(first ? '[' : ',');
+              first = false;
+              final item = iterator.current;
+              if (!_writePrimitive(item, activeSink)) {
+                final future = encode(item);
+                if (future != null) {
+                  return resumeIterableAsync(iterator, future);
+                }
+              }
+            }
+            if (first) activeSink.write('[');
+            activeSink.write(']');
+            return null;
+          } else if (obj is Map) {
+            bool first = true;
+            final iterator = obj.entries.iterator;
+            while (iterator.moveNext()) {
+              activeSink.write(first ? '{' : ',');
+              first = false;
+              dynamic key = iterator.current.key;
+              if (key is Future) {
+                activeSink.flush();
+                return resumeMapFromKeyAsync(
+                  iterator,
+                  key,
+                  iterator.current.value,
+                );
+              }
+              if (key is! String) {
+                jsonEncode({key: null});
+              }
+              activeSink.write(jsonEncode(key));
+              activeSink.write(':');
+              final value = iterator.current.value;
+              if (!_writePrimitive(value, activeSink)) {
+                final future = encode(value);
+                if (future != null) {
+                  return resumeMapFromValueAsync(iterator, future);
+                }
+              }
+            }
+            if (first) activeSink.write('{');
+            activeSink.write('}');
+            return null;
+          } else if (obj is AsyncJsonWritable) {
+            activeSink.flush();
+            return obj.writeJsonAsync(activeSink, (child) async {
+              final future = encode(child);
+              if (future != null) {
+                activeSink.flush();
+                await future;
+              }
+            });
+          } else {
+            try {
+              dynamic result = (obj as dynamic).toJson();
+              if (result is Future) {
+                activeSink.flush();
+                return encodeFutureAsync(result);
+              }
+              return encode(result);
+            } on NoSuchMethodError {
+              activeSink.write(jsonEncode(obj));
+              return null;
+            } catch (e) {
+              rethrow;
+            }
+          }
+        };
+
+        final future = encode(object);
+        if (future != null) {
+          activeSink.flush();
+          await future;
+        }
+      } finally {
+        activeSink.flush();
+      }
     },
   );
+}
+
+bool _writePrimitive(Object? value, StringSink sink) {
+  if (value == null) {
+    sink.write('null');
+    return true;
+  } else if (value is num || value is bool) {
+    sink.write(value.toString());
+    return true;
+  } else if (value is String) {
+    sink.write(jsonEncode(value));
+    return true;
+  }
+  return false;
 }

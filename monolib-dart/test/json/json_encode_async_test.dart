@@ -16,6 +16,37 @@ class CustomWithAsyncToJson {
   dynamic toJson() => Future.value({'delayed': true});
 }
 
+class _CustomDelayedToJson {
+  final Future<dynamic> future;
+  _CustomDelayedToJson(this.future);
+  dynamic toJson() => future;
+}
+
+class _CustomStringSink implements StringSink {
+  final List<String> writes;
+  _CustomStringSink(this.writes);
+
+  @override
+  void write(Object? object) {
+    writes.add('$object');
+  }
+
+  @override
+  void writeAll(Iterable<dynamic> objects, [String separator = '']) {
+    writes.add(objects.join(separator));
+  }
+
+  @override
+  void writeCharCode(int charCode) {
+    writes.add(String.fromCharCode(charCode));
+  }
+
+  @override
+  void writeln([Object? object = '']) {
+    writes.add('$object\n');
+  }
+}
+
 Future<String> encodeToString(dynamic object) async {
   final buffer = StringBuffer();
   await jsonEncodeAsync(object: object, sink: buffer);
@@ -114,5 +145,158 @@ void main() {
         '{"stream":[1,2,3],"nestedMap":{"futureObj":{"custom":true,"nested":"value"}}}',
       );
     });
+
+    test(
+      'flushes prior buffered writes before awaiting nested future',
+      () async {
+        final completer = Completer<int>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+        final complex = {
+          'syncKey': 'syncVal',
+          'asyncKey': completer.future,
+        };
+
+        final future = jsonEncodeAsync(object: complex, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"syncKey":"syncVal","asyncKey":');
+
+        completer.complete(42);
+        await future;
+
+        expect(writes.join(), '{"syncKey":"syncVal","asyncKey":42}');
+      },
+    );
+
+    test(
+      'flushes prior buffered writes before awaiting next stream item',
+      () async {
+        final controller = StreamController<int>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+
+        final future = jsonEncodeAsync(object: controller.stream, sink: sink);
+
+        controller.add(1);
+        await Future<void>.delayed(Duration.zero);
+        expect(writes.join(), '[1');
+
+        controller.add(2);
+        await Future<void>.delayed(Duration.zero);
+        expect(writes.join(), '[1,2');
+
+        controller.close();
+        await future;
+        expect(writes.join(), '[1,2]');
+      },
+    );
+
+    test(
+      'flushes prior buffered writes before awaiting future map key',
+      () async {
+        final completer = Completer<String>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+        final complex = {
+          'syncKey': 'syncVal',
+          completer.future: 100,
+        };
+
+        final future = jsonEncodeAsync(object: complex, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"syncKey":"syncVal",');
+
+        completer.complete('asyncKey');
+        await future;
+
+        expect(writes.join(), '{"syncKey":"syncVal","asyncKey":100}');
+      },
+    );
+
+    test(
+      'flushes prior buffered writes before awaiting async toJson',
+      () async {
+        final completer = Completer<Map<String, dynamic>>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+
+        final complex = {
+          'syncKey': 'syncVal',
+          'lazy': _CustomDelayedToJson(completer.future),
+        };
+
+        final future = jsonEncodeAsync(object: complex, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"syncKey":"syncVal","lazy":');
+
+        completer.complete({'inner': 'value'});
+        await future;
+
+        expect(
+          writes.join(),
+          '{"syncKey":"syncVal","lazy":{"inner":"value"}}',
+        );
+      },
+    );
+
+    test(
+      'flushes prior buffered writes before awaiting future iterable elements',
+      () async {
+        final completer1 = Completer<int>();
+        final completer2 = Completer<int>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+
+        final list = [1, completer1.future, completer2.future, 4];
+        final future = jsonEncodeAsync(object: list, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '[1,');
+
+        completer1.complete(2);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '[1,2,');
+
+        completer2.complete(3);
+        await future;
+
+        expect(writes.join(), '[1,2,3,4]');
+      },
+    );
+
+    test(
+      'flushes prior buffered writes before awaiting future map values',
+      () async {
+        final completer1 = Completer<int>();
+        final completer2 = Completer<int>();
+        final writes = <String>[];
+        final sink = _CustomStringSink(writes);
+
+        final map = {
+          'a': 1,
+          'b': completer1.future,
+          'c': completer2.future,
+          'd': 4,
+        };
+        final future = jsonEncodeAsync(object: map, sink: sink);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"a":1,"b":');
+
+        completer1.complete(2);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(writes.join(), '{"a":1,"b":2,"c":');
+
+        completer2.complete(3);
+        await future;
+
+        expect(writes.join(), '{"a":1,"b":2,"c":3,"d":4}');
+      },
+    );
   });
 }
