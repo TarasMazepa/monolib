@@ -5,6 +5,7 @@ export 'src/stream/composite_event_sink.dart';
 export 'src/stream/composite_event_sink/composite_sink_exception.dart';
 export 'src/stream/composite_event_sink/exception_strategy.dart';
 export 'src/stream/future_event_sink_extension.dart';
+export 'src/stream/line_splitter_batch_converter.dart';
 export 'src/stream/line_splitter_converter.dart';
 export 'src/stream/map_not_null_stream_extension.dart';
 export 'src/stream/on_event_sink.dart';

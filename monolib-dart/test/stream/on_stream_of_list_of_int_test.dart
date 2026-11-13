@@ -39,5 +39,35 @@ void main() {
       final stream = Stream<List<int>>.empty();
       expect(() => stream.readLine(), throwsStateError);
     });
+
+    test('utf8DecodeAndLineSplitBatch emits lines in per-chunk batches',
+        () async {
+      final stream = Stream.fromIterable([
+        utf8.encode('line 1\nline 2\n'),
+        utf8.encode('line 3\n'),
+      ]);
+      final result = await stream.utf8DecodeAndLineSplitBatch().toList();
+      expect(result, [
+        ['line 1', 'line 2'],
+        ['line 3'],
+      ]);
+    });
+
+    test('utf8DecodeAndLineSplitMappedBatch maps lines into domain objects',
+        () async {
+      final stream = Stream.fromIterable([
+        utf8.encode('1\n# skip\n2\n'),
+        utf8.encode('3\n'),
+      ]);
+      final result = await stream
+          .utf8DecodeAndLineSplitMappedBatch<int>(
+            (line) => line.startsWith('#') ? null : int.tryParse(line),
+          )
+          .toList();
+      expect(result, [
+        [1, 2],
+        [3],
+      ]);
+    });
   });
 }
