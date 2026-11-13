@@ -1,5 +1,8 @@
-## 0.1.3
+## 0.1.4
 
+- Introduces `LineSplitterBatchConverter` (with aliases `LineSplitterBatchDecoder` and `LineSplitterMappedBatchDecoder`) and `OnStreamOfListOfInt.utf8DecodeAndLineSplitBatch` / `utf8DecodeAndLineSplitMappedBatch` extensions for batch-emitting line splitting.
+
+## 0.1.3
 - Introduces `JsonMappedConverter` to extract target fields or objects from decoded JSON using `FluentJson` and support stream pipeline fusing.
 - Enhances `iterateStreamOrIterable` to return a nullable `Future<void>?`, allowing synchronous collections to complete without allocating a `Future` or yielding to the event loop.
 - Optimizes `csvEncodeAsync` to write synchronous rows without awaiting or allocating Futures, while batching writes with `BufferedStringSink` and flushing before awaiting asynchronous rows, cells, or stream events.
