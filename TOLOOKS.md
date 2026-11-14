@@ -60,3 +60,11 @@
     2. *Benchmark & Quantify*: Build benchmark suites comparing allocation counts, microtask queue depth, and throughput for purely synchronous collections, fully asynchronous streams, and mixed async payloads across all encoders.
     3. *Buffer Pooling & Sizing*: Investigate buffer reuse or adaptive sizing in `BufferedStringSink` to reduce heap allocations during multi-megabyte stream serialization.
     4. *Direct Byte Sink Integration*: Explore direct encoding into `ChunkedConversionSink<List<int>>` or `Utf8StreamStringSink` to avoid intermediate UTF-16 string allocations.
+
+- [ ] **3. Convert Stale PRs (>3 Months) Using `pr-to-tolook` Skill**
+  - **Idea**: Review and convert open pull requests older than 3 months into structured ToLooks in `TOLOOKS.md` using the `pr-to-tolook` skill, then cleanly close the stale PRs after confirmation.
+  - **Context**: As of 2026-11-14, 2 open PRs in `monolib` have been hanging for more than 3 months (created before 2026-08-14), adding noise to health audits and accumulating merge drift.
+  - **Investigation**:
+    - [ ] [#89](https://github.com/TarasMazepa/monolib/pull/89) [2026-07-23] *Feature/rich text* — inspect diff/comments, distill into a ToLook entry in `TOLOOKS.md`, and close PR once captured.
+    - [ ] [#73](https://github.com/TarasMazepa/monolib/pull/73) [2026-04-20] *feat: Add Custom Rich Text Prototype* — inspect diff/comments, distill into a ToLook entry in `TOLOOKS.md`, and close PR once captured.
+
