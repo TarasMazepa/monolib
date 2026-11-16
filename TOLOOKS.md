@@ -68,3 +68,16 @@
     - [ ] [#89](https://github.com/TarasMazepa/monolib/pull/89) [2026-07-23] *Feature/rich text* — inspect diff/comments, distill into a ToLook entry in `TOLOOKS.md`, and close PR once captured.
     - [ ] [#73](https://github.com/TarasMazepa/monolib/pull/73) [2026-04-20] *feat: Add Custom Rich Text Prototype* — inspect diff/comments, distill into a ToLook entry in `TOLOOKS.md`, and close PR once captured.
 
+- [ ] **4. Migrate Non-Kebab-Case Markdown Files to `kebab-case`**
+  - **Idea**: Rename remaining uppercase/underscore markdown files to pure `kebab-case` per `agents.md` and update any internal or workflow references to them.
+  - **Context**: `repository-seed` standardized markdown naming to pure `kebab-case` (`agents.md`, `readme.md`, `tolooks.md`, `more-agents.md`).
+  - **Investigation**:
+    - [ ] Rename `MORE-AGENTS.md` → `more-agents.md` and update references
+    - [ ] Rename `README.md` → `readme.md` and update references
+    - [ ] Rename `TOLOOKS.md` → `tolooks.md` and update references
+    - [ ] Rename `monolib-dart/CHANGELOG.md` → `monolib-dart/changelog.md` and update references
+    - [ ] Rename `monolib-dart/README.md` → `monolib-dart/readme.md` and update references
+    - [ ] Rename `monolib-flutter/CHANGELOG.md` → `monolib-flutter/changelog.md` and update references
+    - [ ] Rename `monolib-flutter/README.md` → `monolib-flutter/readme.md` and update references
+    - [ ] Rename `monolib-openrouter/CHANGELOG.md` → `monolib-openrouter/changelog.md` and update references
+    - [ ] Rename `monolib-openrouter/README.md` → `monolib-openrouter/readme.md` and update references
