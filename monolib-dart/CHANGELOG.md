@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Adds `CausalException` (and `CausalException.throwNew`) for wrapping an error with a `message` and optional `cause`, `causeStackTrace`, and `suppressed` errors list.
+
 ## 0.1.3
 
 - Introduces `JsonMappedConverter` to extract target fields or objects from decoded JSON using `FluentJson` and support stream pipeline fusing.

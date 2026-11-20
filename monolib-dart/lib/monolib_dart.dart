@@ -2,6 +2,7 @@
 library;
 
 export 'src/general/batcher.dart';
+export 'src/general/causal_exception.dart';
 export 'src/general/dense_table.dart';
 export 'src/general/float64_table.dart';
 export 'src/general/int32_table.dart';
