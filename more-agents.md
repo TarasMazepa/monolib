@@ -1,5 +1,6 @@
 # Agents
 
+- Pub package files (`README.md`, `CHANGELOG.md`, `LICENSE`) keep pub's uppercase names; they are an exception to the `kebab-case` rule because `dart pub publish --dry-run` warns and exits non-zero on lowercase names (see [looked-at.md](looked-at.md)).
 - This is library in incubation period. It can break APIs, wildly change them, rename things. There should not be a restrain for progress.
 - **When instructed to 'prepare a release', you must strictly execute the following steps:**
   1. **Bump the Version:** Increment the hotfix version number in the `pubspec.yaml` of the target package, unless a minor or major bump is explicitly requested.
